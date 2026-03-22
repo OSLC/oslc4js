@@ -40,7 +40,7 @@ style: |
 
 ## Making Domain Knowledge Accessible with OSLC and AI
 
-A platform for creating, connecting, and consuming standard domain models
+A platform for defining, instantiating, and activating standard domain models
 
 ---
 
@@ -77,6 +77,55 @@ The people who **can build ontologies** don't have the domain expertise.
 
 <!-- _class: lead -->
 
+# The Semantic Value Chain
+
+## Define — Instantiate — Activate
+
+---
+
+# Three Layers of Shared Meaning
+
+To make domain knowledge actionable across an enterprise, three layers must work together:
+
+| Layer | Question it answers | Character |
+|---|---|---|
+| **1. Define** | What kinds of things exist? What properties and relationships do they have? | Schema / vocabulary governance |
+| **2. Instantiate** | What are the actual artifacts — requirements, services, processes — their content, links, and governance state? | Instance creation and management |
+| **3. Activate** | What decisions, compliance evidence, analyses, and actions can we derive from the governed data? | Value delivery and outcomes |
+
+This maps onto the classic *schema / instance / use* distinction from information architecture — applied to the OSLC linked data ecosystem.
+
+---
+
+# Where Deployments Fail
+
+Most OSLC deployments invest heavily in Layer 2 (tools, adapters, data migration) without adequate investment in the other layers:
+
+- **Without Layer 1** (Define) — Layer 2 produces a connected but *semantically incoherent* graph. Links exist but mean different things in different tools.
+
+- **Without Layer 2 governance** (versioning, configuration management) — Layer 3 can't answer versioned questions. All you get is a snapshot of today's state.
+
+- **Without Layer 3** (Activate) — Layers 1 and 2 produce a beautifully governed but *unused* knowledge graph. The classic ontology project failure mode.
+
+> The three barriers that follow are concrete manifestations of gaps in these layers.
+
+---
+
+# How oslc4js Addresses Each Layer
+
+**Layer 1 — Define:** Declarative vocabularies and OSLC ResourceShapes formalize domain knowledge as REST API contracts. Vocabulary governance tools (e.g., TopBraid EDG) manage the ontology lifecycle.
+
+**Layer 2 — Instantiate:** The OSLC server hosts governed instances. AI via MCP acts as a first-class participant — creating, linking, and validating resources directly. Configuration management (GCM) adds the temporal dimension.
+
+**Layer 3 — Activate:** Three mechanisms deliver value:
+- *Analytical* — SPARQL/LQE queries for traceability, compliance, coverage
+- *Agentic* — MCP endpoint lets AI reason over live data and propose actions
+- *Operational* — Tool integrations surface linked data inline in native environments
+
+---
+
+<!-- _class: lead -->
+
 # Barrier 1
 
 ## "Creating ontology-based models is too hard"
@@ -99,7 +148,7 @@ This requires a **rare combination** of ontology expertise + full-stack developm
 
 # MRM: The Challenge
 
-MISA defined **8 resource types** for municipal service management:
+MISA defined **8 primary resource types** for municipal service management:
 
 | | | |
 |---|---|---|
@@ -107,7 +156,7 @@ MISA defined **8 resource types** for municipal service management:
 | Resource | Outcome | OrganizationUnit |
 | TargetGroup | Need | |
 
-Rich relationships between them. But building a **tool** to manage them? That was a separate, expensive project.
+with rich relationships between them. But building a **tool** to manage them? That was a separate, expensive project.
 
 ---
 
@@ -121,7 +170,7 @@ You provide **three declarative artifacts**:
 2. **Resource Shapes** (Turtle) — constraints on each type
    Properties, cardinalities, value types, allowed values
 
-3. **Catalog Template** (Turtle) — the services you want
+3. **Catalog Template** (Turtle) — the services you want, e.g., 
    Creation factories, query capabilities, dialogs
 
 **oslc4js provides the rest.**
@@ -131,32 +180,33 @@ You provide **three declarative artifacts**:
 # What You Get Automatically
 
 - **REST API** — OSLC 3.0 compliant CRUD + query
-- **Query translation** — OSLC query syntax translated to SPARQL behind the scenes
+- **Query services** — A full implementation of OSLC with optional storage-service specific endponts such as SPARQL
 - **Creation dialogs** — generated from resource shapes
-- **Compact preview** — for resource linking across tools
+- **Selection dialogs** — for selecting resource across tools for link creation
+- **Compact preview** — for viewing resources across tools
 - **Bulk import** — load existing RDF datasets
-- **Pluggable storage** — Jena/Fuseki, filesystem, MongoDB — or implement the simple StorageService interface on your existing tools and repositories
+- **Pluggable storage** — Jena/Fuseki, filesystem, MongoDB — or implement the simple StorageService interface on your existing tools and repositories to adapt them for OSLC
 - **oslc-browser** — column-based navigation, property views, link traversal, diagrams — a working UI from day one, with custom UX layered on later as needed
 
 ---
 
 # MRM: From Template to Running Server
 
-A single declarative Turtle file defines all 8 resource types with their creation factories, dialogs, query capabilities, and resource shape references.
+A single declarative Turtle file defines all 8 OSLC managed resource types with their creation factories, dialogs, query capabilities, and resource shape references.
 
 ```
 npm start
 → Fully functional MRM server at localhost:3002
 ```
 
-**Demo:** Create a ServiceProvider for "City of Ottawa," then create Programs, Services, and Processes through the browser.
+**Demo:** Create a ServiceProvider for "City of Ottawa," and view Programs, Services, and Processes through the browser.
 
 ---
 
 # Value Delivered
 
 - **Weeks** of custom development replaced by **declarative configuration**
-- Existing tools can be OSLC-enabled by implementing a **simple storage adapter**
+- Existing tools can be OSLC-enabled by implementing a **simple storage a service dapter**
 - Domain experts focus on **vocabulary and shapes** (what they know), not software (what they don't)
 - Users get a **working browser UI from day one** — no UX project required to start getting value
 - Any new domain follows the **same pattern** — the investment is reusable
@@ -177,7 +227,7 @@ Real-world problems **span domains**:
 
 A municipal service involves programs, budgets, IT systems, regulatory requirements, target populations.
 
-Each domain may have its own vocabulary and tools — but the **value is in the connections** between them.
+Each domain may have its own vocabulary and tools — but the **value is in the connections** between them, the **Digital Thread**.
 
 Traditionally, cross-domain linking requires someone who understands both the RDF mechanics and the semantic relationships — and does it **manually, link by link**.
 
@@ -193,6 +243,7 @@ Result: domains stay **siloed**, or links are **incomplete and stale**.
 - Any OSLC client can **discover** what's available without prior knowledge
 - Resource shapes declare which properties are **links** to other types — the link structure is part of the model, not an afterthought
 - Multiple OSLC servers on different domains can **cross-link by URI** — no shared database required
+- Vocabularies and services can easily be extended by updating the catalog templates
 
 ---
 
@@ -207,7 +258,7 @@ A "Water Treatment" Service links to:
 - The **Outcomes** it produces
 - The **Needs** it addresses
 
-**Demo:** Navigate Service → Processes → Resources through link traversal in oslc-browser. No query language needed.
+**Demo:** Navigate Service → Processes → Resources through link traversal in oslc-browser. 
 
 ---
 
@@ -236,7 +287,7 @@ Populating an ontology means analyzing large volumes of unstructured material �
 Tedious. Error-prone. Requires both domain knowledge *and* RDF skills.
 
 **Consuming:**
-Even when populated, most stakeholders can't access the model. Querying requires SPARQL. Analysis — gap analysis, cost/benefit, impact assessment — requires exporting data and building custom reports.
+Even when populated, most stakeholders can't access the model. Querying requires e.g., SPARQL. Analysis — gap analysis, cost/benefit, impact assessment — requires exporting data and building custom reports.
 
 ---
 
@@ -296,7 +347,7 @@ A service manager points AI at a service delivery report. AI populates programs,
 # Value Delivered
 
 - Domain experts contribute through **natural language** and document review
-- Stakeholders get answers through **conversation**, not SPARQL
+- Stakeholders get answers through **conversation**, not static reports or database queries
 - AI handles both **population** (mechanical) and **analysis** (analytical)
 - OSLC discovery makes this **generic** — same MCP server works with any domain
 - The model becomes a **living asset** the organization both maintains and interrogates
@@ -329,26 +380,35 @@ Each layer is reusable. Swap storage, add a domain, connect a new consumer — t
 
 ---
 
-# The Pattern: From Any Domain to a Working Tool
+# The Pattern: Define — Instantiate — Activate
 
-1. **Define** your vocabulary (the terms of your domain)
-2. **Define** your resource shapes (the constraints)
-3. **Write** a catalog template (the services you want)
-4. **Start** the server — you have a working OSLC tool
-5. **Point** oslc-browser at it — stakeholders can browse immediately
-6. **Point** oslc-mcp-server at it — AI can populate and query it
+**Define** your domain:
+1. Write a vocabulary (the terms and relationships of your domain)
+2. Write resource shapes (the constraints on each type)
+3. Write a catalog template (the services you want)
 
-Other domains this fits: IT service management, regulatory compliance, healthcare workflows, engineering lifecycle, enterprise architecture...
+**Instantiate** your data:
+
+4. Start the server — you have a working OSLC tool
+5. Point AI at it via MCP — populate from existing documents
+
+**Activate** the value:
+
+6. Point oslc-browser at it — stakeholders browse immediately
+7. Point oslc-mcp-server at it — AI queries and reasons over live data
+8. Connect other tools — linked data across the enterprise
+
+Other domains this fits: systems and software engineering, IT service management, regulatory compliance, ISO 26262 safety, healthcare workflows, engineering lifecycle, enterprise architecture...
 
 ---
 
-# Three Barriers Revisited
+# Three Barriers → Three Layers
 
-| Barrier | oslc4js Solution | Value |
-|---|---|---|
-| Creating models is too hard | Declarative templates + pluggable storage | Domain experts describe, platform builds |
-| Connecting domains requires linking expertise | OSLC linked data + discovery protocol | Link by URI, discover automatically |
-| Creating & consuming requires specialized skills | oslc-browser + reflective MCP for AI | Anyone can browse; AI populates and answers questions |
+| Layer | Barrier | oslc4js Solution | Value |
+|---|---|---|---|
+| **Define** | Creating models is too hard | Declarative vocabularies, shapes, and catalog templates | Domain experts describe, platform builds |
+| **Instantiate** | Connecting domains requires subject matter expertise across domains | OSLC linked data + discovery protocol + AI via MCP | Link by URI, discover automatically, AI creates and links |
+| **Activate** | Consuming requires specialized skills | oslc-browser + MCP + SPARQL/LQE | Anyone browses; AI populates and answers; tools integrate |
 
 ---
 

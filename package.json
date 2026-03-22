@@ -10,6 +10,7 @@
     "ldp-service-jena",
     "ldp-app",
     "oslc-server",
-    "mrm-server"
+    "mrm-server",
+    "bmm-server"
   ]
 }
