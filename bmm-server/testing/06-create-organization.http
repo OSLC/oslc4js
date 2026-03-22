@@ -1,0 +1,146 @@
+###############################################################################
+# 06-create-organization.http — OrganizationUnits, BusinessProcesses, Assets
+#
+# BMM Organization model:
+#   OrganizationUnit is responsible for Ends and establishes Means
+#   BusinessProcesses are governed by Policies and Rules
+#   Assets are resources deployed to support CoursesOfAction
+###############################################################################
+
+@baseUrl = http://localhost:3005
+
+### ── Organization Units ──────────────────────────────────────────────
+
+### OrgUnit 1: Executive Leadership
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: org-executive
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:OrganizationUnit ;
+   dcterms:title "Executive Leadership Team" ;
+   dcterms:description "CEO, COO, CFO, CTO — responsible for the enterprise Vision, Mission, and overall Strategy." .
+
+### OrgUnit 2: R&D Division
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: org-research
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:OrganizationUnit ;
+   dcterms:title "Research & Development" ;
+   dcterms:description "Solar cell research, product development, and prototype testing. Responsible for the Product Innovation strategy and perovskite research tactic." .
+
+### OrgUnit 3: Manufacturing
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: org-manufacturing
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:OrganizationUnit ;
+   dcterms:title "Manufacturing Operations" ;
+   dcterms:description "Panel production, quality assurance, and supply chain management. Responsible for the cost reduction objective and supply chain integration strategy." .
+
+### OrgUnit 4: Customer Operations
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: org-customer-ops
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:OrganizationUnit ;
+   dcterms:title "Customer Operations" ;
+   dcterms:description "Sales, installation coordination, warranty service, and the certified installer network. Responsible for the customer satisfaction goal and customer experience strategy." .
+
+### ── Business Processes ──────────────────────────────────────────────
+
+### Process 1: Product Development Lifecycle
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: process-product-dev
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:BusinessProcess ;
+   dcterms:title "Product Development Lifecycle" ;
+   dcterms:description "End-to-end process from research concept through prototype, certification testing (IEC 61215/61730), manufacturing transfer, and product launch. Governed by the Product Quality Standards policy." .
+
+### Process 2: Order-to-Installation
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: process-order-install
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:BusinessProcess ;
+   dcterms:title "Order-to-Installation" ;
+   dcterms:description "Customer inquiry, site assessment, system design, permitting, installation, inspection, and grid connection. Governed by the warranty response time and installer certification rules." .
+
+### Process 3: Warranty Service
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: process-warranty
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:BusinessProcess ;
+   dcterms:title "Warranty Claim Resolution" ;
+   dcterms:description "Receive claim, triage severity, dispatch technician, diagnose issue, repair or replace, close claim. Must comply with the 48-hour response time business rule." .
+
+### ── Assets ──────────────────────────────────────────────────────────
+
+### Asset 1: Manufacturing Facility
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: asset-mfg-facility
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Asset ;
+   dcterms:title "Austin Manufacturing Campus" ;
+   dcterms:description "500MW annual capacity solar panel manufacturing facility in Austin, TX. Includes cell fabrication, module assembly, and electroluminescence testing lines." .
+
+### Asset 2: Patent Portfolio
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: asset-patents
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Asset ;
+   dcterms:title "Perovskite Tandem Cell Patent Portfolio" ;
+   dcterms:description "12 granted patents and 8 pending applications covering perovskite-silicon tandem cell architecture, encapsulation methods, and manufacturing processes." .
+
+### Asset 3: Monitoring Platform
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: asset-monitoring-platform
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Asset ;
+   dcterms:title "SolarWatch Monitoring Platform" ;
+   dcterms:description "Cloud-based IoT platform monitoring 85,000 installed systems in real-time. Provides energy production analytics, fault detection, and proactive warranty alerts." .

@@ -1,0 +1,847 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix oslc:    <http://open-services.net/ns/core#> .
+@prefix oslc_am: <http://open-services.net/ns/am#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+# ================================================================
+# OSLC Resource Shapes for the OMG Business Motivation Model (BMM)
+#
+# bmm:MotivationalElement rdfs:subClassOf oslc_am:Resource, so all
+# BMM resource shapes inherit the standard OSLC Core and AM properties.
+#
+# Property definitions are named nodes so that shared/inherited
+# properties are defined once and referenced by multiple shapes.
+# ================================================================
+
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — Inherited from oslc_am:Resource
+# ================================================================
+
+<#p-title>
+  a oslc:Property ;
+  oslc:name "title" ;
+  oslc:propertyDefinition dcterms:title ;
+  dcterms:description "Title of the resource." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType xsd:string .
+
+<#p-description>
+  a oslc:Property ;
+  oslc:name "description" ;
+  oslc:propertyDefinition dcterms:description ;
+  dcterms:description "Descriptive text about the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-identifier>
+  a oslc:Property ;
+  oslc:name "identifier" ;
+  oslc:propertyDefinition dcterms:identifier ;
+  dcterms:description "Unique identifier of the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string ;
+  oslc:readOnly true .
+
+<#p-creator>
+  a oslc:Property ;
+  oslc:name "creator" ;
+  oslc:propertyDefinition dcterms:creator ;
+  dcterms:description "Creator of the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:AnyResource ;
+  oslc:representation oslc:Either .
+
+<#p-modified>
+  a oslc:Property ;
+  oslc:name "modified" ;
+  oslc:propertyDefinition dcterms:modified ;
+  dcterms:description "Date the resource was last modified." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:dateTime ;
+  oslc:readOnly true .
+
+<#p-type>
+  a oslc:Property ;
+  oslc:name "type" ;
+  oslc:propertyDefinition rdf:type ;
+  dcterms:description "RDF type of the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-instanceShape>
+  a oslc:Property ;
+  oslc:name "instanceShape" ;
+  oslc:propertyDefinition oslc:instanceShape ;
+  dcterms:description "Resource shape that describes this resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:readOnly true .
+
+<#p-contributor>
+  a oslc:Property ;
+  oslc:name "contributor" ;
+  oslc:propertyDefinition dcterms:contributor ;
+  dcterms:description "Contributor to the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:AnyResource ;
+  oslc:representation oslc:Either .
+
+<#p-created>
+  a oslc:Property ;
+  oslc:name "created" ;
+  oslc:propertyDefinition dcterms:created ;
+  dcterms:description "Date the resource was created." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:dateTime ;
+  oslc:readOnly true .
+
+<#p-subject>
+  a oslc:Property ;
+  oslc:name "subject" ;
+  oslc:propertyDefinition dcterms:subject ;
+  dcterms:description "Tag or keyword for the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType xsd:string .
+
+<#p-serviceProvider>
+  a oslc:Property ;
+  oslc:name "serviceProvider" ;
+  oslc:propertyDefinition oslc:serviceProvider ;
+  dcterms:description "OSLC service provider for this resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:readOnly true .
+
+<#p-shortTitle>
+  a oslc:Property ;
+  oslc:name "shortTitle" ;
+  oslc:propertyDefinition oslc:shortTitle ;
+  dcterms:description "Shorter form of the title." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — End relationships
+# ================================================================
+
+<#p-enablesEnd>
+  a oslc:Property ;
+  oslc:name "enablesEnd" ;
+  oslc:propertyDefinition bmm:enablesEnd ;
+  dcterms:description "An End that this CourseOfAction enables." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-enabledByCourseOfAction>
+  a oslc:Property ;
+  oslc:name "enabledByCourseOfAction" ;
+  oslc:propertyDefinition bmm:enabledByCourseOfAction ;
+  dcterms:description "A CourseOfAction that enables this End." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — Assessment relationships
+# ================================================================
+
+<#p-affectsAchievementOfEnd>
+  a oslc:Property ;
+  oslc:name "affectsAchievementOfEnd" ;
+  oslc:propertyDefinition bmm:affectsAchievementOfEnd ;
+  dcterms:description "An End whose achievement is affected by this Assessment." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-affectsEmploymentOfMeans>
+  a oslc:Property ;
+  oslc:name "affectsEmploymentOfMeans" ;
+  oslc:propertyDefinition bmm:affectsEmploymentOfMeans ;
+  dcterms:description "A Means whose employment is affected by this Assessment." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — OrganizationUnit relationships
+# ================================================================
+
+<#p-isResponsibleForEnd>
+  a oslc:Property ;
+  oslc:name "isResponsibleForEnd" ;
+  oslc:propertyDefinition bmm:isResponsibleForEnd ;
+  dcterms:description "An End that this OrganizationUnit is responsible for." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-establishesMeans>
+  a oslc:Property ;
+  oslc:name "establishesMeans" ;
+  oslc:propertyDefinition bmm:establishesMeans ;
+  dcterms:description "A Means that this OrganizationUnit establishes." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-recognizesInfluencer>
+  a oslc:Property ;
+  oslc:name "recognizesInfluencer" ;
+  oslc:propertyDefinition bmm:recognizesInfluencer ;
+  dcterms:description "An Influencer recognized by this OrganizationUnit." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-makesAssessment>
+  a oslc:Property ;
+  oslc:name "makesAssessment" ;
+  oslc:propertyDefinition bmm:makesAssessment ;
+  dcterms:description "An Assessment made by this OrganizationUnit." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-definedByBusinessProcess>
+  a oslc:Property ;
+  oslc:name "definedByBusinessProcess" ;
+  oslc:propertyDefinition bmm:definedByBusinessProcess ;
+  dcterms:description "A BusinessProcess that defines this OrganizationUnit's operations." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-subOrganizationUnits>
+  a oslc:Property ;
+  oslc:name "subOrganizationUnits" ;
+  oslc:propertyDefinition bmm:subOrganizationUnits ;
+  dcterms:description "Child OrganizationUnits." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# Vision-specific properties
+# ================================================================
+
+<#p-amplifiedByMission>
+  a oslc:Property ;
+  oslc:name "amplifiedByMission" ;
+  oslc:propertyDefinition bmm:amplifiedByMission ;
+  dcterms:description "The Mission that makes this Vision operative." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-madeOperativeByGoal>
+  a oslc:Property ;
+  oslc:name "madeOperativeByGoal" ;
+  oslc:propertyDefinition bmm:madeOperativeByGoal ;
+  dcterms:description "Goals that amplify this Vision." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# Mission-specific properties
+# ================================================================
+
+<#p-makesOperative>
+  a oslc:Property ;
+  oslc:name "makesOperative" ;
+  oslc:propertyDefinition bmm:makesOperative ;
+  dcterms:description "The Vision that this Mission makes operative." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# Goal-specific properties
+# ================================================================
+
+<#p-amplifiesVision>
+  a oslc:Property ;
+  oslc:name "amplifiesVision" ;
+  oslc:propertyDefinition bmm:amplifiesVision ;
+  dcterms:description "The Vision that this Goal amplifies." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-quantifiedByObjective>
+  a oslc:Property ;
+  oslc:name "quantifiedByObjective" ;
+  oslc:propertyDefinition bmm:quantifiedByObjective ;
+  dcterms:description "Objectives that quantify this Goal." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-includesGoal>
+  a oslc:Property ;
+  oslc:name "includesGoal" ;
+  oslc:propertyDefinition bmm:includesGoal ;
+  dcterms:description "Sub-Goals that are part of this Goal." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# Objective-specific properties
+# ================================================================
+
+<#p-quantifiesGoal>
+  a oslc:Property ;
+  oslc:name "quantifiesGoal" ;
+  oslc:propertyDefinition bmm:quantifiesGoal ;
+  dcterms:description "The Goal that this Objective quantifies." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-includesObjective>
+  a oslc:Property ;
+  oslc:name "includesObjective" ;
+  oslc:propertyDefinition bmm:includesObjective ;
+  dcterms:description "Sub-Objectives that are part of this Objective." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-targetDate>
+  a oslc:Property ;
+  oslc:name "targetDate" ;
+  oslc:propertyDefinition bmm:targetDate ;
+  dcterms:description "The date by which this Objective is targeted to be achieved." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:date .
+
+<#p-measureOfProgress>
+  a oslc:Property ;
+  oslc:name "measureOfProgress" ;
+  oslc:propertyDefinition bmm:measureOfProgress ;
+  dcterms:description "A quantifiable measure for evaluating progress." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+# ================================================================
+# Strategy-specific properties
+# ================================================================
+
+<#p-channelsEffortsTowardVision>
+  a oslc:Property ;
+  oslc:name "channelsEffortsTowardVision" ;
+  oslc:propertyDefinition bmm:channelsEffortsTowardVision ;
+  dcterms:description "The Vision toward which this Strategy channels efforts." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-channelsEffortsTowardGoal>
+  a oslc:Property ;
+  oslc:name "channelsEffortsTowardGoal" ;
+  oslc:propertyDefinition bmm:channelsEffortsTowardGoal ;
+  dcterms:description "Goals toward which this Strategy channels efforts." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-componentOfStrategy>
+  a oslc:Property ;
+  oslc:name "componentOfStrategy" ;
+  oslc:propertyDefinition bmm:componentOfStrategy ;
+  dcterms:description "A broader Strategy of which this Strategy is a component." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-includesStrategy>
+  a oslc:Property ;
+  oslc:name "includesStrategy" ;
+  oslc:propertyDefinition bmm:includesStrategy ;
+  dcterms:description "Sub-Strategies that are components of this Strategy." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# Tactic-specific properties
+# ================================================================
+
+<#p-implementsStrategy>
+  a oslc:Property ;
+  oslc:name "implementsStrategy" ;
+  oslc:propertyDefinition bmm:implementsStrategy ;
+  dcterms:description "The Strategy that this Tactic implements." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-componentOfTactic>
+  a oslc:Property ;
+  oslc:name "componentOfTactic" ;
+  oslc:propertyDefinition bmm:componentOfTactic ;
+  dcterms:description "A broader Tactic of which this Tactic is a component." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-includesTactic>
+  a oslc:Property ;
+  oslc:name "includesTactic" ;
+  oslc:propertyDefinition bmm:includesTactic ;
+  dcterms:description "Sub-Tactics that are components of this Tactic." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-effectsEnforcementOfBusinessRule>
+  a oslc:Property ;
+  oslc:name "effectsEnforcementOfBusinessRule" ;
+  oslc:propertyDefinition bmm:effectsEnforcementOfBusinessRule ;
+  dcterms:description "BusinessRules whose enforcement is effected by this Tactic." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# Directive-specific properties
+# ================================================================
+
+<#p-governsCourseOfAction>
+  a oslc:Property ;
+  oslc:name "governsCourseOfAction" ;
+  oslc:propertyDefinition bmm:governsCourseOfAction ;
+  dcterms:description "CoursesOfAction governed by this Directive." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-governedByDirective>
+  a oslc:Property ;
+  oslc:name "governedByDirective" ;
+  oslc:propertyDefinition bmm:governedByDirective ;
+  dcterms:description "Directives that govern this CourseOfAction." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# BusinessPolicy-specific properties
+# ================================================================
+
+<#p-basedOnBusinessRule>
+  a oslc:Property ;
+  oslc:name "basedOnBusinessRule" ;
+  oslc:propertyDefinition bmm:basedOnBusinessRule ;
+  dcterms:description "BusinessRules that implement this BusinessPolicy." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-governsBusinessProcess>
+  a oslc:Property ;
+  oslc:name "governsBusinessProcess" ;
+  oslc:propertyDefinition bmm:governsBusinessProcess ;
+  dcterms:description "BusinessProcesses governed by this BusinessPolicy." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# BusinessRule-specific properties
+# ================================================================
+
+<#p-basedOnBusinessPolicy>
+  a oslc:Property ;
+  oslc:name "basedOnBusinessPolicy" ;
+  oslc:propertyDefinition bmm:basedOnBusinessPolicy ;
+  dcterms:description "The BusinessPolicy this BusinessRule is based on." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-enforcedByBusinessProcess>
+  a oslc:Property ;
+  oslc:name "enforcedByBusinessProcess" ;
+  oslc:propertyDefinition bmm:enforcedByBusinessProcess ;
+  dcterms:description "BusinessProcesses that enforce this BusinessRule." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-enforcementLevel>
+  a oslc:Property ;
+  oslc:name "enforcementLevel" ;
+  oslc:propertyDefinition bmm:enforcementLevel ;
+  dcterms:description "The enforcement level: strictly enforced, deferred enforcement, or override with explanation." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+# ================================================================
+# Influencer-specific properties
+# ================================================================
+
+<#p-assessedByAssessment>
+  a oslc:Property ;
+  oslc:name "assessedByAssessment" ;
+  oslc:propertyDefinition bmm:assessedByAssessment ;
+  dcterms:description "Assessments made about this Influencer." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-influencerCategory>
+  a oslc:Property ;
+  oslc:name "influencerCategory" ;
+  oslc:propertyDefinition bmm:influencerCategory ;
+  dcterms:description "Category of this Influencer (e.g. Competition, Technology, Regulation)." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+# ================================================================
+# Assessment-specific properties
+# ================================================================
+
+<#p-assessesInfluencer>
+  a oslc:Property ;
+  oslc:name "assessesInfluencer" ;
+  oslc:propertyDefinition bmm:assessesInfluencer ;
+  dcterms:description "The Influencer this Assessment is about." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-identifiesPotentialImpact>
+  a oslc:Property ;
+  oslc:name "identifiesPotentialImpact" ;
+  oslc:propertyDefinition bmm:identifiesPotentialImpact ;
+  dcterms:description "PotentialImpacts identified by this Assessment." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-assessmentCategory>
+  a oslc:Property ;
+  oslc:name "assessmentCategory" ;
+  oslc:propertyDefinition bmm:assessmentCategory ;
+  dcterms:description "SWOT category: Strength, Weakness, Opportunity, or Threat." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# PotentialImpact-specific properties
+# ================================================================
+
+<#p-identifiedByAssessment>
+  a oslc:Property ;
+  oslc:name "identifiedByAssessment" ;
+  oslc:propertyDefinition bmm:identifiedByAssessment ;
+  dcterms:description "The Assessment that identified this PotentialImpact." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-providesImpetusForDirective>
+  a oslc:Property ;
+  oslc:name "providesImpetusForDirective" ;
+  oslc:propertyDefinition bmm:providesImpetusForDirective ;
+  dcterms:description "Directives for which this PotentialImpact provides impetus." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-isRiskForEnd>
+  a oslc:Property ;
+  oslc:name "isRiskForEnd" ;
+  oslc:propertyDefinition bmm:isRiskForEnd ;
+  dcterms:description "Ends for which this PotentialImpact is a risk." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-isRiskForMeans>
+  a oslc:Property ;
+  oslc:name "isRiskForMeans" ;
+  oslc:propertyDefinition bmm:isRiskForMeans ;
+  dcterms:description "Means for which this PotentialImpact is a risk." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-isRewardForEnd>
+  a oslc:Property ;
+  oslc:name "isRewardForEnd" ;
+  oslc:propertyDefinition bmm:isRewardForEnd ;
+  dcterms:description "Ends for which this PotentialImpact is a potential reward." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-isRewardForMeans>
+  a oslc:Property ;
+  oslc:name "isRewardForMeans" ;
+  oslc:propertyDefinition bmm:isRewardForMeans ;
+  dcterms:description "Means for which this PotentialImpact is a potential reward." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# BusinessProcess-specific properties
+# ================================================================
+
+<#p-realizesAsset>
+  a oslc:Property ;
+  oslc:name "realizesAsset" ;
+  oslc:propertyDefinition bmm:realizesAsset ;
+  dcterms:description "Assets used by this BusinessProcess." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-governedByBusinessPolicy>
+  a oslc:Property ;
+  oslc:name "governedByBusinessPolicy" ;
+  oslc:propertyDefinition bmm:governedByBusinessPolicy ;
+  dcterms:description "BusinessPolicies that govern this BusinessProcess." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-governedByBusinessRule>
+  a oslc:Property ;
+  oslc:name "governedByBusinessRule" ;
+  oslc:propertyDefinition bmm:governedByBusinessRule ;
+  dcterms:description "BusinessRules that govern this BusinessProcess." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+
+# ================================================================
+# RESOURCE SHAPE DEFINITIONS
+# ================================================================
+
+# ============================================================
+# Vision
+# ============================================================
+
+<#VisionShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Vision" ;
+  oslc:describes bmm:Vision ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-enabledByCourseOfAction>,
+    <#p-amplifiedByMission>, <#p-madeOperativeByGoal> .
+
+# ============================================================
+# Goal
+# ============================================================
+
+<#GoalShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Goal" ;
+  oslc:describes bmm:Goal ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-enabledByCourseOfAction>,
+    <#p-amplifiesVision>, <#p-quantifiedByObjective>, <#p-includesGoal> .
+
+# ============================================================
+# Objective
+# ============================================================
+
+<#ObjectiveShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Objective" ;
+  oslc:describes bmm:Objective ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-enabledByCourseOfAction>,
+    <#p-quantifiesGoal>, <#p-includesObjective>,
+    <#p-targetDate>, <#p-measureOfProgress> .
+
+# ============================================================
+# Mission
+# ============================================================
+
+<#MissionShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Mission" ;
+  oslc:describes bmm:Mission ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-makesOperative> .
+
+# ============================================================
+# Strategy
+# ============================================================
+
+<#StrategyShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Strategy" ;
+  oslc:describes bmm:Strategy ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-enablesEnd>, <#p-governedByDirective>,
+    <#p-channelsEffortsTowardVision>, <#p-channelsEffortsTowardGoal>,
+    <#p-componentOfStrategy>, <#p-includesStrategy> .
+
+# ============================================================
+# Tactic
+# ============================================================
+
+<#TacticShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Tactic" ;
+  oslc:describes bmm:Tactic ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-enablesEnd>, <#p-governedByDirective>,
+    <#p-implementsStrategy>, <#p-componentOfTactic>, <#p-includesTactic>,
+    <#p-effectsEnforcementOfBusinessRule> .
+
+# ============================================================
+# BusinessPolicy
+# ============================================================
+
+<#BusinessPolicyShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Business Policy" ;
+  oslc:describes bmm:BusinessPolicy ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-governsCourseOfAction>,
+    <#p-basedOnBusinessRule>, <#p-governsBusinessProcess> .
+
+# ============================================================
+# BusinessRule
+# ============================================================
+
+<#BusinessRuleShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Business Rule" ;
+  oslc:describes bmm:BusinessRule ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-governsCourseOfAction>,
+    <#p-basedOnBusinessPolicy>, <#p-enforcedByBusinessProcess>,
+    <#p-enforcementLevel> .
+
+# ============================================================
+# Influencer
+# ============================================================
+
+<#InfluencerShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Influencer" ;
+  oslc:describes bmm:Influencer ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-assessedByAssessment>, <#p-influencerCategory> .
+
+# ============================================================
+# Assessment
+# ============================================================
+
+<#AssessmentShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Assessment" ;
+  oslc:describes bmm:Assessment ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-assessesInfluencer>, <#p-identifiesPotentialImpact>,
+    <#p-assessmentCategory>,
+    <#p-affectsAchievementOfEnd>, <#p-affectsEmploymentOfMeans> .
+
+# ============================================================
+# PotentialImpact
+# ============================================================
+
+<#PotentialImpactShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Potential Impact" ;
+  oslc:describes bmm:PotentialImpact ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-identifiedByAssessment>, <#p-providesImpetusForDirective>,
+    <#p-isRiskForEnd>, <#p-isRiskForMeans>,
+    <#p-isRewardForEnd>, <#p-isRewardForMeans> .
+
+# ============================================================
+# OrganizationUnit
+# ============================================================
+
+<#OrganizationUnitShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Organization Unit" ;
+  oslc:describes bmm:OrganizationUnit ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-isResponsibleForEnd>, <#p-establishesMeans>,
+    <#p-recognizesInfluencer>, <#p-makesAssessment>,
+    <#p-definedByBusinessProcess>, <#p-subOrganizationUnits> .
+
+# ============================================================
+# BusinessProcess
+# ============================================================
+
+<#BusinessProcessShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Business Process" ;
+  oslc:describes bmm:BusinessProcess ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-realizesAsset>,
+    <#p-governedByBusinessPolicy>, <#p-governedByBusinessRule> .
+
+# ============================================================
+# Asset
+# ============================================================
+
+<#AssetShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Asset" ;
+  oslc:describes bmm:Asset ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle> .

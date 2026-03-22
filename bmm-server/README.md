@@ -6,6 +6,21 @@ BMM provides a scheme for developing, communicating, and managing business plans
 
 This server manages the following BMM resource types: **Vision**, **Goal**, **Objective**, **Mission**, **Strategy**, **Tactic**, **Business Policy**, **Business Rule**, **Influencer**, **Assessment**, **Potential Impact**, **Organization Unit**, **Business Process**, **Asset**.
 
+This is a complete demonstration of the Define-Instantiate-Activate pattern from your architecture document:
+
+  **Define** — BMM.ttl vocabulary (25 classes, 49 properties), BMM-Shapes.ttl (14 ResourceShapes), and a catalog template — all declarative, no application code. In this case, Claude was actually used to create the BMM OSLC vocabulary and resource shapes directly from the OMG specification at: https://www.omg.org/spec/BMM/1.3/PDF. 
+
+  **Instantiate** — create-oslc-server.ts scaffolds a working server from those declarations. The embedded MCP endpoint lets AI populate it from the examples in https://www.omg.org/spec/BMM/1.3/PDF, or other documents. 38 linked SolarTech resources created via MCP tool calls.
+
+  **Activate** — AI assistants query, analyze, and extend the model through natural language. The oslc-browser provides human navigation. OSLC queries and SPARQL provide programmatic access. Multiple servers can cross-link by URI.
+
+And the bmm-server gets a generic, reusable OSLC browser that can be used to view and navigate those BMM sample resources:
+
+![alt text](image-3.png)
+
+None of this is BMM-specific. The same toolchain works for any domain — swap the vocabulary and shapes, run the scaffolding script, and you have a working OSLC server with
+an AI-accessible MCP endpoint. The barrier between domain knowledge and a working, AI-integrated tool is now just three Turtle files.
+
 ## Architecture
 
 bmm-server is built from several modules in the oslc4js workspace:
@@ -58,7 +73,13 @@ Start Fuseki with your `bmm` dataset, then:
 
     $ npm start
 
-The server starts on port 3005.
+The server starts on port 3005. Note that the fuseki datasets need to use unionDefaultGraph true in the fuseki configuration file:
+```
+:dataset4 rdf:type tdb2:DatasetTDB2 ;
+    tdb2:location "../bmm" ;
+    tdb2:unionDefaultGraph true ;
+    .
+```
 
 ### Web UI
 
@@ -167,6 +188,48 @@ Once the SolarTech BMM model is populated, here are prompts you can use with an 
 - "If the Federal Solar Investment Tax Credit is not renewed after 2032, which Goals and Objectives would be affected? Trace the impact through the Assessments."
 - "The Certified Installer Shortage constrains growth. What Tactics, Strategies, and Goals are at risk? What is SolarTech doing to address it?"
 - "How does the Vertical Supply Chain Integration strategy connect to the cost reduction Objective? Show the full chain."
+
+Here's an example prompt: If the Federal Solar Investment Tax Credit is not renewed after 2032, which Goals and Objectives would be affected? Trace the impact through the Assessments?
+
+Response from the SolarTech model:
+
+ If the Federal Solar Investment Tax Credit is not renewed after 2032:
+
+  The Chain
+```
+  Influencer: Federal Solar Investment Tax Credit Extension (Regulation)
+      │
+      ▼ assessed by
+  Assessment: Tax Credit Drives Residential Demand Growth
+      │  "The ITC extension is projected to increase residential solar
+      │   adoption by 25-30% through 2030, creating a significant
+      │   window for market share capture."
+      │
+      ▼ identifies
+  Potential Impact: 5-Year Market Expansion Window
+      "The ITC extension creates a 5-year window of accelerated
+       residential solar demand. Companies that scale fastest
+       will capture durable market share."
+```
+  Goals Affected
+
+  Directly at risk: Grow Market Share
+  - The entire demand growth projection (25-30% increase through 2030) is predicated on the ITC. Without renewal, residential solar adoption stalls, closing the market expansion window.
+  - Quantified by Objective: Achieve 15% Residential Market Share by 2027-12-31 (measured by quarterly installed capacity as percentage of total market)
+  - This objective's target date falls before 2032, but the durability of any market share gained depends on sustained demand. Post-2032, without the credit, customer acquisition costs rise and adoption rates drop.
+
+  Indirectly at risk: Maximize Customer Satisfaction
+  - Reduced demand means fewer installations, which reduces the installer network's utilization. The Certified Installer Network tactic depends on volume to sustain partner economics.
+  - Quantified by Objective: Achieve NPS Score of 70+ by 2026-06-30
+
+  Least affected: Improve Operational Efficiency
+  - The Vertical Supply Chain Integration strategy and cost reduction objective are supply-side, not demand-driven. These remain valid regardless of the tax credit.
+  - Quantified by Objective: Reduce Manufacturing Cost per Watt by 20% by 2027-06-30
+
+  Recommendation
+
+  The Assessment identifies this as an opportunity while the credit exists — but it's also a risk if SolarTech builds capacity assumptions around credit-driven demand that evaporates in 2032. The BMM model suggests
+  SolarTech should pursue the market share objective aggressively before 2032 while hedging through the Product Innovation strategy (differentiation that doesn't depend on subsidies).
 
 **Modification and extension:**
 

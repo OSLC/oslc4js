@@ -1,0 +1,64 @@
+###############################################################################
+# 08-query-resources.http — Query BMM resources
+#
+# Uses OSLC query capabilities to retrieve resources by type.
+###############################################################################
+
+@baseUrl = http://localhost:3005
+@sp = solartech
+
+### Query all Visions
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#Vision>
+Accept: text/turtle
+
+### Query all Goals
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#Goal>
+Accept: text/turtle
+
+### Query all Objectives
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#Objective>
+Accept: text/turtle
+
+### Query all Strategies
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#Strategy>
+Accept: text/turtle
+
+### Query all Tactics
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#Tactic>
+Accept: text/turtle
+
+### Query all Business Policies
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#BusinessPolicy>
+Accept: text/turtle
+
+### Query all Business Rules
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#BusinessRule>
+Accept: text/turtle
+
+### Query all Influencers
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#Influencer>
+Accept: text/turtle
+
+### Query all Assessments
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#Assessment>
+Accept: text/turtle
+
+### Query all Potential Impacts
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#PotentialImpact>
+Accept: text/turtle
+
+### Query all Organization Units
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#OrganizationUnit>
+Accept: text/turtle
+
+### Query all Business Processes
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#BusinessProcess>
+Accept: text/turtle
+
+### Query all Assets
+GET {{baseUrl}}/oslc/{{sp}}/resources?oslc.where=rdf:type=<http://www.omg.org/spec/BMM#Asset>
+Accept: text/turtle
+
+### Read all resources in the ServiceProvider container
+GET {{baseUrl}}/oslc/{{sp}}/resources
+Accept: text/turtle

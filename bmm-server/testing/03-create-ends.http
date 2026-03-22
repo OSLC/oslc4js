@@ -1,0 +1,114 @@
+###############################################################################
+# 03-create-ends.http — Create Vision, Goals, and Objectives
+#
+# BMM Ends hierarchy: Vision → Goals → Objectives
+# A Vision is amplified by Goals, Goals are quantified by Objectives.
+###############################################################################
+
+@baseUrl = http://localhost:3005
+
+### ── Vision ──────────────────────────────────────────────────────────
+
+### Create the enterprise Vision
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: vision-market-leader
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Vision ;
+   dcterms:title "Leading Renewable Energy Provider" ;
+   dcterms:description "To be the leading provider of affordable, high-efficiency solar energy solutions for residential and commercial markets worldwide." .
+
+### ── Goals ───────────────────────────────────────────────────────────
+
+### Goal 1: Market Share Growth
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: goal-market-share
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Goal ;
+   dcterms:title "Grow Market Share" ;
+   dcterms:description "Increase market share in the residential solar panel market to become the top-three supplier by installed capacity." .
+
+### Goal 2: Customer Satisfaction
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: goal-customer-satisfaction
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Goal ;
+   dcterms:title "Maximize Customer Satisfaction" ;
+   dcterms:description "Achieve and sustain industry-leading customer satisfaction through product reliability, installation quality, and post-sale support." .
+
+### Goal 3: Operational Efficiency
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: goal-operational-efficiency
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Goal ;
+   dcterms:title "Improve Operational Efficiency" ;
+   dcterms:description "Reduce manufacturing costs and streamline the supply chain to offer competitive pricing without compromising quality." .
+
+### ── Objectives ──────────────────────────────────────────────────────
+
+### Objective 1: Market Share Target (quantifies Goal 1)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: obj-market-share-30pct
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+<> a bmm:Objective ;
+   dcterms:title "Achieve 15% Residential Market Share" ;
+   dcterms:description "Capture 15% of the North American residential solar panel market by installed capacity." ;
+   bmm:targetDate "2027-12-31"^^xsd:date ;
+   bmm:measureOfProgress "Quarterly installed capacity as percentage of total market (source: SEIA reports)" .
+
+### Objective 2: NPS Target (quantifies Goal 2)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: obj-nps-70
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+<> a bmm:Objective ;
+   dcterms:title "Achieve NPS Score of 70+" ;
+   dcterms:description "Achieve and sustain a Net Promoter Score of 70 or above across all customer segments." ;
+   bmm:targetDate "2026-06-30"^^xsd:date ;
+   bmm:measureOfProgress "Monthly NPS survey results across installation, support, and warranty interactions" .
+
+### Objective 3: Cost Reduction (quantifies Goal 3)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: obj-cost-reduction-20pct
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+<> a bmm:Objective ;
+   dcterms:title "Reduce Manufacturing Cost per Watt by 20%" ;
+   dcterms:description "Reduce the fully-loaded manufacturing cost per watt of solar panel output by 20% from the 2024 baseline." ;
+   bmm:targetDate "2027-06-30"^^xsd:date ;
+   bmm:measureOfProgress "Quarterly cost-per-watt tracking from manufacturing ERP system" .

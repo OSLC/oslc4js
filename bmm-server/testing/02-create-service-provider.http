@@ -1,0 +1,24 @@
+###############################################################################
+# 02-create-service-provider.http — Create a ServiceProvider for an enterprise
+#
+# Based on BMM 1.3 examples: a company's business motivation model.
+###############################################################################
+
+@baseUrl = http://localhost:3005
+
+### Create "SolarTech Inc." enterprise
+POST {{baseUrl}}/oslc
+Content-Type: text/turtle
+Slug: solartech
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+<> dcterms:title "SolarTech Inc." ;
+   dcterms:description "Business Motivation Model for SolarTech Inc., a renewable energy technology company." .
+
+### Verify the catalog now contains the ServiceProvider
+GET {{baseUrl}}/oslc
+Accept: text/turtle
+
+### Read the ServiceProvider
+GET {{baseUrl}}/oslc/solartech
+Accept: text/turtle

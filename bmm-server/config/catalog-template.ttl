@@ -1,0 +1,313 @@
+@prefix : <#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix core: <http://open-services.net/ns/core#>.
+@prefix BMM: <http://www.omg.org/spec/BMM#>.
+@prefix spec: <http://www.omg.org/spec/>.
+
+<catalog>
+    dct:description "Root ServiceProviderCatalog for bmm-server";
+    dct:publisher
+    [ a core:Publisher; dct:identifier "bmm-server"; dct:title "Bmm Server" ];
+    dct:title "Bmm Server Service Provider Catalog".
+<sp> a core:ServiceProvider; core:service <sp/service>.
+
+<sp/service>
+    a core:Service;
+    core:creationDialog
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Assessment";
+                core:resourceShape <shapes/BMM-Shapes#AssessmentShape>;
+                core:resourceType BMM:Assessment;
+                dct:title "New Assessment"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Asset";
+                core:resourceShape <shapes/BMM-Shapes#AssetShape>;
+                core:resourceType BMM:Asset;
+                dct:title "New Asset"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Business Policy";
+                core:resourceShape <shapes/BMM-Shapes#BusinessPolicyShape>;
+                core:resourceType BMM:BusinessPolicy;
+                dct:title "New Business Policy"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Business Process";
+                core:resourceShape <shapes/BMM-Shapes#BusinessProcessShape>;
+                core:resourceType BMM:BusinessProcess;
+                dct:title "New Business Process"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Business Rule";
+                core:resourceShape <shapes/BMM-Shapes#BusinessRuleShape>;
+                core:resourceType BMM:BusinessRule;
+                dct:title "New Business Rule"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Goal";
+                core:resourceShape <shapes/BMM-Shapes#GoalShape>;
+                core:resourceType BMM:Goal;
+                dct:title "New Goal"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Influencer";
+                core:resourceShape <shapes/BMM-Shapes#InfluencerShape>;
+                core:resourceType BMM:Influencer;
+                dct:title "New Influencer"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Mission";
+                core:resourceShape <shapes/BMM-Shapes#MissionShape>;
+                core:resourceType BMM:Mission;
+                dct:title "New Mission"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Objective";
+                core:resourceShape <shapes/BMM-Shapes#ObjectiveShape>;
+                core:resourceType BMM:Objective;
+                dct:title "New Objective"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Organization Unit";
+                core:resourceShape <shapes/BMM-Shapes#OrganizationUnitShape>;
+                core:resourceType BMM:OrganizationUnit;
+                dct:title "New Organization Unit"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Potential Impact";
+                core:resourceShape <shapes/BMM-Shapes#PotentialImpactShape>;
+                core:resourceType BMM:PotentialImpact;
+                dct:title "New Potential Impact"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Strategy";
+                core:resourceShape <shapes/BMM-Shapes#StrategyShape>;
+                core:resourceType BMM:Strategy;
+                dct:title "New Strategy"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Tactic";
+                core:resourceShape <shapes/BMM-Shapes#TacticShape>;
+                core:resourceType BMM:Tactic;
+                dct:title "New Tactic"
+            ],
+            [
+                a core:Dialog;
+                core:hintHeight "505px";
+                core:hintWidth "680px";
+                core:label "Vision";
+                core:resourceShape <shapes/BMM-Shapes#VisionShape>;
+                core:resourceType BMM:Vision;
+                dct:title "New Vision"
+            ];
+    core:creationFactory
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#AssessmentShape>;
+                core:resourceType BMM:Assessment;
+                dct:title "Assessments"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#AssetShape>;
+                core:resourceType BMM:Asset;
+                dct:title "Assets"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#BusinessPolicyShape>;
+                core:resourceType BMM:BusinessPolicy;
+                dct:title "Business Policies"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#BusinessProcessShape>;
+                core:resourceType BMM:BusinessProcess;
+                dct:title "Business Processes"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#BusinessRuleShape>;
+                core:resourceType BMM:BusinessRule;
+                dct:title "Business Rules"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#GoalShape>;
+                core:resourceType BMM:Goal;
+                dct:title "Goals"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#InfluencerShape>;
+                core:resourceType BMM:Influencer;
+                dct:title "Influencers"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#MissionShape>;
+                core:resourceType BMM:Mission;
+                dct:title "Missions"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#ObjectiveShape>;
+                core:resourceType BMM:Objective;
+                dct:title "Objectives"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#OrganizationUnitShape>;
+                core:resourceType BMM:OrganizationUnit;
+                dct:title "Organization Units"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#PotentialImpactShape>;
+                core:resourceType BMM:PotentialImpact;
+                dct:title "Potential Impacts"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#StrategyShape>;
+                core:resourceType BMM:Strategy;
+                dct:title "Strategies"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#TacticShape>;
+                core:resourceType BMM:Tactic;
+                dct:title "Tactics"
+            ],
+            [
+                a core:CreationFactory;
+                core:resourceShape <shapes/BMM-Shapes#VisionShape>;
+                core:resourceType BMM:Vision;
+                dct:title "Visions"
+            ];
+    core:domain spec:BMM;
+    core:queryCapability
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#AssessmentShape>;
+                core:resourceType BMM:Assessment;
+                dct:title "Query Assessments"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#AssetShape>;
+                core:resourceType BMM:Asset;
+                dct:title "Query Assets"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#BusinessPolicyShape>;
+                core:resourceType BMM:BusinessPolicy;
+                dct:title "Query Business Policies"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#BusinessProcessShape>;
+                core:resourceType BMM:BusinessProcess;
+                dct:title "Query Business Processes"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#BusinessRuleShape>;
+                core:resourceType BMM:BusinessRule;
+                dct:title "Query Business Rules"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#GoalShape>;
+                core:resourceType BMM:Goal;
+                dct:title "Query Goals"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#InfluencerShape>;
+                core:resourceType BMM:Influencer;
+                dct:title "Query Influencers"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#MissionShape>;
+                core:resourceType BMM:Mission;
+                dct:title "Query Missions"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#ObjectiveShape>;
+                core:resourceType BMM:Objective;
+                dct:title "Query Objectives"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#OrganizationUnitShape>;
+                core:resourceType BMM:OrganizationUnit;
+                dct:title "Query Organization Units"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#PotentialImpactShape>;
+                core:resourceType BMM:PotentialImpact;
+                dct:title "Query Potential Impacts"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#StrategyShape>;
+                core:resourceType BMM:Strategy;
+                dct:title "Query Strategies"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#TacticShape>;
+                core:resourceType BMM:Tactic;
+                dct:title "Query Tactics"
+            ],
+            [
+                a core:QueryCapability;
+                core:resourceShape <shapes/BMM-Shapes#VisionShape>;
+                core:resourceType BMM:Vision;
+                dct:title "Query Visions"
+            ].

@@ -1,0 +1,13 @@
+###############################################################################
+# 01-catalog.http — ServiceProviderCatalog operations
+###############################################################################
+
+@baseUrl = http://localhost:3005
+
+### Get the ServiceProviderCatalog
+GET {{baseUrl}}/oslc
+Accept: text/turtle
+
+### Get the ServiceProviderCatalog as JSON-LD
+GET {{baseUrl}}/oslc
+Accept: application/ld+json
