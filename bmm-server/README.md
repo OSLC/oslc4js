@@ -117,6 +117,31 @@ An AI assistant can connect to multiple OSLC servers simultaneously — each exp
 
 For OSLC servers that don't embed MCP (e.g., IBM EWM, DOORS Next), the standalone [oslc-mcp-server](../oslc-mcp-server/) module provides a separate MCP server that connects via HTTP discovery.
 
+### AI-Driven Population from Documents
+
+An AI assistant connected to bmm-server's MCP endpoint can read a document (such as a specification, strategy paper, or business plan) and automatically populate the BMM model with the artifacts and relationships it finds. For example:
+
+> "Read the BMM 1.3 specification and create all the example artifacts and relationships described in the document."
+
+From the user's perspective, the assistant reads the document, reports what it found, creates the resources, and provides a link to browse the result. Behind the scenes, the agent follows a systematic process:
+
+**1. Learn the domain model.** The agent reads three reflective MCP resources that bmm-server provides automatically:
+- `oslc://vocabulary` — what BMM types exist and how they relate
+- `oslc://shapes` — the exact properties for each type (required vs. optional, links vs. literals, cardinality)
+- `oslc://catalog` — which ServiceProviders and creation/query endpoints are available
+
+This happens before the agent reads any document. It already understands the BMM schema and knows how to create and link resources.
+
+**2. Read the source document.** The agent reads the provided document and identifies concrete instances — named Visions, Goals, Objectives, Strategies, etc. — along with the relationships between them (e.g., "Goal X is quantified by Objective Y").
+
+**3. Plan creation order.** Because resources can only link to things that already exist, the agent plans a dependency-ordered creation sequence: leaf resources first (Influencers, Assets), then resources that link to them (Assessments, Rules), then mid-level (Objectives, Tactics), then top-level (Goals, Strategies, Vision).
+
+**4. Create resources via MCP tools.** For each artifact, the agent calls the appropriate tool (e.g., `create_goals`) with a JSON object containing the properties and link URIs. The tool converts this to RDF, posts it to the OSLC creation factory, and returns the new resource's URI for use in subsequent links.
+
+**5. Verify and report.** The agent queries the created resources to confirm they are linked correctly and reports a summary.
+
+**Why this is generic.** The agent never uses BMM-specific code. It learns the domain at runtime from the MCP resources the server provides. The same agent, connected to an mrm-server instead, would create Municipal Reference Model resources — Programs, Services, Processes — using the same pattern. Any OSLC server with a vocabulary, shapes, and catalog can be populated this way.
+
 ## REST API
 
 See the [oslc-server README](../oslc-server/README.md) for full REST API documentation. The API is identical since both servers use oslc-service middleware.
