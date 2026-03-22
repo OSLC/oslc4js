@@ -142,6 +142,44 @@ This happens before the agent reads any document. It already understands the BMM
 
 **Why this is generic.** The agent never uses BMM-specific code. It learns the domain at runtime from the MCP resources the server provides. The same agent, connected to an mrm-server instead, would create Municipal Reference Model resources — Programs, Services, Processes — using the same pattern. Any OSLC server with a vocabulary, shapes, and catalog can be populated this way.
 
+### Example Prompts
+
+Once the SolarTech BMM model is populated, here are prompts you can use with an AI assistant connected to the bmm-server MCP endpoint:
+
+**Exploring the model:**
+
+- "What is SolarTech's Vision?"
+- "List all of SolarTech's Goals and the Objectives that quantify each one."
+- "What Strategies does SolarTech have, and which Goals does each Strategy channel efforts toward?"
+- "Show me the complete Ends hierarchy — Vision, Goals, and Objectives — as an outline."
+- "What Tactics implement the Product Innovation Leadership strategy?"
+
+**Analysis and insight:**
+
+- "Which Goals have no Strategies channeling efforts toward them? Are there any gaps in the Means-to-Ends alignment?"
+- "What Influencers has SolarTech identified, and what Assessments have been made about each one?"
+- "Trace the chain from the Perovskite Tandem Cell Breakthrough influencer through its Assessment to the Potential Impact it identifies. What Directive does that impact provide impetus for?"
+- "Which Organization Units are responsible for which Ends? Is every Goal covered?"
+- "What Business Processes are governed by Business Rules, and which Business Policies are those Rules based on?"
+
+**Impact analysis:**
+
+- "If the Federal Solar Investment Tax Credit is not renewed after 2032, which Goals and Objectives would be affected? Trace the impact through the Assessments."
+- "The Certified Installer Shortage constrains growth. What Tactics, Strategies, and Goals are at risk? What is SolarTech doing to address it?"
+- "How does the Vertical Supply Chain Integration strategy connect to the cost reduction Objective? Show the full chain."
+
+**Modification and extension:**
+
+- "Add a new Goal: 'Expand into Commercial Markets' with an Objective to achieve 10% commercial market share by 2028. Link the Goal to the Vision."
+- "Create an Assessment for the Perovskite breakthrough Influencer that identifies it as a Strength, and add a Potential Impact describing the competitive advantage it creates."
+- "Add a new Business Rule: 'All installations must include monitoring system activation' with enforcement level 'Strictly enforced', and link it to the Order-to-Installation Business Process."
+- "The Executive Leadership Team has decided to establish a new Tactic: 'Partner with Regional Utilities for Bundled Offerings'. Create it and link it to the End-to-End Customer Experience strategy."
+
+**Cross-server (if mrm-server is also connected):**
+
+- "Which MRM Programs in the City of Ottawa could be linked to SolarTech's Vertical Supply Chain Integration strategy?"
+- "Create a link from SolarTech's Product Quality Standards policy to the relevant MRM regulatory compliance Process."
+
 ## REST API
 
 See the [oslc-server README](../oslc-server/README.md) for full REST API documentation. The API is identical since both servers use oslc-service middleware.
