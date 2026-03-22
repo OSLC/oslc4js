@@ -2,10 +2,8 @@
 
 import { OSLCClient } from 'oslc-client';
 import { discover } from './discovery.js';
-import { generateTools } from './tools/factory.js';
-import { buildMcpResources } from './resources.js';
 import { startServer } from './server.js';
-import type { ServerConfig } from './types.js';
+import type { ServerConfig } from './server-config.js';
 
 /**
  * Parse CLI arguments. Supports:
@@ -77,15 +75,8 @@ async function main(): Promise<void> {
   console.error('[startup] Discovering OSLC capabilities...');
   const discovery = await discover(client, config);
 
-  // Generate per-type tools
-  const generatedTools = generateTools(client, discovery);
-  console.error(`[startup] Generated ${generatedTools.length} per-type tools`);
-
-  // Build MCP resources
-  const mcpResources = buildMcpResources(discovery);
-
-  // Start MCP server
-  await startServer(client, discovery, generatedTools, mcpResources);
+  // Start MCP server with shared tool generation
+  await startServer(client, discovery, config.serverURL);
 }
 
 main().catch((err) => {
