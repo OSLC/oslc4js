@@ -416,6 +416,86 @@ function saveConnection(state: ConnectionState): void {
   } catch { /* ignore */ }
 }
 
+/** Cache of resolved resource titles (URI → title string). */
+const titleCache = new Map<string, string>();
+
+/**
+ * Resolve human-readable titles for link targets.
+ *
+ * Fallback chain per link target:
+ * 1. Title cache (already resolved)
+ * 2. Compact representation (GET /compact?uri=... Accept: text/turtle → oslc:shortTitle or dcterms:title)
+ * 3. GET the resource directly → dcterms:title
+ * 4. localName(uri) — last URI path segment
+ *
+ * Mutates the links array in place for efficiency.
+ */
+async function resolveLinkTitles(
+  links: ResourceLink[],
+  client: OSLCClient,
+  serverURL: string
+): Promise<void> {
+  // Collect unique URIs that need resolution (skip blank nodes and already-cached)
+  const toResolve = new Map<string, ResourceLink[]>();
+  for (const link of links) {
+    if (link.targetURI.startsWith('_:')) continue;
+    if (titleCache.has(link.targetURI)) {
+      link.targetTitle = titleCache.get(link.targetURI);
+      continue;
+    }
+    if (!toResolve.has(link.targetURI)) {
+      toResolve.set(link.targetURI, []);
+    }
+    toResolve.get(link.targetURI)!.push(link);
+  }
+
+  if (toResolve.size === 0) return;
+
+  const serverOrigin = serverURL ? new URL(serverURL).origin : '';
+
+  // Resolve titles in parallel (with concurrency limit to avoid flooding)
+  const entries = [...toResolve.entries()];
+  const batchSize = 10;
+  for (let i = 0; i < entries.length; i += batchSize) {
+    const batch = entries.slice(i, i + batchSize);
+    await Promise.all(batch.map(async ([uri, linkRefs]) => {
+      let title: string | undefined;
+
+      // Try compact representation first
+      if (serverOrigin) {
+        try {
+          const compactURL = `${serverOrigin}/compact?uri=${encodeURIComponent(uri)}`;
+          const compactResource = await client.getResource(compactURL, '3.0', 'text/turtle');
+          title = compactResource.getTitle();
+        } catch { /* compact not available, fall through */ }
+      }
+
+      // Fall back to GET the resource and extract dcterms:title
+      if (!title) {
+        try {
+          let fetchURI = uri;
+          if (serverOrigin && !uri.startsWith(serverOrigin)) {
+            fetchURI = `${serverOrigin}/resource?uri=${encodeURIComponent(uri)}`;
+          }
+          const resource = await client.getResource(fetchURI, '3.0', 'text/turtle');
+          title = resource.getTitle();
+        } catch { /* resource not fetchable, fall through */ }
+      }
+
+      // Final fallback
+      if (!title) {
+        title = localName(uri);
+      }
+
+      // Cache and apply to all links targeting this URI
+      titleCache.set(uri, title);
+      for (const ref of linkRefs) {
+        ref.targetTitle = title;
+      }
+    }));
+  }
+}
+
 export function useOslcClient(): UseOslcClientReturn {
   const [connection, setConnection] = useState<ConnectionState>(() => {
     const saved = loadSavedConnection();
@@ -466,7 +546,12 @@ export function useOslcClient(): UseOslcClientReturn {
       }
 
       const resource = await client.getResource(fetchURI);
-      return await parseOslcResource(resource, uri, shapeLookup);
+      const loaded = await parseOslcResource(resource, uri, shapeLookup);
+
+      // Resolve human-readable titles for link targets
+      await resolveLinkTitles(loaded.links, client, connection.serverURL);
+
+      return loaded;
     } catch (err) {
       console.error('Error fetching resource:', uri, err);
       return null;

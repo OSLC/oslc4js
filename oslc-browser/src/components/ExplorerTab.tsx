@@ -130,7 +130,7 @@ export function ExplorerTabComponent({ resource, onNodeClick }: ExplorerTabProps
             onClick={() => onNodeClick(node.uri)}
             style={{ cursor: 'pointer' }}
           >
-            <title>{node.uri}</title>
+            <title>{node.label}</title>
             <rect
               width={NODE_WIDTH}
               height={NODE_HEIGHT}

@@ -120,7 +120,7 @@ function ResourceAccordion({
           variant="subtitle2"
           sx={{ fontSize: 13, fontWeight: 600 }}
           noWrap
-          title={resource.uri}
+          title={resource.title}
         >
           {resource.title}
         </Typography>
