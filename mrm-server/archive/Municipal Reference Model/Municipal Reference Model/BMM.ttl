@@ -1,0 +1,527 @@
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix dc11:    <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix oslc_am: <http://open-services.net/ns/am#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+# Ontology declaration
+<http://www.omg.org/spec/BMM>
+  a owl:Ontology ;
+  owl:imports <http://open-services.net/ns/am> ;
+  dc11:title "OMG Business Motivation Model Vocabulary" ;
+  dc11:description "RDF vocabulary for the OMG Business Motivation Model (BMM) 1.3 metamodel, adapted for OSLC. BMM provides a scheme for developing, communicating, and managing business plans in an organized manner." .
+
+# ============================================================
+# Abstract / Mixin Classes
+# ============================================================
+
+bmm:MotivationalElement
+  a rdfs:Class ;
+  rdfs:subClassOf oslc_am:Resource ;
+  dc11:description "The root abstract superclass of all BMM elements. A motivational element is any element that can be part of a business motivation model." .
+
+# ============================================================
+# Ends — What the enterprise wishes to achieve
+# ============================================================
+
+bmm:End
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:MotivationalElement ;
+  dc11:description "Something the enterprise wishes to achieve. Ends describe the desired future state of the enterprise. Ends are of two kinds: Vision and DesiredResult." .
+
+bmm:Vision
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:End ;
+  dc11:description "An overall image of what the enterprise wants to be or become. A Vision is the ultimate, possibly unachievable, state the enterprise would like to attain. It describes the future in terms of what the enterprise wants to be rather than what it does." .
+
+bmm:DesiredResult
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:End ;
+  dc11:description "An End that is a desired state or target the enterprise intends to maintain or sustain. DesiredResult is a superclass for Goal and Objective." .
+
+bmm:Goal
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:DesiredResult ;
+  dc11:description "A statement about a state or condition of the enterprise to be brought about or sustained through appropriate Means. A Goal is a long-term, ongoing, qualitative statement of intent. A Goal amplifies a Vision — that is, it indicates what must be done to make the Vision a reality." .
+
+bmm:Objective
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:DesiredResult ;
+  dc11:description "A statement of an attainable, time-targeted, and measurable target that the enterprise seeks to meet in order to achieve its Goals. An Objective quantifies a Goal — it makes the Goal measurable by defining specific, achievable targets with deadlines." .
+
+# ============================================================
+# Means — How the enterprise intends to achieve its Ends
+# ============================================================
+
+bmm:Means
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:MotivationalElement ;
+  dc11:description "Any device, capability, regime, technique, restriction, agency, instrument, or method that may be called upon, activated, or enforced to achieve Ends. Means are of three kinds: Mission, CourseOfAction, and Directive." .
+
+bmm:Mission
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:Means ;
+  dc11:description "The ongoing operational activity of the enterprise that makes the Vision operative. A Mission describes what the enterprise does day-to-day to pursue its Vision. A Mission makes a Vision operative." .
+
+bmm:CourseOfAction
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:Means ;
+  dc11:description "An approach or plan for configuring some aspect of the enterprise involving things, processes, locations, people, timing, or motivation, undertaken to achieve Ends. CourseOfAction is a superclass for Strategy and Tactic." .
+
+bmm:Strategy
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:CourseOfAction ;
+  dc11:description "A CourseOfAction that represents a longer-term, broader approach to achieving Ends. A Strategy defines the essential courses the enterprise needs to pursue over time. A Strategy typically channels efforts toward Goals." .
+
+bmm:Tactic
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:CourseOfAction ;
+  dc11:description "A CourseOfAction that represents a shorter-term, more specific approach to achieving Ends. A Tactic implements a Strategy. A Tactic is narrowly focused and has a shorter time horizon than a Strategy." .
+
+bmm:Directive
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:Means ;
+  dc11:description "A Means that governs CourseOfActions. A Directive provides the basis for guidance and constraints on the enterprise. Directive is a superclass for BusinessPolicy and BusinessRule." .
+
+bmm:BusinessPolicy
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:Directive ;
+  dc11:description "A Directive that is not directly actionable. A BusinessPolicy exists to govern, guide, or constrain the enterprise and its activities. A BusinessPolicy provides the basis for BusinessRules." .
+
+bmm:BusinessRule
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:Directive ;
+  dc11:description "A Directive that is a specific, actionable, testable constraint or guidance that is under business jurisdiction. A BusinessRule provides specific operational guidance that can be directly enforced." .
+
+# ============================================================
+# Influencers — Things that can affect Means and Ends
+# ============================================================
+
+bmm:Influencer
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:MotivationalElement ;
+  dc11:description "Something that can cause changes affecting the enterprise in its employment of its Means or achievement of its Ends. An Influencer is an act, event, or state that is not under the control of the enterprise but has or may have an influence on business motivation elements." .
+
+bmm:ExternalInfluencer
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:Influencer ;
+  dc11:description "An Influencer that comes from outside the enterprise. Examples include competitors, technology trends, regulations, economic conditions, and market changes." .
+
+bmm:InternalInfluencer
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:Influencer ;
+  dc11:description "An Influencer that comes from inside the enterprise. Examples include resources, habits, infrastructure, management prerogatives, and corporate values." .
+
+# ============================================================
+# Assessment — Judgment about Influencers
+# ============================================================
+
+bmm:Assessment
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:MotivationalElement ;
+  dc11:description "A judgment about an Influencer, specifically about its impact on the employment of specific Means or on the achievement of specific Ends. An Assessment uses the SWOT categories: Strength, Weakness, Opportunity, or Threat." .
+
+bmm:PotentialImpact
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:MotivationalElement ;
+  dc11:description "A possible effect that an Influencer may have on the enterprise, expressed as either a risk or a potential reward. A PotentialImpact is identified by an Assessment and can provide impetus for a Directive." .
+
+# ============================================================
+# Organization and Process
+# ============================================================
+
+bmm:OrganizationUnit
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:MotivationalElement ;
+  dc11:description "An organized group of people that forms a recognized part of an organizational structure. An OrganizationUnit is responsible for achieving Ends, establishing and deploying Means, recognizing Influencers, and making Assessments." .
+
+bmm:BusinessProcess
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:MotivationalElement ;
+  dc11:description "A partially-ordered set of enterprise activities that can be executed to achieve some desired End or to realize a CourseOfAction. BusinessProcesses are governed by BusinessPolicies and BusinessRules." .
+
+bmm:Asset
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:MotivationalElement ;
+  dc11:description "A resource of value owned or controlled by the enterprise. Assets are deployed to support CoursesOfAction and may be affected by Directives." .
+
+bmm:InfluencingOrganization
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:ExternalInfluencer ;
+  dc11:description "An organization outside the enterprise that acts as an Influencer, such as a competitor, partner, regulator, or industry body." .
+
+bmm:Regulation
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:ExternalInfluencer ;
+  dc11:description "A rule or directive made and maintained by an authority external to the enterprise, such as a government agency or standards body." .
+
+# ============================================================
+# Enumeration Types
+# ============================================================
+
+bmm:InfluencerCategoryType
+  a rdfs:Class ;
+  rdfs:subClassOf rdfs:Datatype ;
+  dc11:description "The SWOT category of an Assessment: Strength, Weakness, Opportunity, or Threat." .
+
+bmm:InfluencerCategoryType-Strength
+  a bmm:InfluencerCategoryType ;
+  rdfs:label "Strength" .
+
+bmm:InfluencerCategoryType-Weakness
+  a bmm:InfluencerCategoryType ;
+  rdfs:label "Weakness" .
+
+bmm:InfluencerCategoryType-Opportunity
+  a bmm:InfluencerCategoryType ;
+  rdfs:label "Opportunity" .
+
+bmm:InfluencerCategoryType-Threat
+  a bmm:InfluencerCategoryType ;
+  rdfs:label "Threat" .
+
+# ============================================================
+# End Relationships
+# ============================================================
+
+# Vision ↔ Mission
+bmm:amplifiedByMission
+  a rdf:Property ;
+  rdfs:domain bmm:Vision ;
+  rdfs:range bmm:Mission ;
+  dc11:description "The Mission that makes this Vision operative. A Vision is amplified by a Mission." .
+
+bmm:makesOperative
+  a rdf:Property ;
+  rdfs:domain bmm:Mission ;
+  rdfs:range bmm:Vision ;
+  dc11:description "The Vision that this Mission makes operative." .
+
+# Vision ↔ Goal
+bmm:madeOperativeByGoal
+  a rdf:Property ;
+  rdfs:domain bmm:Vision ;
+  rdfs:range bmm:Goal ;
+  dc11:description "A Goal that amplifies this Vision — indicates what must be done to make the Vision a reality." .
+
+bmm:amplifiesVision
+  a rdf:Property ;
+  rdfs:domain bmm:Goal ;
+  rdfs:range bmm:Vision ;
+  dc11:description "The Vision that this Goal amplifies." .
+
+# Goal ↔ Objective
+bmm:quantifiedByObjective
+  a rdf:Property ;
+  rdfs:domain bmm:Goal ;
+  rdfs:range bmm:Objective ;
+  dc11:description "An Objective that quantifies this Goal by defining a specific, measurable target." .
+
+bmm:quantifiesGoal
+  a rdf:Property ;
+  rdfs:domain bmm:Objective ;
+  rdfs:range bmm:Goal ;
+  dc11:description "The Goal that this Objective quantifies." .
+
+# Goal ↔ Goal (part-whole)
+bmm:includesGoal
+  a rdf:Property ;
+  rdfs:domain bmm:Goal ;
+  rdfs:range bmm:Goal ;
+  dc11:description "A sub-Goal that is part of this Goal." .
+
+# Objective ↔ Objective (part-whole)
+bmm:includesObjective
+  a rdf:Property ;
+  rdfs:domain bmm:Objective ;
+  rdfs:range bmm:Objective ;
+  dc11:description "A sub-Objective that is part of this Objective." .
+
+# ============================================================
+# Means Relationships
+# ============================================================
+
+# CourseOfAction ↔ DesiredResult
+bmm:enablesEnd
+  a rdf:Property ;
+  rdfs:domain bmm:CourseOfAction ;
+  rdfs:range bmm:End ;
+  dc11:description "An End that this CourseOfAction enables or contributes to achieving." .
+
+bmm:enabledByCourseOfAction
+  a rdf:Property ;
+  rdfs:domain bmm:End ;
+  rdfs:range bmm:CourseOfAction ;
+  dc11:description "A CourseOfAction that enables or contributes to achieving this End." .
+
+# Strategy → Vision
+bmm:channelsEffortsTowardVision
+  a rdf:Property ;
+  rdfs:domain bmm:Strategy ;
+  rdfs:range bmm:Vision ;
+  dc11:description "The Vision toward which this Strategy channels efforts." .
+
+# Strategy → Goal
+bmm:channelsEffortsTowardGoal
+  a rdf:Property ;
+  rdfs:domain bmm:Strategy ;
+  rdfs:range bmm:Goal ;
+  dc11:description "A Goal toward which this Strategy channels efforts." .
+
+# Strategy ↔ Strategy (part-whole)
+bmm:componentOfStrategy
+  a rdf:Property ;
+  rdfs:domain bmm:Strategy ;
+  rdfs:range bmm:Strategy ;
+  dc11:description "A broader Strategy of which this Strategy is a component." .
+
+bmm:includesStrategy
+  a rdf:Property ;
+  rdfs:domain bmm:Strategy ;
+  rdfs:range bmm:Strategy ;
+  dc11:description "A sub-Strategy that is a component of this Strategy." .
+
+# Tactic → Strategy
+bmm:implementsStrategy
+  a rdf:Property ;
+  rdfs:domain bmm:Tactic ;
+  rdfs:range bmm:Strategy ;
+  dc11:description "The Strategy that this Tactic implements." .
+
+# Tactic ↔ Tactic (part-whole)
+bmm:componentOfTactic
+  a rdf:Property ;
+  rdfs:domain bmm:Tactic ;
+  rdfs:range bmm:Tactic ;
+  dc11:description "A broader Tactic of which this Tactic is a component." .
+
+bmm:includesTactic
+  a rdf:Property ;
+  rdfs:domain bmm:Tactic ;
+  rdfs:range bmm:Tactic ;
+  dc11:description "A sub-Tactic that is a component of this Tactic." .
+
+# Directive → CourseOfAction
+bmm:governsCourseOfAction
+  a rdf:Property ;
+  rdfs:domain bmm:Directive ;
+  rdfs:range bmm:CourseOfAction ;
+  dc11:description "A CourseOfAction that is governed by this Directive." .
+
+bmm:governedByDirective
+  a rdf:Property ;
+  rdfs:domain bmm:CourseOfAction ;
+  rdfs:range bmm:Directive ;
+  dc11:description "A Directive that governs this CourseOfAction." .
+
+# BusinessPolicy → BusinessRule
+bmm:basedOnBusinessRule
+  a rdf:Property ;
+  rdfs:domain bmm:BusinessPolicy ;
+  rdfs:range bmm:BusinessRule ;
+  dc11:description "A BusinessRule that is the basis for or implements this BusinessPolicy." .
+
+bmm:basedOnBusinessPolicy
+  a rdf:Property ;
+  rdfs:domain bmm:BusinessRule ;
+  rdfs:range bmm:BusinessPolicy ;
+  dc11:description "The BusinessPolicy that this BusinessRule is based on." .
+
+# BusinessPolicy → BusinessProcess
+bmm:governsBusinessProcess
+  a rdf:Property ;
+  rdfs:domain bmm:BusinessPolicy ;
+  rdfs:range bmm:BusinessProcess ;
+  dc11:description "A BusinessProcess that is governed by this BusinessPolicy." .
+
+# BusinessRule → BusinessProcess
+bmm:enforcedByBusinessProcess
+  a rdf:Property ;
+  rdfs:domain bmm:BusinessRule ;
+  rdfs:range bmm:BusinessProcess ;
+  dc11:description "A BusinessProcess that enforces this BusinessRule." .
+
+# Tactic → BusinessRule
+bmm:effectsEnforcementOfBusinessRule
+  a rdf:Property ;
+  rdfs:domain bmm:Tactic ;
+  rdfs:range bmm:BusinessRule ;
+  dc11:description "A BusinessRule whose enforcement is effected by this Tactic." .
+
+# ============================================================
+# Influencer and Assessment Relationships
+# ============================================================
+
+# Assessment → Influencer
+bmm:assessesInfluencer
+  a rdf:Property ;
+  rdfs:domain bmm:Assessment ;
+  rdfs:range bmm:Influencer ;
+  dc11:description "The Influencer that this Assessment is about." .
+
+bmm:assessedByAssessment
+  a rdf:Property ;
+  rdfs:domain bmm:Influencer ;
+  rdfs:range bmm:Assessment ;
+  dc11:description "An Assessment made about this Influencer." .
+
+# Assessment → PotentialImpact
+bmm:identifiesPotentialImpact
+  a rdf:Property ;
+  rdfs:domain bmm:Assessment ;
+  rdfs:range bmm:PotentialImpact ;
+  dc11:description "A PotentialImpact identified by this Assessment." .
+
+bmm:identifiedByAssessment
+  a rdf:Property ;
+  rdfs:domain bmm:PotentialImpact ;
+  rdfs:range bmm:Assessment ;
+  dc11:description "The Assessment that identified this PotentialImpact." .
+
+# Assessment → End
+bmm:affectsAchievementOfEnd
+  a rdf:Property ;
+  rdfs:domain bmm:Assessment ;
+  rdfs:range bmm:End ;
+  dc11:description "An End whose achievement is affected by this Assessment." .
+
+# Assessment → Means
+bmm:affectsEmploymentOfMeans
+  a rdf:Property ;
+  rdfs:domain bmm:Assessment ;
+  rdfs:range bmm:Means ;
+  dc11:description "A Means whose employment is affected by this Assessment." .
+
+# Assessment category
+bmm:assessmentCategory
+  a rdf:Property ;
+  rdfs:domain bmm:Assessment ;
+  rdfs:range bmm:InfluencerCategoryType ;
+  dc11:description "The SWOT category of this Assessment: Strength, Weakness, Opportunity, or Threat." .
+
+# PotentialImpact → Directive
+bmm:providesImpetusForDirective
+  a rdf:Property ;
+  rdfs:domain bmm:PotentialImpact ;
+  rdfs:range bmm:Directive ;
+  dc11:description "A Directive for which this PotentialImpact provides impetus." .
+
+# PotentialImpact → End
+bmm:isRiskForEnd
+  a rdf:Property ;
+  rdfs:domain bmm:PotentialImpact ;
+  rdfs:range bmm:End ;
+  dc11:description "An End for which this PotentialImpact represents a risk." .
+
+# PotentialImpact → Means
+bmm:isRiskForMeans
+  a rdf:Property ;
+  rdfs:domain bmm:PotentialImpact ;
+  rdfs:range bmm:Means ;
+  dc11:description "A Means for which this PotentialImpact represents a risk." .
+
+# PotentialImpact → End
+bmm:isRewardForEnd
+  a rdf:Property ;
+  rdfs:domain bmm:PotentialImpact ;
+  rdfs:range bmm:End ;
+  dc11:description "An End for which this PotentialImpact represents a potential reward." .
+
+# PotentialImpact → Means
+bmm:isRewardForMeans
+  a rdf:Property ;
+  rdfs:domain bmm:PotentialImpact ;
+  rdfs:range bmm:Means ;
+  dc11:description "A Means for which this PotentialImpact represents a potential reward." .
+
+# ============================================================
+# OrganizationUnit Relationships
+# ============================================================
+
+bmm:isResponsibleForEnd
+  a rdf:Property ;
+  rdfs:domain bmm:OrganizationUnit ;
+  rdfs:range bmm:End ;
+  dc11:description "An End that this OrganizationUnit is responsible for achieving." .
+
+bmm:establishesMeans
+  a rdf:Property ;
+  rdfs:domain bmm:OrganizationUnit ;
+  rdfs:range bmm:Means ;
+  dc11:description "A Means that this OrganizationUnit establishes or deploys." .
+
+bmm:recognizesInfluencer
+  a rdf:Property ;
+  rdfs:domain bmm:OrganizationUnit ;
+  rdfs:range bmm:Influencer ;
+  dc11:description "An Influencer that this OrganizationUnit has recognized." .
+
+bmm:makesAssessment
+  a rdf:Property ;
+  rdfs:domain bmm:OrganizationUnit ;
+  rdfs:range bmm:Assessment ;
+  dc11:description "An Assessment that this OrganizationUnit has made." .
+
+bmm:definedByBusinessProcess
+  a rdf:Property ;
+  rdfs:domain bmm:OrganizationUnit ;
+  rdfs:range bmm:BusinessProcess ;
+  dc11:description "A BusinessProcess that defines the operations of this OrganizationUnit." .
+
+bmm:subOrganizationUnits
+  a rdf:Property ;
+  rdfs:domain bmm:OrganizationUnit ;
+  rdfs:range bmm:OrganizationUnit ;
+  dc11:description "A child OrganizationUnit that is part of this OrganizationUnit." .
+
+# ============================================================
+# BusinessProcess Relationships
+# ============================================================
+
+bmm:realizesAsset
+  a rdf:Property ;
+  rdfs:domain bmm:BusinessProcess ;
+  rdfs:range bmm:Asset ;
+  dc11:description "An Asset that this BusinessProcess uses or realizes." .
+
+bmm:governedByBusinessPolicy
+  a rdf:Property ;
+  rdfs:domain bmm:BusinessProcess ;
+  rdfs:range bmm:BusinessPolicy ;
+  dc11:description "A BusinessPolicy that governs this BusinessProcess." .
+
+bmm:governedByBusinessRule
+  a rdf:Property ;
+  rdfs:domain bmm:BusinessProcess ;
+  rdfs:range bmm:BusinessRule ;
+  dc11:description "A BusinessRule that governs this BusinessProcess." .
+
+# ============================================================
+# Datatype Properties
+# ============================================================
+
+bmm:targetDate
+  a rdf:Property ;
+  rdfs:domain bmm:Objective ;
+  rdfs:range xsd:date ;
+  dc11:description "The date by which this Objective is targeted to be achieved." .
+
+bmm:measureOfProgress
+  a rdf:Property ;
+  rdfs:domain bmm:Objective ;
+  rdfs:range xsd:string ;
+  dc11:description "A quantifiable measure used to evaluate progress toward achieving this Objective." .
+
+bmm:enforcementLevel
+  a rdf:Property ;
+  rdfs:domain bmm:BusinessRule ;
+  rdfs:range xsd:string ;
+  dc11:description "The level at which the BusinessRule is enforced: strictly enforced, deferred enforcement, or override with explanation." .
+
+bmm:influencerCategory
+  a rdf:Property ;
+  rdfs:domain bmm:Influencer ;
+  rdfs:range xsd:string ;
+  dc11:description "The category of this Influencer: Competition, Customer, Environment, Habit, Infrastructure, Issue, Management Prerogative, Partner, Regulation, Resource, Supplier, Technology, etc." .
