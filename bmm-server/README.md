@@ -1,0 +1,126 @@
+# bmm-server
+
+An [OSLC 3.0](https://docs.oasis-open-projects.org/oslc-op/core/v3.0/oslc-core.html) server for the [OMG Business Motivation Model (BMM) 1.3](https://www.omg.org/spec/BMM/1.3/) built with Node.js and Express. It uses the **oslc-service** Express middleware for OSLC operations, backed by **Apache Jena Fuseki** for RDF persistence.
+
+BMM provides a scheme for developing, communicating, and managing business plans in an organized manner. It captures the relationships between an enterprise's Ends (what it wants to achieve) and its Means (how it intends to achieve them), along with the Influencers and Assessments that shape business motivation.
+
+This server manages the following BMM resource types: **Vision**, **Goal**, **Objective**, **Mission**, **Strategy**, **Tactic**, **Business Policy**, **Business Rule**, **Influencer**, **Assessment**, **Potential Impact**, **Organization Unit**, **Business Process**, **Asset**.
+
+## Architecture
+
+bmm-server is built from several modules in the oslc4js workspace:
+
+- **bmm-server** -- Express application entry point and static assets
+- **oslc-service** -- Express middleware providing OSLC 3.0 services
+- **ldp-service** -- Express middleware implementing the W3C LDP protocol
+- **storage-service** -- Abstract storage interface
+- **ldp-service-jena** -- Storage backend using Apache Jena Fuseki
+
+## Running
+
+### Prerequisites
+
+- [Node.js](http://nodejs.org) v22 or later
+- [Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/) running with a `bmm` dataset configured
+
+### Setup
+
+Install dependencies from the workspace root:
+
+    $ npm install
+
+Build the TypeScript source:
+
+    $ cd bmm-server
+    $ npm run build
+
+### Configuration
+
+Edit `config.json` to match your environment:
+
+```json
+{
+  "scheme": "http",
+  "host": "localhost",
+  "port": 3005,
+  "context": "/",
+  "jenaURL": "http://localhost:3030/bmm/"
+}
+```
+
+- **port** -- The port to listen on (3005 by default)
+- **context** -- The URL path prefix for OSLC/LDP resources
+- **jenaURL** -- The Fuseki dataset endpoint URL
+
+### Start
+
+Start Fuseki with your `bmm` dataset, then:
+
+    $ npm start
+
+The server starts on port 3005.
+
+### Web UI
+
+bmm-server includes the [oslc-browser](../oslc-browser) web application, served from `public/`. To build the UI:
+
+    $ cd bmm-server/ui
+    $ npm install
+    $ npm run build
+
+Then open your browser to `http://localhost:3005/`.
+
+## Customization
+
+After scaffolding, you should:
+
+1. **Review or extend the vocabularies** in `config/vocab/` with your domain vocabulary definitions
+2. **Review or extend the resource shapes** in `config/shapes/` to describe your domain resources
+3. **Review or update the catalog template** in `config/catalog-template.ttl` to define your service provider's creation factories, query capabilities, and dialogs
+4. **Update the Fuseki dataset name** in `config.json` (`jenaURL`) to match your Fuseki configuration
+
+## Example: SolarTech Inc.
+
+The `testing/` folder contains `.http` request files that populate a complete BMM example based on a fictional renewable energy company, SolarTech Inc. The example illustrates the full BMM metamodel with interconnected resources:
+
+| File | Creates | Description |
+|------|---------|-------------|
+| `01-catalog.http` | — | Read the ServiceProviderCatalog |
+| `02-create-service-provider.http` | 1 ServiceProvider | "SolarTech Inc." enterprise |
+| `03-create-ends.http` | 1 Vision, 3 Goals, 3 Objectives | Vision to be the leading solar energy provider; Goals for market share, customer satisfaction, and operational efficiency; Objectives with measurable targets and deadlines |
+| `04-create-means.http` | 1 Mission, 3 Strategies, 3 Tactics, 2 Policies, 3 Rules | Mission to deliver affordable solar solutions; Strategies for product innovation, customer experience, and supply chain integration; Tactics implementing each strategy; Policies for quality and data protection; Rules with enforcement levels |
+| `05-create-influencers-assessments.http` | 4 Influencers, 3 Assessments, 2 PotentialImpacts | External influencers (tax credits, import competition) and internal influencers (labor shortage, technology breakthrough); SWOT-style assessments; potential impacts identifying risks and rewards |
+| `06-create-organization.http` | 4 OrgUnits, 3 Processes, 3 Assets | Executive, R&D, Manufacturing, and Customer Operations divisions; product development, order-to-installation, and warranty processes; manufacturing facility, patent portfolio, and monitoring platform |
+| `07-link-resources.http` | — | Templates for adding cross-references between resources (requires ETags from the server) |
+| `08-query-resources.http` | — | OSLC queries to retrieve resources by type |
+
+To load the example, run the files in order (02 through 06) using a REST client such as the VS Code REST Client extension. Then browse the populated model at `http://localhost:3005/`.
+
+## AI via MCP
+
+bmm-server includes a built-in MCP endpoint at `/mcp` using the [Streamable HTTP](https://modelcontextprotocol.io/docs/concepts/transports#streamable-http) transport. When the server starts, it automatically discovers the BMM vocabulary, shapes, and catalog, and exposes them as MCP tools that an AI assistant can call.
+
+**Tools exposed (33 total):**
+- 14 `create_*` tools — one per BMM resource type (create_visions, create_goals, create_strategies, etc.)
+- 14 `query_*` tools — one per BMM resource type
+- 5 generic tools — get_resource, update_resource, delete_resource, list_resource_types, query_resources
+
+**To connect an AI assistant (e.g., Claude Desktop):**
+
+Configure the MCP server URL as `http://localhost:3005/mcp` in your AI assistant's MCP settings. No separate process is needed.
+
+**Multi-server scenario:**
+
+An AI assistant can connect to multiple OSLC servers simultaneously — each exposes its own `/mcp` endpoint. For example, Claude Desktop can connect to both bmm-server (`http://localhost:3005/mcp`) and mrm-server (`http://localhost:3002/mcp`) to work across BMM strategies and MRM programs.
+
+**Third-party OSLC servers:**
+
+For OSLC servers that don't embed MCP (e.g., IBM EWM, DOORS Next), the standalone [oslc-mcp-server](../oslc-mcp-server/) module provides a separate MCP server that connects via HTTP discovery.
+
+## REST API
+
+See the [oslc-server README](../oslc-server/README.md) for full REST API documentation. The API is identical since both servers use oslc-service middleware.
+
+## License
+
+Licensed under the Apache License, Version 2.0.
