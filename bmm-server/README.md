@@ -6,20 +6,20 @@ BMM provides a scheme for developing, communicating, and managing business plans
 
 This server manages the following BMM resource types: **Vision**, **Goal**, **Objective**, **Mission**, **Strategy**, **Tactic**, **Business Policy**, **Business Rule**, **Influencer**, **Assessment**, **Potential Impact**, **Organization Unit**, **Business Process**, **Asset**.
 
-This is a complete demonstration of the Define-Instantiate-Activate pattern from your architecture document:
+This is a complete demonstration of the Define-Instantiate-Activate pattern from the architecture document (../docs/Define-Instantiate-Activate.md):
 
-  **Define** — BMM.ttl vocabulary (25 classes, 49 properties), BMM-Shapes.ttl (14 ResourceShapes), and a catalog template — all declarative, no application code. In this case, Claude was actually used to create the BMM OSLC vocabulary and resource shapes directly from the OMG specification at: https://www.omg.org/spec/BMM/1.3/PDF. 
+  **Define** — BMM.ttl vocabulary (25 classes, 49 properties), BMM-Shapes.ttl (14 ResourceShapes), and a catalog template — all declarative, no application code. Claude was used to create the BMM OSLC vocabulary and resource shapes directly from the OMG specification at: https://www.omg.org/spec/BMM/1.3/PDF. 
 
-  **Instantiate** — create-oslc-server.ts scaffolds a working server from those declarations. The embedded MCP endpoint lets AI populate it from the examples in https://www.omg.org/spec/BMM/1.3/PDF, or other documents. 38 linked SolarTech resources created via MCP tool calls.
+  **Instantiate** — create-oslc-server.ts scaffolds a working server from the vocabulary and resource shape constraints. The embedded MCP endpoint lets an AI assistant populate server resources from the examples in https://www.omg.org/spec/BMM/1.3/PDF, or other documents. 38 linked SolarTech resources are created via MCP tool calls.
 
-  **Activate** — AI assistants query, analyze, and extend the model through natural language. The oslc-browser provides human navigation. OSLC queries and SPARQL provide programmatic access. Multiple servers can cross-link by URI.
+  **Activate** — AI assistants query, analyze, and extend the model through natural language. The oslc-browser provides human navigation. OSLC services provide programmatic access. Multiple servers can cross-link by URI.
 
 And the bmm-server gets a generic, reusable OSLC browser that can be used to view and navigate those BMM sample resources:
 
 ![alt text](image-3.png)
 
 None of this is BMM-specific. The same toolchain works for any domain — swap the vocabulary and shapes, run the scaffolding script, and you have a working OSLC server with
-an AI-accessible MCP endpoint. The barrier between domain knowledge and a working, AI-integrated tool is now just three Turtle files.
+an AI-accessible MCP endpoint and a generic, usable and consistent UI. The barrier between domain knowledge and a working, AI-integrated tool is now just three Turtle files that can often be generated from your existing documentation.
 
 ## Architecture
 
@@ -36,7 +36,7 @@ bmm-server is built from several modules in the oslc4js workspace:
 ### Prerequisites
 
 - [Node.js](http://nodejs.org) v22 or later
-- [Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/) running with a `bmm` dataset configured
+- [Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/) running with a `bmm` dataset configured with tdb2:unionDefaultGraph true 
 
 ### Setup
 
@@ -51,7 +51,7 @@ Build the TypeScript source:
 
 ### Configuration
 
-Edit `config.json` to match your environment:
+Edit `config.json` to match your environment (initial values creqted by the creat-oslc-server.ts script):
 
 ```json
 {
@@ -102,7 +102,7 @@ After scaffolding, you should:
 
 ## Example: SolarTech Inc.
 
-The `testing/` folder contains `.http` request files that populate a complete BMM example based on a fictional renewable energy company, SolarTech Inc. The example illustrates the full BMM metamodel with interconnected resources:
+The `testing/` folder contains `.http` request files that populate a complete BMM example based on a fictional renewable energy company, SolarTech Inc described in the  OMG Business Motivation Model (BMM) 1.3 specification. The example illustrates the full BMM metamodel with interconnected resources and how to use the server's OSLC REST API:
 
 | File | Creates | Description |
 |------|---------|-------------|
@@ -146,12 +146,12 @@ An AI assistant connected to bmm-server's MCP endpoint can read a document (such
 
 From the user's perspective, the assistant reads the document, reports what it found, creates the resources, and provides a link to browse the result. Behind the scenes, the agent follows a systematic process:
 
-**1. Learn the domain model.** The agent reads three reflective MCP resources that bmm-server provides automatically:
+**1. Learn the domain model.** The agent reads three reflective resources that bmm-server exposes through the MCP `resources/read` protocol. These are MCP resource URIs (not HTTP URLs) — the AI reads them automatically when it connects to the `/mcp` endpoint:
 - `oslc://vocabulary` — what BMM types exist and how they relate
 - `oslc://shapes` — the exact properties for each type (required vs. optional, links vs. literals, cardinality)
 - `oslc://catalog` — which ServiceProviders and creation/query endpoints are available
 
-This happens before the agent reads any document. It already understands the BMM schema and knows how to create and link resources.
+These resources return human-readable markdown descriptions of the server's domain model. The AI reads them before any user interaction, so it already understands the BMM schema and knows how to create and link resources.
 
 **2. Read the source document.** The agent reads the provided document and identifies concrete instances — named Visions, Goals, Objectives, Strategies, etc. — along with the relationships between them (e.g., "Goal X is quantified by Objective Y").
 
