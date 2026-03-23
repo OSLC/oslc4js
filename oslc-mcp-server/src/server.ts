@@ -84,7 +84,30 @@ class HttpToolContext {
     if (params.orderBy) parts.push(`oslc.orderBy=${encodeURIComponent(params.orderBy)}`);
     const fullURL = parts.length > 0 ? `${queryURL}?${parts.join('&')}` : queryURL;
     const resource = await this.client.getResource(fullURL, '3.0', 'text/turtle');
-    return JSON.stringify(resourceToJson(resource.store, fullURL));
+
+    // Extract member resources from the LDP container response.
+    // The query response is an LDP BasicContainer with ldp:contains
+    // or rdfs:member links to the result resources.
+    const store = resource.store;
+    const containerSym = store.sym(fullURL);
+    const LDP_CONTAINS = 'http://www.w3.org/ns/ldp#contains';
+    const RDFS_MEMBER = 'http://www.w3.org/2000/01/rdf-schema#member';
+
+    const memberNodes = [
+      ...store.each(containerSym, store.sym(LDP_CONTAINS), undefined),
+      ...store.each(containerSym, store.sym(RDFS_MEMBER), undefined),
+    ];
+
+    if (memberNodes.length > 0) {
+      // Return each member as a JSON object
+      const members = memberNodes
+        .filter(n => n.termType === 'NamedNode')
+        .map(n => resourceToJson(store, n.value));
+      return JSON.stringify(members, null, 2);
+    }
+
+    // Fallback: return the container itself
+    return JSON.stringify(resourceToJson(store, fullURL));
   }
 
   getGeneratedHandler(_name: string): ((args: Record<string, unknown>) => Promise<string>) | undefined {
