@@ -88,8 +88,11 @@ class HttpToolContext {
     // Extract member resources from the LDP container response.
     // The query response is an LDP BasicContainer with ldp:contains
     // or rdfs:member links to the result resources.
+    // Note: the store's container subject uses the base URL without
+    // query parameters, even though fullURL includes them.
     const store = resource.store;
-    const containerSym = store.sym(fullURL);
+    const containerBaseURL = fullURL.split('?')[0];
+    const containerSym = store.sym(containerBaseURL);
     const LDP_CONTAINS = 'http://www.w3.org/ns/ldp#contains';
     const RDFS_MEMBER = 'http://www.w3.org/2000/01/rdf-schema#member';
 
