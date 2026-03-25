@@ -159,11 +159,82 @@ POST to create Components, Streams, Baselines, and ChangeSets uses the OSLC crea
 | GET configurations container | List branches + tags as LDP Container |
 | GET stream (branch) | Get branch details, return `oslc_config:Stream` representation |
 | GET baseline (tag) | Get tag details, return `oslc_config:Baseline` representation |
-| GET changeset (commit) | Get commit details, return `oslc_config:ChangeSet` representation |
+| GET changeset | Get pending or delivered changeset, return `oslc_config:ChangeSet` representation |
 | POST to creation factory (create stream) | Create branch via GitHub API |
 | POST to creation factory (create baseline) | Create tag from stream HEAD |
+| POST to creation factory (create changeset) | Create pending changeset on a stream (see Section 2.1) |
 | GET concept URI + config context | Get file/tree at ref |
-| PUT versioned resource in stream | Stage file change in current change set (see Section 5) |
+| PUT versioned resource in stream/changeset | Stage file change in current change set (see Section 5) |
+
+### Change Set Lifecycle
+
+Based on proposed OSLC Configuration Management change set delivery operations.
+
+#### Creating a Change Set
+
+A change set is created via POST to the ChangeSet creation factory on the ServiceProvider. The request body includes:
+
+- `oslc_config:overrides` -- the base stream (branch) this change set modifies
+- `dcterms:title` -- description of the change set
+
+In GitHub terms, creating a change set establishes a staging area for modifications to files on a branch. The change set tracks:
+- Which files have been added, modified, or removed
+- The 'before' state (the base stream's current HEAD)
+- The 'after' state (the modified files)
+
+Multiple change sets can override the same base stream, each representing independent sets of changes.
+
+#### Modifying Resources in a Change Set
+
+Versioned resources (files, directories) are modified by PUT/POST/DELETE on the concept resource URI with the **change set** as the configuration context (not the stream directly):
+
+- **PUT** on a concept resource in a change set context updates the file, creating a new version in the change set's selections
+- **POST** to a component in a change set context creates a new file
+- **DELETE** on a concept resource in a change set context marks the file for removal
+
+The change set's `oslc_config:ChangeSetSelections` track the delta: additions, replacements, and removals relative to the base stream.
+
+#### Delivering a Change Set
+
+Delivery is performed by POST to the `oslc_config:ChangeSetDelivery` creation factory, with a body containing:
+
+- `oslc_config:sourceConfiguration` -- the change set to deliver
+- `oslc_config:targetStream` -- the target stream (branch)
+
+A delivery represents delivery of a **single change set to a single target stream**. Delivery is atomic — all changes are applied or none.
+
+**GitHub mapping:** Delivering a change set creates a Git commit via the Git Data API:
+1. Create blobs for each modified/added file in the change set
+2. Create a new tree incorporating all changes
+3. Create a commit on the target branch referencing the tree
+4. Update the branch ref to point to the new commit
+
+**Possible responses:**
+
+| Response | Meaning | GitHub Scenario |
+|---|---|---|
+| `201 Created` | Delivery completed | Commit created successfully, returns `ChangeSetDelivery` resource |
+| `202 Accepted` | Long-running | Large change set; returns `oslc_config:Activity` to poll |
+| `400 Bad Request` | Invalid request | Missing source configuration or target stream |
+| `409 Conflict` | Delivery conflicts | Target branch has newer changes to same files (non-fast-forward) |
+| `303 See Other` | Already delivered | Change set was already delivered; returns existing delivery |
+
+**Conflict handling:** If the target stream has been modified since the change set's base state (e.g., another commit has advanced the branch), delivery fails with `409 Conflict`. The response includes `oslc_config:ChangeSetDeliveryConflict` resources identifying which files conflict. Conflict resolution is performed through the tool UI or non-OSLC APIs (e.g., Git merge/rebase).
+
+#### Change Set Delivery History
+
+The ServiceProvider includes a query capability for `oslc_config:ChangeSetDelivery` resources, enabling delivery history queries:
+
+- **When was a change set delivered to a stream?** `oslc.where=oslc_config:sourceConfiguration={csUri} and oslc_config:targetStream={streamUri}`
+- **Which streams has a change set been delivered to?** `oslc.where=oslc_config:sourceConfiguration={csUri}`
+- **What change sets have been delivered to a stream?** `oslc.where=oslc_config:targetStream={streamUri}`
+- **Deliveries to a stream since a date?** `oslc.where=oslc_config:targetStream={streamUri} and dcterms:created>="2026-01-01T00:00:00"^^xsd:dateTime`
+
+In GitHub terms, delivery history maps to the Git commit log for a branch, filtered by commits that originated from OSLC change set deliveries.
+
+#### Long-Running Deliveries
+
+For large change sets, delivery may return `202 Accepted` with an `oslc_config:Activity` resource. Clients poll the Activity resource until `oslc_auto:state` indicates completion (`complete`, `canceled`). Activity resources are persisted for at least 24 hours after completion.
 
 ---
 
@@ -250,15 +321,15 @@ Reflects the refactored `StorageService` interface with generic query method nam
 |---|---|
 | `init(env)` | Initialize Octokit with PAT |
 | `read(uri)` | Parse URI pattern, call appropriate GitHub API, build RDF graph |
-| `update(resource)` | Compare incoming LdpDocument against current GitHub state; update Issue/PR via API, or stage file change in current change set (see Section 5) |
+| `update(resource)` | Compare incoming LdpDocument against current GitHub state; update Issue/PR via API, or create new file version in change set selections (see Section 5) |
 | `remove(uri)` | Close issue/PR or delete branch (where appropriate) |
 | `reserveURI(uri)` | No-op (GitHub assigns IDs) |
 | `releaseURI(uri)` | No-op |
 | `getMembershipTriples(container)` | List container members (repo's issues, branch's files, etc.) via GitHub API with pagination |
 | `query(queryExpression, format)` | Translate OSLC query to GitHub API calls, return RDF graph of results |
 | `rawQuery(queryExpression, accept)` | Translate OSLC query to GitHub API calls, return serialized results |
-| `insertData(data, uri)` | Parse triples, stage structured comment additions in current change set |
-| `removeData(data, uri)` | Parse triples, stage structured comment removals in current change set |
+| `insertData(data, uri)` | Parse triples, add structured comments to file version in change set selections |
+| `removeData(data, uri)` | Parse triples, remove structured comments from file version in change set selections |
 | `exportDataset(format)` | Not supported initially |
 | `importDataset(data, format)` | Not supported initially |
 | `drop()` | Not supported (destructive on GitHub) |
@@ -360,7 +431,7 @@ Generated by `create-oslc-server.ts`. Defines per-component services for three d
 
 - **CM service** (`oslc:domain oslc_cm:`): One creation factory for ChangeRequest (subtypes via labels), one query capability (filter by `dcterms:type` for subtypes), delegated creation and selection dialogs
 - **SCM service** (`oslc:domain oslc_scm:`): Query capabilities for FileVersion, DirectoryVersion
-- **Config Management service** (`oslc:domain oslc_config:`): Query capabilities for Stream, Baseline, ChangeSet, Component. Creation factories for Stream (create branch) and Baseline (create tag). Selection dialog for configurations
+- **Config Management service** (`oslc:domain oslc_config:`): Query capabilities for Stream, Baseline, ChangeSet, Component, and ChangeSetDelivery (delivery history). Creation factories for Stream (create branch), Baseline (create tag), ChangeSet (create pending change set), and ChangeSetDelivery (deliver a change set). Selection dialog for configurations
 
 ---
 
@@ -418,47 +489,42 @@ The fragment `#PaymentProcessor` appends to the FileVersion concept URI, giving 
 
 ### Change Set Model for Link Modifications
 
-Link modifications (adding or removing structured comments) follow the OSLC Configuration Management change set model. Changes are **staged** in the current change set, not immediately committed. The user decides when to deliver (commit) the change set.
+Link modifications (adding or removing structured comments) follow the OSLC Configuration Management change set model. The workflow is:
 
-This maps naturally to Git's staging model:
-- A **change set** corresponds to a pending Git commit on a branch (stream)
-- **Staging** a link change creates a new version of the file in the change set
-- **Delivering** the change set creates a Git commit with all staged changes
+1. **Create a change set** on the target stream (branch) via the ChangeSet creation factory
+2. **Modify files** in the context of the change set (PUT/insertData/removeData with change set as configuration context)
+3. **Deliver the change set** when ready, which creates the Git commit
+
+This maps naturally to Git's model:
+- A **change set** corresponds to a set of staged changes on a branch
+- **Modifications** in a change set create new versions of files in the change set's selections
+- **Delivery** creates a Git commit with all changes in the change set
 
 ### Writing Links (via `insertData`)
 
-1. Client POSTs triples to the FileVersion resource in a configuration context (stream)
+1. Client POSTs triples to the FileVersion resource with the **change set** as configuration context
 2. `structured-comments.ts` parses the existing file content, finds the appropriate `@oslc` block (or creates one)
 3. Adds new triples to the block, creating a new version of the file
-4. The new file version is staged in the current change set for that stream
+4. The new file version is recorded in the change set's `ChangeSetSelections`
 5. No Git commit is created yet — the change is part of the pending change set
 
 ### Reading Links (via `read`)
 
-1. When a FileVersion is read in a configuration context, `structured-comments.ts` parses all `@oslc` blocks
-2. If there are pending (staged) changes in the current change set, the staged version is returned
+1. When a FileVersion is read with a **change set** as configuration context, the change set's version is returned (if modified), otherwise the base stream's version
+2. `structured-comments.ts` parses all `@oslc` blocks from the returned version
 3. Link triples are included in the returned RDF graph alongside standard SCM properties
 4. Fragment-scoped links use the concept URI with fragment identifier as subject
 
 ### Removing Links (via `removeData`)
 
-1. Client sends triples to remove in a configuration context (stream)
+1. Client sends triples to remove with the **change set** as configuration context
 2. `structured-comments.ts` locates and removes matching triples from the `@oslc` block
 3. If the block becomes empty, the entire comment block is removed
-4. The modified file is staged in the current change set — no commit yet
+4. The modified file is recorded in the change set's selections — no commit yet
 
 ### Delivering a Change Set
 
-When the user is ready to commit their changes:
-
-1. Client POSTs to deliver the change set (or uses a creation factory to create a baseline)
-2. The github-storage-service commits all staged file changes via the Git Data API:
-   - Create blobs for each modified file
-   - Create a new tree incorporating all changed blobs
-   - Create a commit referencing the tree
-   - Update the branch ref
-3. The commit message summarizes the changes (e.g., `oslc: add/update traceability links`)
-4. The change set transitions to a delivered state
+When the user is ready to commit, they POST to the `oslc_config:ChangeSetDelivery` creation factory (see Section 2, Change Set Lifecycle). The delivery creates a Git commit with all file changes in the change set.
 
 ---
 
