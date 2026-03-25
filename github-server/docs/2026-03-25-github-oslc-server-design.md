@@ -177,7 +177,8 @@ The existing `oslc-service` and `ldp-service` have no concept of OSLC Configurat
 
 1. Intercepts requests with `Configuration-Context` header or `oslc_config.context` query parameter
 2. Resolves concept URIs to version URIs by mapping the configuration to a git ref
-3. Adds `Vary: Configuration-Context` to the response
+3. Adds `Vary: Configuration-Context` to the response only for versioned (SCM) resources — not for CM resources like issues/PRs, to avoid unnecessary HTTP cache fragmentation
+4. Adds `Configuration-Context` to the CORS `Access-Control-Allow-Headers` list so cross-origin browser clients can send the custom header
 
 This middleware is specific to github-server and does not require changes to `oslc-service`.
 
@@ -263,11 +264,12 @@ The catalog template must be extended beyond the current `oslc-service` template
 ### Startup Flow
 
 1. Load config, initialize Octokit with PAT
-2. For each configured org, discover repositories via GitHub API
-3. POST to catalog to create a ServiceProvider for each org (using existing catalog mechanism)
-4. Populate each ServiceProvider with repos as `oslc_config:Component` resources
-5. Register custom query handlers and configuration context middleware on the dynamic router
-6. Start Express server
+2. Mount configuration context middleware and CORS extension (before `oslc-service`)
+3. Register custom query handlers and resource handlers on the dynamic router (must be registered **before** step 4, since `catalogPostHandler` calls `registerSPRoutes` which adds default handlers)
+4. For each configured org, discover repositories via GitHub API
+5. POST to catalog to create a ServiceProvider for each org (using existing catalog mechanism)
+6. Populate each ServiceProvider with repos as `oslc_config:Component` resources
+7. Start Express server
 
 ---
 
