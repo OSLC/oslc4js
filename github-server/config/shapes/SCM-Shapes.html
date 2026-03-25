@@ -225,8 +225,9 @@
       <h2>Configuration Management Resource Constraints</h2>
       <p>
         This section specifies the constraints for Configuration Management resources used in an SCM context.
-        These resource types are defined in the OSLC Configuration Management namespace [[OSLCConfig]] and
-        are included here with SCM-specific constraints for the GitHub server implementation.
+        These resource types are defined in the OSLC Configuration Management namespace [[OSLCConfig]].
+        The authoritative shapes are in <a href="Config-Shapes.ttl">Config-Shapes.ttl</a>, which includes
+        proposed changes for change set delivery and history operations.
       </p>
 
       <section id="ComponentShape">
@@ -238,7 +239,7 @@
 
         <div
           title="Shape for Component"
-          data-include="SCM-Shapes.ttl#ComponentShape"
+          data-include="Config-Shapes.ttl#ComponentShape"
           data-oninclude="shapeToSpec"
           data-include-sync="true"
           data-include-replace="true"
@@ -255,7 +256,7 @@
 
         <div
           title="Shape for Stream"
-          data-include="SCM-Shapes.ttl#StreamShape"
+          data-include="Config-Shapes.ttl#StreamShape"
           data-oninclude="shapeToSpec"
           data-include-sync="true"
           data-include-replace="true"
@@ -272,7 +273,7 @@
 
         <div
           title="Shape for Baseline"
-          data-include="SCM-Shapes.ttl#BaselineShape"
+          data-include="Config-Shapes.ttl#BaselineShape"
           data-oninclude="shapeToSpec"
           data-include-sync="true"
           data-include-replace="true"
@@ -284,12 +285,47 @@
         <h3>Resource: ChangeSet</h3>
         <p>
           A ChangeSet represents a unit of change applied to a configuration.
-          In the GitHub context, a changeset corresponds to a Git commit.
+          In the GitHub context, a pending changeset represents staged file modifications;
+          a delivered changeset corresponds to a Git commit.
         </p>
 
         <div
           title="Shape for ChangeSet"
-          data-include="SCM-Shapes.ttl#ChangeSetShape"
+          data-include="Config-Shapes.ttl#ChangeSetShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="ChangeSetDeliveryShape">
+        <h3>Resource: ChangeSetDelivery</h3>
+        <p>
+          A ChangeSetDelivery represents the delivery of a single change set to a single target stream.
+          In the GitHub context, delivering a change set creates a Git commit on the target branch.
+        </p>
+
+        <div
+          title="Shape for ChangeSetDelivery"
+          data-include="Config-Shapes.ttl#ChangeSetDeliveryShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="ActivityShape">
+        <h3>Resource: Activity</h3>
+        <p>
+          An Activity represents a long-running operation such as recursive baseline creation
+          or change set delivery. Clients poll the Activity resource until completion.
+        </p>
+
+        <div
+          title="Shape for Activity"
+          data-include="Config-Shapes.ttl#ActivityShape"
           data-oninclude="shapeToSpec"
           data-include-sync="true"
           data-include-replace="true"

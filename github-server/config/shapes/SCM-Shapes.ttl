@@ -7,11 +7,11 @@
 @prefix oslc_scm: <http://open-services.net/ns/scm#> .
 
 # ================================================================
-# OSLC Resource Shapes for SCM and Configuration Management
+# OSLC Resource Shapes for SCM Domain
 #
-# Configuration Management types (Stream, Baseline, ChangeSet,
-# Component) use the oslc_config namespace.
-# SCM-specific types use the oslc_scm namespace.
+# SCM-specific resource types use the oslc_scm namespace.
+# Configuration Management shapes (Stream, Baseline, ChangeSet,
+# Component, ChangeSetDelivery, etc.) are in Config-Shapes.ttl.
 #
 # Property definitions are named nodes so that shared/inherited
 # properties are defined once and referenced by multiple shapes.
@@ -148,62 +148,8 @@
 
 
 # ================================================================
-# SHARED PROPERTY DEFINITIONS — Configuration Management
+# SHARED PROPERTY DEFINITIONS — SCM Domain
 # ================================================================
-
-<#p-component>
-  a oslc:Property ;
-  oslc:name "component" ;
-  oslc:propertyDefinition oslc_config:component ;
-  dcterms:description "The component this configuration belongs to." ;
-  oslc:occurs oslc:Exactly-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-selections>
-  a oslc:Property ;
-  oslc:name "selections" ;
-  oslc:propertyDefinition oslc_config:selections ;
-  dcterms:description "Resource version selections for this configuration." ;
-  oslc:occurs oslc:Zero-or-many ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-baselines>
-  a oslc:Property ;
-  oslc:name "baselines" ;
-  oslc:propertyDefinition oslc_config:baselines ;
-  dcterms:description "Container of baselines for this stream." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-previousBaseline>
-  a oslc:Property ;
-  oslc:name "previousBaseline" ;
-  oslc:propertyDefinition oslc_config:previousBaseline ;
-  dcterms:description "The previous baseline in the sequence." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-baselineOfStream>
-  a oslc:Property ;
-  oslc:name "baselineOfStream" ;
-  oslc:propertyDefinition oslc_config:baselineOfStream ;
-  dcterms:description "The stream from which this baseline was created." ;
-  oslc:occurs oslc:Exactly-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-configurations>
-  a oslc:Property ;
-  oslc:name "configurations" ;
-  oslc:propertyDefinition oslc_config:configurations ;
-  dcterms:description "Container of configurations for this component." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
 
 <#p-versionId>
   a oslc:Property ;
@@ -212,11 +158,6 @@
   dcterms:description "A short human-readable identifier for the version of a resource." ;
   oslc:occurs oslc:Zero-or-one ;
   oslc:valueType xsd:string .
-
-
-# ================================================================
-# SHARED PROPERTY DEFINITIONS — SCM Domain
-# ================================================================
 
 <#p-change>
   a oslc:Property ;
@@ -373,64 +314,6 @@
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference .
-
-
-# ================================================================
-# RESOURCE SHAPE DEFINITIONS — Configuration Management
-# ================================================================
-
-# ============================================================
-# Stream
-# ============================================================
-
-<#StreamShape>
-  a oslc:ResourceShape ;
-  dcterms:title "Stream" ;
-  oslc:describes oslc_config:Stream ;
-  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
-    <#p-created>, <#p-modified>, <#p-type>,
-    <#p-serviceProvider>, <#p-instanceShape>,
-    <#p-component>, <#p-selections>,
-    <#p-baselines>, <#p-previousBaseline> .
-
-# ============================================================
-# Baseline
-# ============================================================
-
-<#BaselineShape>
-  a oslc:ResourceShape ;
-  dcterms:title "Baseline" ;
-  oslc:describes oslc_config:Baseline ;
-  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
-    <#p-created>, <#p-type>,
-    <#p-serviceProvider>, <#p-instanceShape>,
-    <#p-component>, <#p-selections>,
-    <#p-baselineOfStream>, <#p-previousBaseline> .
-
-# ============================================================
-# ChangeSet
-# ============================================================
-
-<#ChangeSetShape>
-  a oslc:ResourceShape ;
-  dcterms:title "ChangeSet" ;
-  oslc:describes oslc_config:ChangeSet ;
-  oslc:property <#p-title-optional>, <#p-description>,
-    <#p-identifier-required>, <#p-creator>, <#p-created>,
-    <#p-type>, <#p-serviceProvider>, <#p-instanceShape>,
-    <#p-change> .
-
-# ============================================================
-# Component
-# ============================================================
-
-<#ComponentShape>
-  a oslc:ResourceShape ;
-  dcterms:title "Component" ;
-  oslc:describes oslc_config:Component ;
-  oslc:property <#p-title>, <#p-description>, <#p-identifier-rw>,
-    <#p-type>, <#p-serviceProvider>,
-    <#p-configurations> .
 
 
 # ================================================================
