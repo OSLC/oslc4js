@@ -54,30 +54,39 @@ The server is scaffolded using `create-oslc-server.ts` and uses a custom `github
 
 Change Requests are **not versioned** resources. CM-to-SCM links (e.g., `oslc_cm:tracksChangeSet`) are stored on the ChangeRequest itself.
 
-### SCM Domain (`http://open-services.net/ns/scm#`)
+### SCM Domain (`http://open-services.net/ns/scm#`) and Configuration Management (`http://open-services.net/ns/config#`)
 
-| GitHub Concept | OSLC Resource Type |
-|---|---|
-| Branch | `oslc_scm:Configuration` (stream) |
-| Tag | `oslc_scm:Baseline` |
-| Commit | `oslc_scm:ChangeSet` |
-| File diff in commit | `oslc_scm:Change` |
-| Directory at ref | `oslc_scm:DirectoryVersion` |
-| File at ref | `oslc_scm:FileVersion` |
+The github-server uses two distinct namespaces for SCM-related resources:
 
-SCM resources are **versioned**. They have concept URIs (path without ref) and version URIs (path with ref), resolved via OSLC Configuration Management.
+- **OSLC Configuration Management** (`oslc_config:` at `http://open-services.net/ns/config#`) -- standard vocabulary for Stream, Baseline, ChangeSet, Component, configuration context resolution
+- **OSLC SCM** (`oslc_scm:` at `http://open-services.net/ns/scm#`) -- domain-specific vocabulary for FileVersion, DirectoryVersion, Change, and SCM-specific properties
+
+| GitHub Concept | OSLC Resource Type | Namespace |
+|---|---|---|
+| Branch | `oslc_config:Stream` | Config Mgmt |
+| Tag | `oslc_config:Baseline` | Config Mgmt |
+| Commit | `oslc_config:ChangeSet` | Config Mgmt |
+| File diff in commit | `oslc_scm:Change` | SCM |
+| Directory at ref | `oslc_scm:DirectoryVersion` | SCM |
+| File at ref | `oslc_scm:FileVersion` | SCM |
+
+SCM resources (FileVersion, DirectoryVersion) are **versioned**. They have concept URIs (path without ref) and version URIs (path with ref), resolved via OSLC Configuration Management. Configuration resources (Stream, Baseline, ChangeSet) are not themselves versioned -- they define the configurations used to resolve versioned resources.
 
 ### URI Patterns
 
+The `/github` prefix is a hard-coded path segment under the server's context root. All organizations share this prefix.
+
+Branch and tag names containing slashes (e.g., `feature/my-branch`) are URL-encoded in URI patterns (e.g., `feature%2Fmy-branch`). The `{name}` segment is a single path component, not a wildcard.
+
 ```
 /github/{org}/                                  -> ServiceProvider
-/github/{org}/{repo}/                           -> Component
+/github/{org}/{repo}/                           -> oslc_config:Component
 /github/{org}/{repo}/configurations/            -> LDP Container (branches + tags)
-/github/{org}/{repo}/branches/{name}            -> Stream (oslc_config:Stream)
+/github/{org}/{repo}/branches/{name}            -> oslc_config:Stream
 /github/{org}/{repo}/branches/{name}/baselines/ -> LDP Container (create tags from branch)
-/github/{org}/{repo}/tags/{name}                -> Baseline (oslc_config:Baseline)
+/github/{org}/{repo}/tags/{name}                -> oslc_config:Baseline
 /github/{org}/{repo}/tags/{name}/streams/       -> LDP Container (create branches from tag)
-/github/{org}/{repo}/commits/{sha}              -> ChangeSet
+/github/{org}/{repo}/commits/{sha}              -> oslc_config:ChangeSet
 /github/{org}/{repo}/tree/{path}                -> DirectoryVersion concept URI
 /github/{org}/{repo}/tree/{ref}/{path}          -> DirectoryVersion version URI
 /github/{org}/{repo}/blob/{path}                -> FileVersion concept URI
@@ -156,6 +165,22 @@ This approach:
 - Follows established monorepo patterns (consistent with bmm-server, mrm-server)
 - Provides a valuable data point for understanding what should be abstracted in `StorageService` vs. what's inherently backend-specific (especially query handling)
 
+### ldp-service Dependency
+
+`oslc-service` has a hard dependency on `ldp-service` -- it imports and mounts `ldpService` as a catch-all middleware. The github-server handles this by registering all its custom route handlers on the Express dynamic router **before** the `ldp-service` catch-all. Since Express routes are first-match, custom handlers for `/github/...` URI patterns intercept all requests before they reach `ldp-service`. The `ldp-service` middleware is effectively inert for github-server URIs.
+
+This means `ldp-service` is still mounted but never reached for GitHub resource requests. The github-storage-service's `constructQuery()` and `sparqlQuery()` returning 501 is a safety net, not the primary mechanism. Long-term, `oslc-service` should be refactored to make `ldp-service` optional, but that is out of scope for this design.
+
+### Configuration Context Middleware
+
+The existing `oslc-service` and `ldp-service` have no concept of OSLC Configuration Management or the `Configuration-Context` header. The github-server adds its own Express middleware (mounted before `oslc-service`) that:
+
+1. Intercepts requests with `Configuration-Context` header or `oslc_config.context` query parameter
+2. Resolves concept URIs to version URIs by mapping the configuration to a git ref
+3. Adds `Vary: Configuration-Context` to the response
+
+This middleware is specific to github-server and does not require changes to `oslc-service`.
+
 ### Package Structure
 
 ```
@@ -193,7 +218,7 @@ github-server/
 |---|---|
 | `init(env)` | Initialize Octokit with PAT, validate org access |
 | `read(uri)` | Parse URI pattern, call appropriate GitHub API, build RDF graph |
-| `update(resource)` | Diff graph, update Issue/PR via API or commit file changes via Git Data API |
+| `update(resource)` | Compare incoming LdpDocument against current GitHub state to determine changes; update Issue/PR via API or commit file via Git Data API (fetch tree -> create blob -> create tree -> create commit -> update ref) |
 | `remove(uri)` | Close issue/PR or delete branch (where appropriate) |
 | `reserveURI(uri)` | No-op (GitHub assigns IDs) |
 | `releaseURI(uri)` | No-op |
@@ -208,7 +233,7 @@ github-server/
 
 ### Query Handling
 
-The current oslc-service query pipeline translates `oslc.where`/`oslc.select` to SPARQL, which is directly coupled to a SPARQL endpoint. Since github-storage-service doesn't support SPARQL, the github-server registers a custom query route handler that translates OSLC query syntax directly to GitHub API parameters.
+The current oslc-service query pipeline translates `oslc.where`/`oslc.select` to SPARQL, which is directly coupled to a SPARQL endpoint. Since github-storage-service doesn't support SPARQL, the github-server registers custom query route handlers on the Express dynamic router **before** the default `oslc-service` query handler. These custom handlers are registered at the same path patterns that `catalog.ts` `registerSPRoutes()` would use (e.g., `{catalogPath}/{slug}/query`), ensuring they match first.
 
 For CM resources, one query capability serves all ChangeRequest subtypes, with `oslc.where` on `dcterms:type` filtering by subclass.
 
@@ -221,13 +246,27 @@ For SCM resources, queries translate to GitHub tree/search API calls.
 
 This custom query handler serves as a data point for the eventual abstraction of query handling in `StorageService`. The expectation is that different storage backends will require significantly different query translation and implementation.
 
+### ServiceProvider Creation
+
+In the existing bmm-server/mrm-server pattern, ServiceProviders are created dynamically via POST to the catalog. The github-server uses the same mechanism but automates it at startup:
+
+1. The catalog template defines a meta ServiceProvider with CM and SCM services, including `oslc_config:Component` entries
+2. At startup, the server discovers GitHub organizations via the API
+3. For each org, the server programmatically POSTs to the catalog (using the existing `catalogPostHandler` internally) to create a ServiceProvider
+4. After each SP is created, the server registers custom query and configuration context route handlers on the dynamic router **before** the default handlers registered by `registerSPRoutes()`
+
+The catalog template must be extended beyond the current `oslc-service` template vocabulary to include:
+- `oslc_config:Component` entries for repositories (discovered dynamically, not in the template)
+- Configuration Management service entries (`oslc:domain oslc_config:`)
+- The template defines the service structure; actual component/repo data is populated at SP creation time
+
 ### Startup Flow
 
 1. Load config, initialize Octokit with PAT
 2. For each configured org, discover repositories via GitHub API
-3. Create ServiceProviderCatalog with one ServiceProvider per org
-4. Each ServiceProvider lists repos as Components with CM and SCM services
-5. Register query handlers and route handlers
+3. POST to catalog to create a ServiceProvider for each org (using existing catalog mechanism)
+4. Populate each ServiceProvider with repos as `oslc_config:Component` resources
+5. Register custom query handlers and configuration context middleware on the dynamic router
 6. Start Express server
 
 ---
@@ -246,8 +285,10 @@ Local copy from `https://docs.oasis-open-projects.org/oslc-op/cm/v3.0/errata01/o
 
 New file authored from the SCM v1.0 specification (no published Turtle exists). Namespace: `http://open-services.net/ns/scm#`.
 
+Note: `oslc_config:Stream`, `oslc_config:Baseline`, `oslc_config:ChangeSet`, and `oslc_config:Component` are defined in the OSLC Configuration Management vocabulary (`http://open-services.net/ns/config#`), not in the SCM vocabulary. The SCM vocabulary defines only SCM-domain-specific resource types and properties.
+
 **Classes:**
-- `Configuration`, `Baseline`, `ChangeSet`, `Change`
+- `Change`
 - `FileVersion`, `DirectoryVersion`
 - `FileVersionComparison`, `DirectoryVersionComparison`, `BaselineComparison`
 - `SymlinkVersion`, `SymlinkVersionComparison` (spec completeness, not managed)
@@ -266,11 +307,19 @@ New file authored from the SCM v1.0 specification (no published Turtle exists). 
 
 New file defining ResourceShapes for SCM resources.
 
+**Config Management shapes** (from `oslc_config:` vocabulary, local copies for extensibility):
+
 | Shape | Describes | Managed in Catalog? |
 |---|---|---|
-| `ConfigurationShape` | `oslc_scm:Configuration` | Yes (branches) |
-| `BaselineShape` | `oslc_scm:Baseline` | Yes (tags) |
-| `ChangeSetShape` | `oslc_scm:ChangeSet` | Yes (commits) |
+| `StreamShape` | `oslc_config:Stream` | Yes (branches) |
+| `BaselineShape` | `oslc_config:Baseline` | Yes (tags) |
+| `ChangeSetShape` | `oslc_config:ChangeSet` | Yes (commits) |
+| `ComponentShape` | `oslc_config:Component` | Yes (repositories) |
+
+**SCM domain shapes** (new, from `oslc_scm:` vocabulary):
+
+| Shape | Describes | Managed in Catalog? |
+|---|---|---|
 | `ChangeShape` | `oslc_scm:Change` | No (inlined in ChangeSet) |
 | `FileVersionShape` | `oslc_scm:FileVersion` | Yes (blobs) |
 | `DirectoryVersionShape` | `oslc_scm:DirectoryVersion` | Yes (trees) |
@@ -280,10 +329,11 @@ New file defining ResourceShapes for SCM resources.
 
 ### Catalog Template
 
-Generated by `create-oslc-server.ts`. Defines per-component services for both domains:
+Generated by `create-oslc-server.ts`. Defines per-component services for three domains:
 
 - **CM service** (`oslc:domain oslc_cm:`): One creation factory for ChangeRequest (subtypes via labels), one query capability (filter by `dcterms:type` for subtypes), delegated creation and selection dialogs
-- **SCM service** (`oslc:domain oslc_scm:`): Query capabilities for Configuration, Baseline, ChangeSet, FileVersion, DirectoryVersion. Creation factories for Configuration (create branch) and Baseline (create tag)
+- **SCM service** (`oslc:domain oslc_scm:`): Query capabilities for FileVersion, DirectoryVersion
+- **Config Management service** (`oslc:domain oslc_config:`): Query capabilities for Stream, Baseline, ChangeSet, Component. Creation factories for Stream (create branch) and Baseline (create tag). Selection dialog for configurations
 
 ---
 
@@ -368,6 +418,7 @@ The fragment `#PaymentProcessor` appends to the FileVersion concept URI, giving 
 
 ```json
 {
+  "scheme": "http",
   "host": "localhost",
   "port": 3003,
   "context": "/",
@@ -379,9 +430,32 @@ The fragment `#PaymentProcessor` appends to the FileVersion concept URI, giving 
 }
 ```
 
+- `scheme` -- `http` or `https`, used with `host` and `port` to construct `appBase` (required by `StorageEnv`)
 - `organizations` -- list of GitHub orgs to expose as ServiceProviders; the catalog auto-discovers repos within each
 - PAT read from the environment variable named in `patEnvVar` (never stored in config)
 - `apiUrl` supports GitHub Enterprise (e.g., `https://github.mycompany.com/api/v3`)
+
+### Caching and Rate Limiting
+
+GitHub's REST API has a 5,000 requests/hour rate limit for authenticated requests. The github-storage-service implements an in-memory cache with TTL-based expiry:
+
+- **CM resources** (issues, PRs): Cached with a short TTL (e.g., 60 seconds) since they change frequently
+- **SCM resources** (files, trees, commits): Cached with a longer TTL (e.g., 5 minutes) since they change less often via the API
+- **Configuration resources** (branches, tags): Cached with moderate TTL (e.g., 2 minutes)
+- Cache entries are keyed by the full GitHub API URL including query parameters
+- ETags from GitHub API responses are stored and used for conditional requests (`If-None-Match`), which do not count against the rate limit when returning 304
+
+Future enhancement: GitHub webhooks can be used for real-time cache invalidation.
+
+### Concurrent Write Handling
+
+When two clients concurrently write structured comments to the same file (via `insertData`), the second commit may fail as a non-fast-forward update. The github-storage-service handles this by:
+
+1. Detecting the non-fast-forward error from the Git Data API
+2. Re-fetching the current file content at the updated ref
+3. Re-applying the structured comment changes
+4. Retrying the commit (up to 3 attempts)
+5. If retries are exhausted, returning 409 Conflict
 
 ### Dependencies
 
@@ -399,6 +473,7 @@ No dependency on `ldp-service-jena` or any triple store.
 
 - **User authentication/authorization**: Express middleware for GitHub OAuth, role mapping
 - **LDM link contribution**: Optionally contribute discovered links to an LDM server for efficient incoming link discovery
-- **GitHub webhooks**: Real-time cache invalidation when issues, PRs, or code change
-- **Rate limiting**: GitHub API rate limit handling with backoff and caching
+- **GitHub webhooks**: Real-time cache invalidation when issues, PRs, or code change (upgrading the initial TTL-based caching)
 - **StorageService abstraction**: Lessons from this implementation will inform better abstraction of query handling and storage concerns in the `storage-service` package
+- **oslc-service refactoring**: Make `ldp-service` dependency optional to better support non-LDP storage backends
+- **Global Configuration Management**: Support for global configurations that aggregate contributions from multiple components/repositories
