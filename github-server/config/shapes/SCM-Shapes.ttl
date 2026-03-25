@@ -1,0 +1,511 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix oslc:    <http://open-services.net/ns/core#> .
+@prefix oslc_config: <http://open-services.net/ns/config#> .
+@prefix oslc_scm: <http://open-services.net/ns/scm#> .
+
+# ================================================================
+# OSLC Resource Shapes for SCM and Configuration Management
+#
+# Configuration Management types (Stream, Baseline, ChangeSet,
+# Component) use the oslc_config namespace.
+# SCM-specific types use the oslc_scm namespace.
+#
+# Property definitions are named nodes so that shared/inherited
+# properties are defined once and referenced by multiple shapes.
+# ================================================================
+
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — OSLC Core / Dublin Core
+# ================================================================
+
+<#p-title>
+  a oslc:Property ;
+  oslc:name "title" ;
+  oslc:propertyDefinition dcterms:title ;
+  dcterms:description "Title of the resource." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType xsd:string .
+
+<#p-title-optional>
+  a oslc:Property ;
+  oslc:name "title" ;
+  oslc:propertyDefinition dcterms:title ;
+  dcterms:description "Title of the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-description>
+  a oslc:Property ;
+  oslc:name "description" ;
+  oslc:propertyDefinition dcterms:description ;
+  dcterms:description "Descriptive text about the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType rdf:XMLLiteral .
+
+<#p-identifier>
+  a oslc:Property ;
+  oslc:name "identifier" ;
+  oslc:propertyDefinition dcterms:identifier ;
+  dcterms:description "Unique identifier of the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string ;
+  oslc:readOnly true .
+
+<#p-identifier-required>
+  a oslc:Property ;
+  oslc:name "identifier" ;
+  oslc:propertyDefinition dcterms:identifier ;
+  dcterms:description "Unique identifier of the resource." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType xsd:string ;
+  oslc:readOnly true .
+
+<#p-identifier-rw>
+  a oslc:Property ;
+  oslc:name "identifier" ;
+  oslc:propertyDefinition dcterms:identifier ;
+  dcterms:description "Unique identifier of the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-creator>
+  a oslc:Property ;
+  oslc:name "creator" ;
+  oslc:propertyDefinition dcterms:creator ;
+  dcterms:description "Creator of the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:AnyResource ;
+  oslc:representation oslc:Either .
+
+<#p-created>
+  a oslc:Property ;
+  oslc:name "created" ;
+  oslc:propertyDefinition dcterms:created ;
+  dcterms:description "Date the resource was created." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:dateTime ;
+  oslc:readOnly true .
+
+<#p-modified>
+  a oslc:Property ;
+  oslc:name "modified" ;
+  oslc:propertyDefinition dcterms:modified ;
+  dcterms:description "Date the resource was last modified." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:dateTime ;
+  oslc:readOnly true .
+
+<#p-type>
+  a oslc:Property ;
+  oslc:name "type" ;
+  oslc:propertyDefinition rdf:type ;
+  dcterms:description "RDF type of the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-type-required>
+  a oslc:Property ;
+  oslc:name "type" ;
+  oslc:propertyDefinition rdf:type ;
+  dcterms:description "RDF type of the resource." ;
+  oslc:occurs oslc:One-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-serviceProvider>
+  a oslc:Property ;
+  oslc:name "serviceProvider" ;
+  oslc:propertyDefinition oslc:serviceProvider ;
+  dcterms:description "OSLC service provider for this resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:readOnly true .
+
+<#p-instanceShape>
+  a oslc:Property ;
+  oslc:name "instanceShape" ;
+  oslc:propertyDefinition oslc:instanceShape ;
+  dcterms:description "Resource shape that describes this resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:readOnly true .
+
+<#p-isVersionOf>
+  a oslc:Property ;
+  oslc:name "isVersionOf" ;
+  oslc:propertyDefinition dcterms:isVersionOf ;
+  dcterms:description "The concept resource of which this is a version." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — Configuration Management
+# ================================================================
+
+<#p-component>
+  a oslc:Property ;
+  oslc:name "component" ;
+  oslc:propertyDefinition oslc_config:component ;
+  dcterms:description "The component this configuration belongs to." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-selections>
+  a oslc:Property ;
+  oslc:name "selections" ;
+  oslc:propertyDefinition oslc_config:selections ;
+  dcterms:description "Resource version selections for this configuration." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-baselines>
+  a oslc:Property ;
+  oslc:name "baselines" ;
+  oslc:propertyDefinition oslc_config:baselines ;
+  dcterms:description "Container of baselines for this stream." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-previousBaseline>
+  a oslc:Property ;
+  oslc:name "previousBaseline" ;
+  oslc:propertyDefinition oslc_config:previousBaseline ;
+  dcterms:description "The previous baseline in the sequence." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-baselineOfStream>
+  a oslc:Property ;
+  oslc:name "baselineOfStream" ;
+  oslc:propertyDefinition oslc_config:baselineOfStream ;
+  dcterms:description "The stream from which this baseline was created." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-configurations>
+  a oslc:Property ;
+  oslc:name "configurations" ;
+  oslc:propertyDefinition oslc_config:configurations ;
+  dcterms:description "Container of configurations for this component." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-versionId>
+  a oslc:Property ;
+  oslc:name "versionId" ;
+  oslc:propertyDefinition oslc_config:versionId ;
+  dcterms:description "A short human-readable identifier for the version of a resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — SCM Domain
+# ================================================================
+
+<#p-change>
+  a oslc:Property ;
+  oslc:name "change" ;
+  oslc:propertyDefinition oslc_scm:change ;
+  dcterms:description "A change within a change set or comparison." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-changeType>
+  a oslc:Property ;
+  oslc:name "changeType" ;
+  oslc:propertyDefinition oslc_scm:changeType ;
+  dcterms:description "The type of change (e.g. add, modify, delete)." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType xsd:string .
+
+<#p-changedObject>
+  a oslc:Property ;
+  oslc:name "changedObject" ;
+  oslc:propertyDefinition oslc_scm:changedObject ;
+  dcterms:description "The resource that was changed." ;
+  oslc:occurs oslc:One-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-fullName>
+  a oslc:Property ;
+  oslc:name "fullName" ;
+  oslc:propertyDefinition oslc_scm:fullName ;
+  dcterms:description "Full path name of the file or directory." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-content>
+  a oslc:Property ;
+  oslc:name "content" ;
+  oslc:propertyDefinition oslc_scm:content ;
+  dcterms:description "Reference to the content of the file version." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-mimeType>
+  a oslc:Property ;
+  oslc:name "mimeType" ;
+  oslc:propertyDefinition oslc_scm:mimeType ;
+  dcterms:description "MIME type of the file content." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-status>
+  a oslc:Property ;
+  oslc:name "status" ;
+  oslc:propertyDefinition oslc_scm:status ;
+  dcterms:description "Status of the versioned resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-memberIdentifier>
+  a oslc:Property ;
+  oslc:name "memberIdentifier" ;
+  oslc:propertyDefinition oslc_scm:memberIdentifier ;
+  dcterms:description "Identifier of a member within a directory." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType xsd:string .
+
+<#p-member>
+  a oslc:Property ;
+  oslc:name "member" ;
+  oslc:propertyDefinition rdfs:member ;
+  dcterms:description "A member resource within a directory." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-baseline1>
+  a oslc:Property ;
+  oslc:name "baseline1" ;
+  oslc:propertyDefinition oslc_scm:baseline1 ;
+  dcterms:description "The first baseline in a comparison." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-baseline2>
+  a oslc:Property ;
+  oslc:name "baseline2" ;
+  oslc:propertyDefinition oslc_scm:baseline2 ;
+  dcterms:description "The second baseline in a comparison." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-fileVersion1>
+  a oslc:Property ;
+  oslc:name "fileVersion1" ;
+  oslc:propertyDefinition oslc_scm:fileVersion1 ;
+  dcterms:description "The first file version in a comparison." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-fileVersion2>
+  a oslc:Property ;
+  oslc:name "fileVersion2" ;
+  oslc:propertyDefinition oslc_scm:fileVersion2 ;
+  dcterms:description "The second file version in a comparison." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-unifiedDiff>
+  a oslc:Property ;
+  oslc:name "unifiedDiff" ;
+  oslc:propertyDefinition oslc_scm:unifiedDiff ;
+  dcterms:description "Unified diff text between two file versions." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-directoryVersion1>
+  a oslc:Property ;
+  oslc:name "directoryVersion1" ;
+  oslc:propertyDefinition oslc_scm:directoryVersion1 ;
+  dcterms:description "The first directory version in a comparison." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-directoryVersion2>
+  a oslc:Property ;
+  oslc:name "directoryVersion2" ;
+  oslc:propertyDefinition oslc_scm:directoryVersion2 ;
+  dcterms:description "The second directory version in a comparison." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-memberAdded>
+  a oslc:Property ;
+  oslc:name "memberAdded" ;
+  oslc:propertyDefinition oslc_scm:memberAdded ;
+  dcterms:description "A member added between two directory versions." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-memberRemoved>
+  a oslc:Property ;
+  oslc:name "memberRemoved" ;
+  oslc:propertyDefinition oslc_scm:memberRemoved ;
+  dcterms:description "A member removed between two directory versions." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+
+# ================================================================
+# RESOURCE SHAPE DEFINITIONS — Configuration Management
+# ================================================================
+
+# ============================================================
+# Stream
+# ============================================================
+
+<#StreamShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Stream" ;
+  oslc:describes oslc_config:Stream ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-created>, <#p-modified>, <#p-type>,
+    <#p-serviceProvider>, <#p-instanceShape>,
+    <#p-component>, <#p-selections>,
+    <#p-baselines>, <#p-previousBaseline> .
+
+# ============================================================
+# Baseline
+# ============================================================
+
+<#BaselineShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Baseline" ;
+  oslc:describes oslc_config:Baseline ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-created>, <#p-type>,
+    <#p-serviceProvider>, <#p-instanceShape>,
+    <#p-component>, <#p-selections>,
+    <#p-baselineOfStream>, <#p-previousBaseline> .
+
+# ============================================================
+# ChangeSet
+# ============================================================
+
+<#ChangeSetShape>
+  a oslc:ResourceShape ;
+  dcterms:title "ChangeSet" ;
+  oslc:describes oslc_config:ChangeSet ;
+  oslc:property <#p-title-optional>, <#p-description>,
+    <#p-identifier-required>, <#p-creator>, <#p-created>,
+    <#p-type>, <#p-serviceProvider>, <#p-instanceShape>,
+    <#p-change> .
+
+# ============================================================
+# Component
+# ============================================================
+
+<#ComponentShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Component" ;
+  oslc:describes oslc_config:Component ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier-rw>,
+    <#p-type>, <#p-serviceProvider>,
+    <#p-configurations> .
+
+
+# ================================================================
+# RESOURCE SHAPE DEFINITIONS — SCM Domain
+# ================================================================
+
+# ============================================================
+# Change
+# ============================================================
+
+<#ChangeShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Change" ;
+  oslc:describes oslc_scm:Change ;
+  oslc:property <#p-title-optional>, <#p-type>,
+    <#p-changeType>, <#p-changedObject> .
+
+# ============================================================
+# FileVersion
+# ============================================================
+
+<#FileVersionShape>
+  a oslc:ResourceShape ;
+  dcterms:title "FileVersion" ;
+  oslc:describes oslc_scm:FileVersion ;
+  oslc:property <#p-title-optional>, <#p-description>, <#p-identifier>,
+    <#p-created>, <#p-modified>, <#p-creator>,
+    <#p-type-required>, <#p-serviceProvider>, <#p-instanceShape>,
+    <#p-versionId>, <#p-isVersionOf>,
+    <#p-fullName>, <#p-content>, <#p-mimeType>, <#p-status> .
+
+# ============================================================
+# DirectoryVersion
+# ============================================================
+
+<#DirectoryVersionShape>
+  a oslc:ResourceShape ;
+  dcterms:title "DirectoryVersion" ;
+  oslc:describes oslc_scm:DirectoryVersion ;
+  oslc:property <#p-title-optional>, <#p-description>, <#p-identifier>,
+    <#p-created>, <#p-modified>,
+    <#p-type-required>, <#p-serviceProvider>, <#p-instanceShape>,
+    <#p-versionId>, <#p-isVersionOf>,
+    <#p-fullName>, <#p-memberIdentifier>, <#p-member>, <#p-status> .
+
+# ============================================================
+# BaselineComparison
+# ============================================================
+
+<#BaselineComparisonShape>
+  a oslc:ResourceShape ;
+  dcterms:title "BaselineComparison" ;
+  oslc:describes oslc_scm:BaselineComparison ;
+  oslc:property <#p-title-optional>, <#p-type>,
+    <#p-baseline1>, <#p-baseline2>, <#p-change> .
+
+# ============================================================
+# FileVersionComparison
+# ============================================================
+
+<#FileVersionComparisonShape>
+  a oslc:ResourceShape ;
+  dcterms:title "FileVersionComparison" ;
+  oslc:describes oslc_scm:FileVersionComparison ;
+  oslc:property <#p-title-optional>, <#p-type>,
+    <#p-fileVersion1>, <#p-fileVersion2>, <#p-unifiedDiff> .
+
+# ============================================================
+# DirectoryVersionComparison
+# ============================================================
+
+<#DirectoryVersionComparisonShape>
+  a oslc:ResourceShape ;
+  dcterms:title "DirectoryVersionComparison" ;
+  oslc:describes oslc_scm:DirectoryVersionComparison ;
+  oslc:property <#p-title-optional>, <#p-type>,
+    <#p-directoryVersion1>, <#p-directoryVersion2>,
+    <#p-memberAdded>, <#p-memberRemoved> .

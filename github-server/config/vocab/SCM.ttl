@@ -1,0 +1,244 @@
+@prefix owl:         <http://www.w3.org/2002/07/owl#> .
+@prefix dc11:        <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:         <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix oslc_scm:    <http://open-services.net/ns/scm#> .
+@prefix oslc_config: <http://open-services.net/ns/config#> .
+
+# Ontology declaration
+<http://open-services.net/ns/scm>
+  a owl:Ontology ;
+  owl:imports <http://open-services.net/ns/config> ;
+  dc11:title "OSLC Source Control Management Vocabulary" ;
+  dc11:description "RDF vocabulary for the OSLC SCM v1.0 domain. Defines SCM-domain-specific resource types and properties for source control management. Configuration Management types (Stream, Baseline, ChangeSet, Component) are defined in the oslc_config namespace." .
+
+# ============================================================
+# Classes
+# ============================================================
+
+oslc_scm:Change
+  a rdfs:Class ;
+  dc11:description "A single change within a change set. Represents an individual modification to a versioned resource." .
+
+oslc_scm:FileVersion
+  a rdfs:Class ;
+  dc11:description "A specific version of a file under source control." .
+
+oslc_scm:DirectoryVersion
+  a rdfs:Class ;
+  dc11:description "A specific version of a directory under source control." .
+
+oslc_scm:SymlinkVersion
+  a rdfs:Class ;
+  dc11:description "A specific version of a symbolic link under source control." .
+
+oslc_scm:FileVersionComparison
+  a rdfs:Class ;
+  dc11:description "A comparison representing the difference between two file versions." .
+
+oslc_scm:DirectoryVersionComparison
+  a rdfs:Class ;
+  dc11:description "A comparison representing the difference between two directory versions." .
+
+oslc_scm:BaselineComparison
+  a rdfs:Class ;
+  dc11:description "A comparison representing the difference between two baselines." .
+
+oslc_scm:SymlinkVersionComparison
+  a rdfs:Class ;
+  dc11:description "A comparison representing the difference between two symbolic link versions." .
+
+# ============================================================
+# ChangeSet Properties
+# ============================================================
+
+oslc_scm:change
+  a rdf:Property ;
+  rdfs:domain oslc_config:ChangeSet ;
+  rdfs:range oslc_scm:Change ;
+  dc11:description "Links a change set to one of its constituent changes." .
+
+# ============================================================
+# Change Properties
+# ============================================================
+
+oslc_scm:changeType
+  a rdf:Property ;
+  rdfs:domain oslc_scm:Change ;
+  rdfs:range xsd:string ;
+  dc11:description "The nature of a change, such as add, modify, or delete. Values are provider-specific." .
+
+oslc_scm:changedObject
+  a rdf:Property ;
+  rdfs:domain oslc_scm:Change ;
+  rdfs:range rdfs:Resource ;
+  dc11:description "The object version associated with a change." .
+
+# ============================================================
+# Stream and Build Properties
+# ============================================================
+
+oslc_scm:stream
+  a rdf:Property ;
+  rdfs:range rdfs:Resource ;
+  dc11:description "Links to the stream or branch associated with a resource." .
+
+oslc_scm:build
+  a rdf:Property ;
+  rdfs:range rdfs:Resource ;
+  dc11:description "A reference to a build resource associated with a source control resource." .
+
+# ============================================================
+# Baseline Properties
+# ============================================================
+
+oslc_scm:subBaseline
+  a rdf:Property ;
+  rdfs:domain oslc_config:Baseline ;
+  rdfs:range oslc_config:Baseline ;
+  dc11:description "A sub-baseline contained within a baseline." .
+
+oslc_scm:changeSetAdded
+  a rdf:Property ;
+  rdfs:range oslc_config:ChangeSet ;
+  dc11:description "A change set that was added in a baseline." .
+
+oslc_scm:changeSetModified
+  a rdf:Property ;
+  rdfs:range oslc_config:ChangeSet ;
+  dc11:description "A change set that was modified in a baseline." .
+
+oslc_scm:changeSetRemoved
+  a rdf:Property ;
+  rdfs:range oslc_config:ChangeSet ;
+  dc11:description "A change set that was removed from a baseline." .
+
+# ============================================================
+# BaselineComparison Properties
+# ============================================================
+
+oslc_scm:baseline1
+  a rdf:Property ;
+  rdfs:domain oslc_scm:BaselineComparison ;
+  rdfs:range oslc_config:Baseline ;
+  dc11:description "The basis baseline in a baseline comparison." .
+
+oslc_scm:baseline2
+  a rdf:Property ;
+  rdfs:domain oslc_scm:BaselineComparison ;
+  rdfs:range oslc_config:Baseline ;
+  dc11:description "The target baseline in a baseline comparison." .
+
+# ============================================================
+# FileVersion Properties
+# ============================================================
+
+oslc_scm:content
+  a rdf:Property ;
+  rdfs:domain oslc_scm:FileVersion ;
+  rdfs:range rdfs:Resource ;
+  dc11:description "A link to the content of a file version." .
+
+oslc_scm:mimeType
+  a rdf:Property ;
+  rdfs:domain oslc_scm:FileVersion ;
+  rdfs:range xsd:string ;
+  dc11:description "The MIME type of the file content." .
+
+# ============================================================
+# FileVersionComparison Properties
+# ============================================================
+
+oslc_scm:fileVersion1
+  a rdf:Property ;
+  rdfs:domain oslc_scm:FileVersionComparison ;
+  rdfs:range oslc_scm:FileVersion ;
+  dc11:description "The basis file version in a file version comparison." .
+
+oslc_scm:fileVersion2
+  a rdf:Property ;
+  rdfs:domain oslc_scm:FileVersionComparison ;
+  rdfs:range oslc_scm:FileVersion ;
+  dc11:description "The target file version in a file version comparison." .
+
+oslc_scm:unifiedDiff
+  a rdf:Property ;
+  rdfs:range xsd:string ;
+  dc11:description "The unified diff text representing the differences between two versions." .
+
+# ============================================================
+# DirectoryVersion Properties
+# ============================================================
+
+oslc_scm:memberIdentifier
+  a rdf:Property ;
+  rdfs:domain oslc_scm:DirectoryVersion ;
+  rdfs:range xsd:string ;
+  dc11:description "An identifier of a member within a directory version." .
+
+# ============================================================
+# DirectoryVersionComparison Properties
+# ============================================================
+
+oslc_scm:directoryVersion1
+  a rdf:Property ;
+  rdfs:domain oslc_scm:DirectoryVersionComparison ;
+  rdfs:range oslc_scm:DirectoryVersion ;
+  dc11:description "The basis directory version in a directory version comparison." .
+
+oslc_scm:directoryVersion2
+  a rdf:Property ;
+  rdfs:domain oslc_scm:DirectoryVersionComparison ;
+  rdfs:range oslc_scm:DirectoryVersion ;
+  dc11:description "The target directory version in a directory version comparison." .
+
+oslc_scm:memberAdded
+  a rdf:Property ;
+  rdfs:range rdfs:Resource ;
+  dc11:description "A member that was added in a directory or version comparison." .
+
+oslc_scm:memberRemoved
+  a rdf:Property ;
+  rdfs:range rdfs:Resource ;
+  dc11:description "A member that was removed in a directory or version comparison." .
+
+# ============================================================
+# SymlinkVersion Properties
+# ============================================================
+
+oslc_scm:target
+  a rdf:Property ;
+  rdfs:domain oslc_scm:SymlinkVersion ;
+  rdfs:range xsd:string ;
+  dc11:description "The file system path target of a symbolic link." .
+
+# ============================================================
+# SymlinkVersionComparison Properties
+# ============================================================
+
+oslc_scm:symlinkVersion1
+  a rdf:Property ;
+  rdfs:domain oslc_scm:SymlinkVersionComparison ;
+  rdfs:range oslc_scm:SymlinkVersion ;
+  dc11:description "The basis symbolic link version in a symlink version comparison." .
+
+oslc_scm:symlinkVersion2
+  a rdf:Property ;
+  rdfs:domain oslc_scm:SymlinkVersionComparison ;
+  rdfs:range oslc_scm:SymlinkVersion ;
+  dc11:description "The target symbolic link version in a symlink version comparison." .
+
+# ============================================================
+# General Properties
+# ============================================================
+
+oslc_scm:fullName
+  a rdf:Property ;
+  rdfs:range xsd:string ;
+  dc11:description "The full unique human-readable name of a source control resource." .
+
+oslc_scm:status
+  a rdf:Property ;
+  rdfs:range xsd:string ;
+  dc11:description "The current status of a source control resource." .
