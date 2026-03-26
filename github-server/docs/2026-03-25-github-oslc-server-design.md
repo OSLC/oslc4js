@@ -393,7 +393,7 @@ Copy from `/Users/jamsden/Developer/OSLC/oslc-specs/specs/config/config-shapes.t
 
 New file authored from the SCM v1.0 specification (no published Turtle exists). Namespace: `http://open-services.net/ns/scm#`.
 
-Note: `oslc_config:Stream`, `oslc_config:Baseline`, `oslc_config:ChangeSet`, and `oslc_config:Component` are defined in the OSLC Configuration Management vocabulary (`http://open-services.net/ns/config#`), not in the SCM vocabulary. The SCM vocabulary defines only SCM-domain-specific resource types and properties.
+Note: `oslc_config:Stream`, `oslc_config:Baseline`, `oslc_config:ChangeSet`, and `oslc_config:Component` are defined in the OSLC Configuration Management vocabulary (`http://open-services.net/ns/config#`), and are no longer defined in the SCM vocabulary. The SCM vocabulary defines only SCM-domain-specific resource types and properties. This normalizes the legacy SCM spec with the OASIS OSLC Configuration Management 1.0 spec, including the proposed 1.1 spech changes for change set delivery and history.
 
 **Classes:**
 - `Change`
