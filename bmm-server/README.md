@@ -10,7 +10,7 @@ This is a complete demonstration of the Define-Instantiate-Activate pattern from
 
   **Define** — BMM.ttl vocabulary (25 classes, 49 properties), BMM-Shapes.ttl (14 ResourceShapes), and a catalog template — all declarative, no application code. Claude was used to create the BMM OSLC vocabulary and resource shapes directly from the OMG specification at: https://www.omg.org/spec/BMM/1.3/PDF. 
 
-  **Instantiate** — create-oslc-server.ts scaffolds a working server from the vocabulary and resource shape constraints. The embedded MCP endpoint lets an AI assistant populate server resources from the examples in https://www.omg.org/spec/BMM/1.3/PDF, or other documents. 38 linked SolarTech resources are created via MCP tool calls.
+  **Instantiate** — create-oslc-server.ts scaffolds a working server from the vocabulary and resource shape constraints. The embedded MCP endpoint lets an AI assistant populate server resources from the examples in https://www.omg.org/spec/BMM/1.3/PDF, or other documents. An AI assistant reads the BMM 1.3 specification and populates the EU-Rent example via MCP tool calls.
 
   **Activate** — AI assistants query, analyze, and extend the model through natural language. The oslc-browser provides human navigation. OSLC services provide programmatic access. Multiple servers can cross-link by URI.
 
@@ -100,22 +100,43 @@ After scaffolding, you should:
 3. **Review or update the catalog template** in `config/catalog-template.ttl` to define your service provider's creation factories, query capabilities, and dialogs
 4. **Update the Fuseki dataset name** in `config.json` (`jenaURL`) to match your Fuseki configuration
 
-## Example: SolarTech Inc.
+## Example: EU-Rent (from BMM 1.3 Specification)
 
-The `testing/` folder contains `.http` request files that populate a complete BMM example based on a fictional renewable energy company, SolarTech Inc described in the  OMG Business Motivation Model (BMM) 1.3 specification. The example illustrates the full BMM metamodel with interconnected resources and how to use the server's OSLC REST API:
+EU-Rent is a fictitious European car rental company used as the running example throughout the BMM 1.3 specification (Annex C provides background). Rather than hand-crafted `.http` files, the EU-Rent domain data is populated by an AI assistant that reads the spec and creates resources via the MCP endpoint.
 
-| File | Creates | Description |
-|------|---------|-------------|
-| `01-catalog.http` | — | Read the ServiceProviderCatalog |
-| `02-create-service-provider.http` | 1 ServiceProvider | "SolarTech Inc." enterprise |
-| `03-create-ends.http` | 1 Vision, 3 Goals, 3 Objectives | Vision to be the leading solar energy provider; Goals for market share, customer satisfaction, and operational efficiency; Objectives with measurable targets and deadlines |
-| `04-create-means.http` | 1 Mission, 3 Strategies, 3 Tactics, 2 Policies, 3 Rules | Mission to deliver affordable solar solutions; Strategies for product innovation, customer experience, and supply chain integration; Tactics implementing each strategy; Policies for quality and data protection; Rules with enforcement levels |
-| `05-create-influencers-assessments.http` | 4 Influencers, 3 Assessments, 2 PotentialImpacts | External influencers (tax credits, import competition) and internal influencers (labor shortage, technology breakthrough); SWOT-style assessments; potential impacts identifying risks and rewards |
-| `06-create-organization.http` | 4 OrgUnits, 3 Processes, 3 Assets | Executive, R&D, Manufacturing, and Customer Operations divisions; product development, order-to-installation, and warranty processes; manufacturing facility, patent portfolio, and monitoring platform |
-| `07-link-resources.http` | — | Templates for adding cross-references between resources (requires ETags from the server) |
-| `08-query-resources.http` | — | OSLC queries to retrieve resources by type |
+The spec PDF is included at `docs/BMM-formal-15-05-19.pdf`.
 
-To load the example, run the files in order (02 through 06) using a REST client such as the VS Code REST Client extension. Then browse the populated model at `http://localhost:3005/`.
+**To populate the EU-Rent example:**
+
+1. Start bmm-server and Fuseki as described above.
+2. Connect an AI assistant (e.g., Claude Desktop) to the MCP endpoint at `http://localhost:3005/mcp`.
+3. Ask the assistant to read the BMM 1.3 specification and create the EU-Rent example artifacts.
+
+The `testing/` folder contains `.http` files for API verification:
+
+| File | Purpose |
+|------|---------|
+| `01-catalog.http` | Read the ServiceProviderCatalog |
+| `02-create-service-provider.http` | Create the "EU-Rent" ServiceProvider (smoke test) |
+| `08-query-resources.http` | Query templates for all BMM resource types |
+
+**What the spec contains for EU-Rent:**
+
+| BMM Type | EU-Rent Content |
+|----------|----------------|
+| Vision | "Be the car rental brand of choice for business users in the countries in which we operate." |
+| Goals | Premium brand positioning (top 6/9 in operating countries), industry-leading customer service, well-maintained cars, vehicle availability |
+| Objectives | A C Nielsen top 6 in EC countries by year-end, top 9 in other countries, 85% customer satisfaction score, less than 1% mechanical breakdown replacements |
+| Mission | "Provide car rental service across Europe and North America for both business and personal customers." |
+| Strategies | Operate nation-wide focusing on major airports, manage car purchase/disposal at local area level, join established third-party rewards scheme |
+| Tactics | Encourage rental extensions, outsource maintenance for small branches, create standard car model specifications, equalize car usage, comply with maintenance schedules |
+| Business Policies | Minimize depreciation, guarantee rental payments in advance, prohibit car export, contracts under pick-up country law, comply with laws and regulations |
+| Business Rules | Cars must match standard specification, assign lowest-mileage car, require valid driver's license, schedule service by odometer reading, drivers must be over 21 |
+| External Influencers | Competitor mergers, Hertz/Avis, budget airlines, customers/market research, car parking costs, Eastern Europe growth, on-airport environment, EC-Lease, laws/regulations, car manufacturers, insurers, vehicle tracking tech, electric/LPG cars, internet self-service |
+| Internal Influencers | Business expansion assumption, loyalty rewards assumption, manager promotion habit, branch staff training habit, branch clustering infrastructure, car ownership by local area, internet software limitations, outsourcing issue, Eastern Europe board priority, manager discount authority, car models/quality, staff quality, environment-friendly values, quality/service/value values, supportive staff, car care values |
+| Assessments (SWOT) | Strengths: geographical distribution, environment-friendly values, branch managers. Weaknesses: internet software for corporate agreements, high counter staff turnover. Opportunities: room in premium market, depreciation management. Threats: budget airlines at secondary airports, budget airlines as alternative, congestion charges |
+| Risks | Failure to position as premium risks 15% customer loss, unrented cars at weekends, Scandinavian emission penalties |
+| Potential Rewards | 12% average increase on rental rates, replace 15% of customers moving upmarket, 3% depreciation cost reduction |
 
 ## AI via MCP
 
@@ -142,7 +163,7 @@ For OSLC servers that don't embed MCP (e.g., IBM EWM, DOORS Next), the standalon
 
 An AI assistant connected to bmm-server's MCP endpoint can read a document (such as a specification, strategy paper, or business plan) and automatically populate the BMM model with the artifacts and relationships it finds. For example:
 
-> "Read the BMM 1.3 specification and create all the example artifacts and relationships described in the document."
+> "Read the BMM 1.3 specification at docs/BMM-formal-15-05-19.pdf and create all the EU-Rent example artifacts and relationships described in the document."
 
 From the user's perspective, the assistant reads the document, reports what it found, creates the resources, and provides a link to browse the result. Behind the scenes, the agent follows a systematic process:
 
@@ -165,83 +186,95 @@ These resources return human-readable markdown descriptions of the server's doma
 
 ### Example Prompts
 
-Once the SolarTech BMM model is populated, here are prompts you can use with an AI assistant connected to the bmm-server MCP endpoint:
+Once the EU-Rent BMM model is populated, here are prompts you can use with an AI assistant connected to the bmm-server MCP endpoint:
+
+**Populating from the spec:**
+
+- "Read docs/BMM-formal-15-05-19.pdf and create all EU-Rent BMM artifacts described in the specification."
+- "Create the EU-Rent Vision, Goals, and Objectives from the BMM 1.3 spec."
+- "Populate the EU-Rent Influencers, Assessments, and Potential Impacts from the spec's SWOT analysis."
 
 **Exploring the model:**
 
-- "What is SolarTech's Vision?"
-- "List all of SolarTech's Goals and the Objectives that quantify each one."
-- "What Strategies does SolarTech have, and which Goals does each Strategy channel efforts toward?"
+- "What is EU-Rent's Vision?"
+- "List all of EU-Rent's Goals and the Objectives that quantify each one."
+- "What Strategies does EU-Rent have, and which Goals does each Strategy channel efforts toward?"
 - "Show me the complete Ends hierarchy — Vision, Goals, and Objectives — as an outline."
-- "What Tactics implement the Product Innovation Leadership strategy?"
+- "What Tactics implement the 'operate nation-wide focusing on major airports' Strategy?"
 
 **Analysis and insight:**
 
 - "Which Goals have no Strategies channeling efforts toward them? Are there any gaps in the Means-to-Ends alignment?"
-- "What Influencers has SolarTech identified, and what Assessments have been made about each one?"
-- "Trace the chain from the Perovskite Tandem Cell Breakthrough influencer through its Assessment to the Potential Impact it identifies. What Directive does that impact provide impetus for?"
-- "Which Organization Units are responsible for which Ends? Is every Goal covered?"
+- "What external Influencers has EU-Rent identified, and what Assessments have been made about each one?"
+- "Show the SWOT analysis: list all Assessments categorized as Strengths, Weaknesses, Opportunities, and Threats."
 - "What Business Processes are governed by Business Rules, and which Business Policies are those Rules based on?"
+- "Trace the chain from the 'minimize depreciation' Business Policy through the Tactics and Business Rules that implement it."
 
 **Impact analysis:**
 
-- "If the Federal Solar Investment Tax Credit is not renewed after 2032, which Goals and Objectives would be affected? Trace the impact through the Assessments."
-- "The Certified Installer Shortage constrains growth. What Tactics, Strategies, and Goals are at risk? What is SolarTech doing to address it?"
-- "How does the Vertical Supply Chain Integration strategy connect to the cost reduction Objective? Show the full chain."
+- "If budget airlines expand to secondary airports, which Goals and Strategies would be affected? Trace the impact through the Assessments."
+- "Competitor mergers in the premium market could change EU-Rent's positioning. What Goals, Strategies, and Tactics are at risk?"
+- "How does the 'room in premium market' Opportunity connect to the premium brand Goal? Show the full chain from Influencer through Assessment to Ends and Means."
 
-Here's an example prompt: If the Federal Solar Investment Tax Credit is not renewed after 2032, which Goals and Objectives would be affected? Trace the impact through the Assessments?
+Here is an example of the kind of chain analysis an AI assistant can perform. Based on section 8.5.8 of the BMM 1.3 spec, the prompt "How did EU-Rent decide to position as a premium brand, and what chain of decisions followed?" produces a response like:
 
-Response from the SolarTech model:
-
- If the Federal Solar Investment Tax Credit is not renewed after 2032:
-
-  The Chain
+  The Premium Brand Positioning Chain (BMM 1.3, Section 8.5.8)
 ```
-  Influencer: Federal Solar Investment Tax Credit Extension (Regulation)
-      │
-      ▼ assessed by
-  Assessment: Tax Credit Drives Residential Demand Growth
-      │  "The ITC extension is projected to increase residential solar
-      │   adoption by 25-30% through 2030, creating a significant
-      │   window for market share capture."
-      │
-      ▼ identifies
-  Potential Impact: 5-Year Market Expansion Window
-      "The ITC extension creates a 5-year window of accelerated
-       residential solar demand. Companies that scale fastest
-       will capture durable market share."
+  Influencers: Competitors (Hertz/Avis), Customers/Market Research
+      |
+      v assessed by
+  Assessment: Opportunity — room in premium market
+      |
+      v provides impetus for
+  Goal: To be a 'premium brand' car rental company,
+        positioned alongside companies such as Hertz and Avis
+      |
+      v channeled by
+  Strategy: Operate nation-wide in each country of operation,
+            focusing on major airports, competing head-to-head,
+            on-airport, with other premium car rental companies
+      |
+      v constrained by
+  Assessment: Weakness — on-airport pricing is high
+      |
+      v leads to
+  Assessment: Opportunity — depreciation management
+      |
+      v provides impetus for
+  Business Policy: Depreciation of rental cars must be minimized
+      |
+      v implemented by
+  Tactics: Create standard specifications of car models,
+           Equalize use of cars across rentals,
+           Comply with car manufacturers' maintenance schedules
+      |
+      v govern
+  Business Rules: Each Car purchased must match the standard
+                  specification of its Car Model,
+                  The Car assigned to a Rental must be the one
+                  with the lowest mileage,
+                  Cars must be scheduled for service based on
+                  odometer reading
 ```
-  Goals Affected
+  This chain shows how external competitive pressures led EU-Rent to identify a market opportunity, set a strategic goal, adopt a head-to-head competitive strategy, and then address the resulting cost constraint through a depreciation policy implemented by specific tactics and enforced by concrete business rules. The full chain from Influencer to Business Rule is traceable in the BMM model.
 
-  Directly at risk: Grow Market Share
-  - The entire demand growth projection (25-30% increase through 2030) is predicated on the ITC. Without renewal, residential solar adoption stalls, closing the market expansion window.
-  - Quantified by Objective: Achieve 15% Residential Market Share by 2027-12-31 (measured by quarterly installed capacity as percentage of total market)
-  - This objective's target date falls before 2032, but the durability of any market share gained depends on sustained demand. Post-2032, without the credit, customer acquisition costs rise and adoption rates drop.
+  Risks and Rewards
 
-  Indirectly at risk: Maximize Customer Satisfaction
-  - Reduced demand means fewer installations, which reduces the installer network's utilization. The Certified Installer Network tactic depends on volume to sustain partner economics.
-  - Quantified by Objective: Achieve NPS Score of 70+ by 2026-06-30
-
-  Least affected: Improve Operational Efficiency
-  - The Vertical Supply Chain Integration strategy and cost reduction objective are supply-side, not demand-driven. These remain valid regardless of the tax credit.
-  - Quantified by Objective: Reduce Manufacturing Cost per Watt by 20% by 2027-06-30
-
-  Recommendation
-
-  The Assessment identifies this as an opportunity while the credit exists — but it's also a risk if SolarTech builds capacity assumptions around credit-driven demand that evaporates in 2032. The BMM model suggests
-  SolarTech should pursue the market share objective aggressively before 2032 while hedging through the Product Innovation strategy (differentiation that doesn't depend on subsidies).
+  - Risk: Failure to position as premium risks 15% customer loss
+  - Potential Reward: 12% average increase on rental rates
+  - Potential Reward: 3% depreciation cost reduction from the tactics above
 
 **Modification and extension:**
 
-- "Add a new Goal: 'Expand into Commercial Markets' with an Objective to achieve 10% commercial market share by 2028. Link the Goal to the Vision."
-- "Create an Assessment for the Perovskite breakthrough Influencer that identifies it as a Strength, and add a Potential Impact describing the competitive advantage it creates."
-- "Add a new Business Rule: 'All installations must include monitoring system activation' with enforcement level 'Strictly enforced', and link it to the Order-to-Installation Business Process."
-- "The Executive Leadership Team has decided to establish a new Tactic: 'Partner with Regional Utilities for Bundled Offerings'. Create it and link it to the End-to-End Customer Experience strategy."
+- "Add a new Goal: 'Expand into Eastern European markets' with an Objective to operate in 5 new Eastern European countries by year-end. Link the Goal to the Vision."
+- "Create an Assessment for the 'electric/LPG cars' Influencer that identifies it as an Opportunity, and add a Potential Impact describing the environmental brand advantage it creates."
+- "Add a new Business Rule: 'All rental cars must carry a GPS tracking device' with enforcement level 'Strictly enforced', and link it to the vehicle tracking technology Influencer."
+- "EU-Rent's board has decided to establish a new Tactic: 'Offer weekend discount rates to reduce idle fleet'. Create it and link it to the vehicle availability Goal."
 
 **Cross-server (if mrm-server is also connected):**
 
-- "Which MRM Programs in the City of Ottawa could be linked to SolarTech's Vertical Supply Chain Integration strategy?"
-- "Create a link from SolarTech's Product Quality Standards policy to the relevant MRM regulatory compliance Process."
+- "Which MRM Programs in the City of Ottawa could be linked to EU-Rent's 'comply with relevant laws and regulations' Business Policy?"
+- "Create a link from EU-Rent's 'contracts under pick-up country law' policy to the relevant MRM regulatory compliance Process."
 
 ## REST API
 
