@@ -58,7 +58,6 @@ style: |
 - [The Three-Layer Framework](#the-three-layer-framework)
 - [Layer 1 — Define](#layer-1--define)
 - [Layer 1 Example: BMM Vocabulary](#layer-1-example-bmm-vocabulary)
-- [Layer 1 Example: BMM Relationships](#layer-1-example-bmm-relationships)
 - [Layer 2 — Instantiate](#layer-2--instantiate)
 - [Layer 2 Example: EU-Rent](#layer-2-example-eu-rent)
 - [AI Transforms Layer 2](#ai-transforms-layer-2)
@@ -66,17 +65,12 @@ style: |
 - [Layer 3 Example: MCP Endpoint](#layer-3-example-mcp-endpoint)
 - [The Feedback Loop](#the-feedback-loop)
 - [Why Not Just Use AI Alone?](#why-not-just-use-ai-alone)
-- [AI Needs Structure to Be Reliable](#ai-needs-structure)
-- [What AI Brings to the System of Record](#what-ai-brings)
-- [The Integrated Architecture](#the-integrated-architecture)
 - [BMM Server: Working Example](#bmm-server-working-example)
 - [Key Takeaway](#key-takeaway)
 - [AI-Assisted V-Model](#ai-assisted-v-model)
 - [Three Layers of AI Assistance](#three-layers-of-ai-assistance)
 - [Scenario: Requirements Change](#scenario-requirements-change)
 - [The V-Model Feedback Loop](#the-v-model-feedback-loop)
-- [Governance: Authority](#governance-authority)
-- [Governance: Metrics](#governance-metrics)
 
 ---
 
@@ -104,13 +98,13 @@ A semantic value chain requires three distinct layers:
 | **2. Instantiate** | Artifact creation & governance | What are the actual resources in this project? |
 | **3. Activate** | Outcomes & value delivery | What decisions can we make from this data? |
 
-This maps onto the classic **schema / instance / use** distinction from information architecture, applied to the OSLC linked data ecosystem.
+This maps onto the classic **schema / instance / use** distinction from information architecture, applied to an AI assisted OSLC linked data ecosystem.
 
 ---
 
 # Layer 1 — Define
 
-**The meaning layer.** It establishes shared understanding before any data is created.
+**The meaning layer**: It establishes shared understanding before any data is created.
 
 **Two complementary mechanisms:**
 
@@ -162,13 +156,13 @@ The **bmm-server** defines the OMG Business Motivation Model 1.3 as an RDF ontol
 
 The ontology defines precisely how concepts connect. These typed relationships are what make queries, traceability, and AI analysis precise.
 
-![w:750](images/bmm-relationships.svg)
+![w:750](images/bmm-relationships.png)
 
 ---
 
 # Layer 2 — Instantiate
 
-**The artifact layer.** Here we transition from ontology experts to **subject matter experts** in the domain.
+**The artifact layer**: Here we transition from ontology experts to **subject matter experts** in the domain.
 
 **What it produces:**
 - Actual resources — requirements, plans, assessments, strategies
@@ -184,8 +178,6 @@ The ontology defines precisely how concepts connect. These typed relationships a
 <!-- _class: small-text -->
 
 # Layer 2 Example: EU-Rent
-
-**EU-Rent** is a fictitious European car rental company used as the running example throughout the OMG BMM 1.3 specification:
 
 | BMM Concept | EU-Rent Examples in Spec |
 |-------------|------------------------|
@@ -223,7 +215,7 @@ Traditionally, Layer 2 was the bottleneck — entirely human-authored through fo
 
 # Layer 3 — Activate
 
-**The value layer.** Without it, Layers 1 and 2 produce a beautifully governed but unused knowledge graph.
+**The value layer**: Without it, Layers 1 and 2 produce a beautifully governed but unused knowledge graph.
 
 **Three activation mechanisms:**
 
@@ -271,7 +263,7 @@ The bmm-server exposes an MCP endpoint at `/mcp` with **34 dynamically generated
 
 This creates a virtuous cycle that didn't exist before MCP:
 
-![w:600](images/feedback-loop.svg)
+![w:800](images/feedback-loop.png)
 
 ---
 
@@ -319,7 +311,7 @@ Ontologies provide stakeholder viewpoints — structured perspectives tailored t
 
 # The Integrated Architecture
 
-![w:700](images/integrated-architecture.svg)
+![w:800](images/integrated-architecture.png)
 
 ---
 
@@ -361,7 +353,7 @@ The **Define-Instantiate-Activate** framing positions ontologies and OSLC server
 
 The framework applies not just to individual OSLC servers, but to the **entire systems engineering lifecycle**.
 
-![w:650](images/v-model.svg)
+![w:700](images/v-model.png)
 
 In OSLC terms, each traceability link is **typed** — the V-model's traceability is a **live link graph** spanning tools.
 
@@ -369,7 +361,7 @@ In OSLC terms, each traceability link is **typed** — the V-model's traceabilit
 
 # Three Layers of AI Assistance
 
-An AI assistant connected via MCP to an integrated tool chain operates at three layers:
+An AI assistant could be connected via MCP to an integrated tool chain operates at three layers:
 
 | Layer | Scope | MCP Access | Example |
 |-------|-------|------------|---------|
@@ -406,13 +398,15 @@ AI re-queries to confirm all gaps closed, coverage restored.
 
 # The V-Model Feedback Loop
 
-![w:580](images/v-model-feedback-loop.svg)
+![w:700](images/v-model-feedback-loop.png)
 
-This is **Define-Instantiate-Activate applied to the lifecycle**: vocabularies define valid traceability, tools instantiate artifacts and links, analytics activate the data — feeding back into new instantiation.
+This is **Define-Instantiate-Activate applied to the lifecycle**: vocabularies define valid traceability, tools instantiate artifacts and links, analytics activate the data — feeding back into new versions.
 
 ---
 
 # Governance: Authority and Approval
+
+Governance helps ensure we achieve intended outcomes with proper authority and approval traceability. 
 
 | Level | AI Action | Approval | Example |
 |-------|-----------|----------|---------|
