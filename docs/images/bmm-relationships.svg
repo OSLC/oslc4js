@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#2c3e50"/>
+    </marker>
+  </defs>
+
+  <!-- Vision -->
+  <rect x="300" y="10" width="200" height="36" rx="6" fill="#1a5276" stroke="#1a5276"/>
+  <text x="400" y="34" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Vision</text>
+
+  <!-- Mission -->
+  <rect x="580" y="10" width="200" height="36" rx="6" fill="#2980b9" stroke="#2980b9"/>
+  <text x="680" y="34" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Mission</text>
+
+  <!-- Arrow Vision -> Mission -->
+  <line x1="500" y1="28" x2="575" y2="28" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="537" y="22" text-anchor="middle" fill="#555" font-size="10">amplifiedByMission</text>
+
+  <!-- Goal -->
+  <rect x="300" y="80" width="200" height="36" rx="6" fill="#1a5276" stroke="#1a5276"/>
+  <text x="400" y="104" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Goal</text>
+
+  <!-- Arrow Vision -> Goal -->
+  <line x1="400" y1="46" x2="400" y2="75" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="430" y="65" fill="#555" font-size="10">madeOperativeByGoal</text>
+
+  <!-- Objective -->
+  <rect x="300" y="150" width="200" height="36" rx="6" fill="#1a5276" stroke="#1a5276"/>
+  <text x="400" y="174" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Objective</text>
+
+  <!-- Arrow Goal -> Objective -->
+  <line x1="400" y1="116" x2="400" y2="145" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="440" y="135" fill="#555" font-size="10">quantifiedByObjective</text>
+
+  <!-- Strategy -->
+  <rect x="40" y="80" width="200" height="36" rx="6" fill="#2980b9" stroke="#2980b9"/>
+  <text x="140" y="104" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Strategy</text>
+
+  <!-- Arrow Strategy -> Goal -->
+  <line x1="240" y1="98" x2="295" y2="98" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="267" y="92" text-anchor="middle" fill="#555" font-size="10">channelsEfforts</text>
+
+  <!-- Tactic -->
+  <rect x="40" y="150" width="200" height="36" rx="6" fill="#2980b9" stroke="#2980b9"/>
+  <text x="140" y="174" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Tactic</text>
+
+  <!-- Arrow Tactic -> Strategy -->
+  <line x1="140" y1="150" x2="140" y2="121" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="175" y="138" fill="#555" font-size="10">implementsStrategy</text>
+
+  <!-- Business Policy -->
+  <rect x="40" y="230" width="200" height="36" rx="6" fill="#8e44ad" stroke="#8e44ad"/>
+  <text x="140" y="254" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Business Policy</text>
+
+  <!-- Arrow Policy -> Strategy/Tactic -->
+  <line x1="140" y1="230" x2="140" y2="191" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="195" y="215" fill="#555" font-size="10">governsCourseOfAction</text>
+
+  <!-- Business Rule -->
+  <rect x="300" y="230" width="200" height="36" rx="6" fill="#8e44ad" stroke="#8e44ad"/>
+  <text x="400" y="254" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Business Rule</text>
+
+  <!-- Influencer -->
+  <rect x="580" y="150" width="200" height="36" rx="6" fill="#27ae60" stroke="#27ae60"/>
+  <text x="680" y="174" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Influencer</text>
+
+  <!-- Assessment -->
+  <rect x="580" y="230" width="200" height="36" rx="6" fill="#27ae60" stroke="#27ae60"/>
+  <text x="680" y="254" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Assessment</text>
+
+  <!-- Arrow Assessment -> Influencer -->
+  <line x1="680" y1="230" x2="680" y2="191" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="725" y="215" fill="#555" font-size="10">assessesInfluencer</text>
+
+  <!-- Potential Impact -->
+  <rect x="580" y="310" width="200" height="36" rx="6" fill="#27ae60" stroke="#27ae60"/>
+  <text x="680" y="334" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Potential Impact</text>
+
+  <!-- Arrow Impact -> Policy/Rule -->
+  <line x1="580" y1="328" x2="500" y2="260" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="520" y="305" fill="#555" font-size="10">providesImpetusForDirective</text>
+
+  <!-- Organization Unit -->
+  <rect x="40" y="310" width="200" height="36" rx="6" fill="#e67e22" stroke="#e67e22"/>
+  <text x="140" y="334" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Organization Unit</text>
+
+  <!-- Arrow OrgUnit -> Goal -->
+  <line x1="200" y1="310" x2="340" y2="120" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="240" y="290" fill="#555" font-size="10">isResponsibleForEnd</text>
+
+  <!-- Legend -->
+  <rect x="20" y="370" width="16" height="16" rx="3" fill="#1a5276"/>
+  <text x="42" y="383" fill="#333" font-size="12">Ends</text>
+  <rect x="100" y="370" width="16" height="16" rx="3" fill="#2980b9"/>
+  <text x="122" y="383" fill="#333" font-size="12">Means</text>
+  <rect x="190" y="370" width="16" height="16" rx="3" fill="#8e44ad"/>
+  <text x="212" y="383" fill="#333" font-size="12">Directives</text>
+  <rect x="310" y="370" width="16" height="16" rx="3" fill="#27ae60"/>
+  <text x="332" y="383" fill="#333" font-size="12">Influencers &amp; Assessments</text>
+  <rect x="530" y="370" width="16" height="16" rx="3" fill="#e67e22"/>
+  <text x="552" y="383" fill="#333" font-size="12">Organization</text>
+</svg>

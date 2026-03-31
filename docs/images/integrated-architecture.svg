@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 380" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#2c3e50"/>
+    </marker>
+  </defs>
+
+  <!-- AI Assistant -->
+  <rect x="75" y="15" width="600" height="70" rx="10" fill="#1a5276"/>
+  <text x="375" y="40" text-anchor="middle" fill="white" font-size="16" font-weight="bold">AI Assistant (Claude)</text>
+  <text x="375" y="60" text-anchor="middle" fill="#a9cce3" font-size="12">Authoring: reads documents, creates resources  |  Analysis: gap analysis, impact, compliance</text>
+
+  <!-- MCP arrow -->
+  <line x1="375" y1="85" x2="375" y2="115" stroke="#2c3e50" stroke-width="2" marker-end="url(#a)"/>
+  <text x="420" y="105" fill="#555" font-size="12" font-weight="bold">MCP</text>
+
+  <!-- OSLC Server -->
+  <rect x="75" y="120" width="600" height="110" rx="10" fill="#f8f9fa" stroke="#2980b9" stroke-width="2"/>
+  <text x="375" y="145" text-anchor="middle" fill="#2980b9" font-size="16" font-weight="bold">OSLC Server (bmm-server)</text>
+
+  <!-- Three sub-layers -->
+  <rect x="95" y="158" width="175" height="30" rx="5" fill="#1a5276"/>
+  <text x="182" y="178" text-anchor="middle" fill="white" font-size="11">Layer 1: Vocabulary + Shapes</text>
+
+  <rect x="288" y="158" width="175" height="30" rx="5" fill="#2980b9"/>
+  <text x="375" y="178" text-anchor="middle" fill="white" font-size="11">Layer 2: Governed Resources</text>
+
+  <rect x="481" y="158" width="175" height="30" rx="5" fill="#27ae60"/>
+  <text x="568" y="178" text-anchor="middle" fill="white" font-size="11">Layer 3: REST + MCP + UI</text>
+
+  <!-- Storage -->
+  <rect x="200" y="198" width="350" height="22" rx="4" fill="#eee" stroke="#bbb"/>
+  <text x="375" y="214" text-anchor="middle" fill="#555" font-size="11">Apache Jena Fuseki (RDF / TDB2)</text>
+
+  <!-- Arrow down to consumers -->
+  <line x1="200" y1="230" x2="200" y2="265" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="375" y1="230" x2="375" y2="265" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="550" y1="230" x2="550" y2="265" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- Consumer boxes -->
+  <rect x="120" y="270" width="160" height="45" rx="6" fill="#f5eef8" stroke="#8e44ad"/>
+  <text x="200" y="290" text-anchor="middle" fill="#8e44ad" font-size="13" font-weight="bold">LQE / SPARQL</text>
+  <text x="200" y="306" text-anchor="middle" fill="#666" font-size="11">Analytics</text>
+
+  <rect x="295" y="270" width="160" height="45" rx="6" fill="#eaf2f8" stroke="#2980b9"/>
+  <text x="375" y="290" text-anchor="middle" fill="#2980b9" font-size="13" font-weight="bold">Tool Integration</text>
+  <text x="375" y="306" text-anchor="middle" fill="#666" font-size="11">DOORS, EWM, Polarion</text>
+
+  <rect x="470" y="270" width="160" height="45" rx="6" fill="#eafaf1" stroke="#27ae60"/>
+  <text x="550" y="290" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">Web Browser</text>
+  <text x="550" y="306" text-anchor="middle" fill="#666" font-size="11">oslc-browser</text>
+</svg>
