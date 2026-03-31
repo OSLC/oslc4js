@@ -372,6 +372,120 @@ The **Define-Instantiate-Activate** framing positions ontologies and OSLC server
 
 ---
 
+# Applying Define-Instantiate-Activate to an AI-Assisted V-Model
+
+The framework applies not just to individual OSLC servers, but to the **entire systems engineering lifecycle**.
+
+The V-model traces requirements decomposition (left) to verification (right):
+
+```
+Stakeholder Needs ←————————→ Acceptance Tests
+  System Requirements ←————→ System Tests
+    Subsystem Reqs ←————————→ Integration Tests
+      Component Reqs ←——————→ Unit Tests
+            Design → Implementation
+```
+
+In OSLC terms, each `←→` is a **typed link** — `oslc_rm:validatedBy`, `oslc_qm:validatesRequirement`, etc. The V-model's traceability is a **live link graph** spanning tools.
+
+---
+
+# Three Layers of AI Assistance
+
+An AI assistant connected via MCP to an integrated tool chain operates at three layers:
+
+| Layer | Scope | MCP Access | Example |
+|-------|-------|------------|---------|
+| **1. Tool-Local** | Single tool | Tool's own MCP endpoint | DOORS Next AI improves requirement quality; ETM AI suggests test cases |
+| **2. Integration** | Cross-tool | OSLC server MCP endpoint | Traverse links: "which requirements lack test cases?" |
+| **3. Analytics** | Lifecycle-wide | LQE/TRS MCP endpoint | Materialized graph: coverage ratios, compliance, impact analysis |
+
+**Layer 1** improves authoring within each tool silo.
+**Layer 2** enables cross-tool reasoning over the OSLC link graph.
+**Layer 3** provides efficient read-only analytics across the entire lifecycle.
+
+---
+
+# Scenario: Requirements Change Impact
+
+An engineer changes a system requirement: performance threshold from 100ms to 50ms.
+
+**Phase 1 — Impact Discovery (Layer 3, LQE)**
+- AI queries the materialized graph for full downstream impact
+- Result: "3 subsystem requirements, 12 component requirements, 8 test cases (2 passing, 3 draft, 3 missing), 4 work items affected"
+
+**Phase 2 — Triage and Planning (Layer 2, OSLC)**
+- AI traverses live links to assess each affected artifact
+- Flags test cases needing threshold updates vs. already parameterized
+- Identifies pre-existing coverage gaps made urgent by the change
+
+**Phase 3 — Assisted Authoring (Layer 1, Tools)**
+- ETM: drafts updated test procedures with new threshold
+- DOORS Next: proposes revised subsystem performance allocations
+- EWM: creates change requests linked to the originating change
+
+**Phase 4 — Verification (Layer 3, LQE)**
+- AI re-queries to confirm all gaps closed, coverage restored
+
+---
+
+# The Feedback Loop
+
+```
+Layer 3 (LQE Analytics)
+  │ Detects: gaps, coverage ratios, inconsistencies
+  ▼
+Layer 2 (OSLC Integration)
+  │ Proposes: cross-tool actions, link updates
+  ▼
+Layer 1 (Individual Tools)
+  │ Authors: requirements, test cases, work items
+  ▼
+Layer 2 (OSLC Integration)
+  │ Connects: new artifacts into the traceability graph
+  ▼
+Layer 3 (LQE Analytics)
+  │ Verifies: structural integrity, quantified outcomes
+```
+
+This is **Define-Instantiate-Activate applied to the lifecycle**: vocabularies define valid traceability, tools instantiate artifacts and links, analytics activate the data — feeding back into new instantiation.
+
+---
+
+# Governance: Three Dimensions
+
+**Authority and Approval**
+
+| Level | AI Action | Approval | Example |
+|-------|-----------|----------|---------|
+| **Observe** | Query and report | None needed | LQE gap analysis, coverage reports |
+| **Propose** | Draft artifacts in "Draft" state | Human review required | AI-generated test cases, requirement updates |
+| **Execute** | Create links by policy | Pre-authorized | Mechanical linking: test case → requirement |
+
+The AI operates within OSLC access controls — it does not bypass governance.
+
+---
+
+# Governance: Traceability and Metrics
+
+**Traceability of AI actions**
+
+Every AI action records provenance: what triggered it, what analysis justified it, what policy authorized it, and what human approved it. TRS propagates these records to LQE, making the AI's contribution auditable and queryable.
+
+**Quantifiable outcomes**
+
+| Metric | What It Measures |
+|--------|-----------------|
+| Coverage ratio | Requirement-to-test traceability before and after |
+| Gap closure rate | Gaps resolved per cycle |
+| Change propagation completeness | Downstream artifacts updated within time window |
+| Consistency scores | SHACL validation against V-model structural rules |
+| Cycle time | Requirement change to verified traceability closure |
+
+> These metrics measure the **engineering process**, not the AI. The AI makes the process faster and more complete. Governance sets targets; Layer 3 analytics continuously measure against them.
+
+---
+
 # Thank You
 
 **Resources:**
