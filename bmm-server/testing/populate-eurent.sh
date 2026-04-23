@@ -10,10 +10,15 @@
 # Influencers (external + internal), Assessments (SWOT), Potential
 # Impacts, Business Processes, Assets, and Organization Units.
 #
-# The "eu-rent" ServiceProvider must already exist. If it does not,
-# create it first — for example, via the create_service_provider MCP
-# tool or testing/02-create-service-provider.http (adjusted to use
-# slug "eu-rent").
+# If the "eu-rent" ServiceProvider doesn't yet exist, the script
+# creates it via the create_service_provider MCP tool. bmm-server's
+# embedded MCP endpoint auto-rediscovers the catalog after a new
+# ServiceProvider is created, so the per-type create_* tools (e.g.,
+# create_visions, create_goals, etc.) become available within the
+# same MCP session — no session restart needed. This is the same
+# refresh mechanism an MCP client with listChanged support would
+# observe; for clients that don't honor listChanged (e.g., Claude
+# Desktop), the script here is a scripted workaround.
 #
 # Usage:  ./testing/populate-eurent.sh
 # Prereq: bmm-server running at http://localhost:3005; node available
@@ -94,6 +99,28 @@ echo ""
 echo "============================================================"
 echo "EU-Rent BMM Example Population (from OMG BMM 1.3 spec)"
 echo "============================================================"
+
+# ── Ensure the eu-rent ServiceProvider exists ──────────────────
+# Idempotent: if the ServiceProvider already exists, the server
+# returns a 409 conflict in the tool result; we treat that as "OK,
+# already there" and continue. On a successful creation the server
+# auto-rediscovers, which adds the per-type create_* and query_*
+# tools to the handler map used by this same MCP session.
+SP_URI="$BASE/oslc/eu-rent"
+echo "── Ensuring ServiceProvider ──────────────────────────────"
+SP_RESP=$(curl -sf -X POST "$MCP" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Mcp-Session-Id: $SID" \
+  -d '{"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"create_service_provider","arguments":{"title":"EU-Rent","slug":"eu-rent","description":"EU-Rent BMM example from OMG BMM 1.3 specification (Annex C). Fictitious European car rental company used throughout the spec to illustrate Ends, Means, Influencers, Assessments, and Directives."}}}')
+if printf '%s' "$SP_RESP" | grep -q "already exists"; then
+  echo "  ServiceProvider already exists: $SP_URI"
+elif printf '%s' "$SP_RESP" | grep -q '"uri"'; then
+  echo "  ServiceProvider created: $SP_URI"
+else
+  echo "  WARNING: unexpected create_service_provider response:" >&2
+  printf '%s\n' "$SP_RESP" | head -5 >&2
+fi
 
 # ============================================================
 # Layer 0: Influencers (no outgoing BMM links)
