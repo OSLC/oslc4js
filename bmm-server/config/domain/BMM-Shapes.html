@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>OSLC Resource Shapes for the OMG Business Motivation Model (BMM)</title>
+    <meta
+      name="description"
+      content="Documents the OSLC ResourceShape constraints on the OMG Business Motivation Model (BMM) 1.3 vocabulary as served by the bmm-server OSLC service."
+    />
+
+    <script
+      src="https://cdn.jsdelivr.net/gh/oasis-tcs/tab-respec@v2.1.32/builds/respec-oasis-common.min.js"
+      async
+      class="remove"
+    ></script>
+    <script class="remove">
+      var respecConfig = {
+        shortName: "bmm-shapes",
+        specStatus: "base",
+        citationLabel: "BMM-Shapes",
+
+        license: "apache",
+        additionalLicenses: [
+          {
+            licenseName: "Creative Commons Attribution 4.0",
+            licenseURI: "https://creativecommons.org/licenses/by/4.0/",
+          },
+        ],
+
+        publishDate: "2026-04-23",
+
+        // Other artifacts related to this document
+        additionalArtifacts: [
+          {
+            title: "BMM Vocabulary (Machine Readable)",
+            href: "BMM.ttl",
+          },
+          {
+            title: "BMM Resource Shapes (Machine Readable)",
+            href: "BMM-Shapes.ttl",
+          },
+          {
+            title: "OMG Business Motivation Model 1.3 Specification",
+            href: "https://www.omg.org/spec/BMM/1.3/",
+          },
+        ],
+
+        relatedWork: [
+          {
+            title: "Object Management Group Business Motivation Model (BMM)",
+            href: "https://www.omg.org/spec/BMM/1.3/",
+          },
+          {
+            title: "bmm-server — OSLC 3.0 server for BMM",
+            href: "../../README.md",
+          },
+        ],
+
+        // Include h1, h2, and h3 levels in the table of contents
+        maxTocLevel: 3,
+
+        editors: [
+          {
+            name: "Jim Amsden",
+            company: "MID GmbH",
+            companyURL: "https://www.mid.de/",
+          },
+        ],
+
+        // Namespaces used in this document
+        namespaces: [
+          { href: "http://www.omg.org/spec/BMM#", prefix: "bmm" },
+          { href: "http://open-services.net/ns/core#", prefix: "oslc" },
+          { href: "http://open-services.net/ns/am#", prefix: "oslc_am" },
+          { href: "http://purl.org/dc/terms/", prefix: "dcterms" },
+        ],
+
+        localBiblio: {
+          BMM: {
+            title: "Business Motivation Model, Version 1.3",
+            href: "https://www.omg.org/spec/BMM/1.3/",
+            status: "Formal",
+            publisher: "Object Management Group",
+            date: "May 2015",
+          },
+          OSLCCore3: {
+            title: "OSLC Core Version 3.0. Part 1: Overview",
+            href: "https://docs.oasis-open-projects.org/oslc-op/core/v3.0/oslc-core.html",
+            authors: ["Jim Amsden", "S. Speicher"],
+            status: "Project Specification",
+            publisher: "OASIS",
+          },
+          OSLCShapes: {
+            title: "OSLC Core Version 3.0. Part 6: Resource Shape",
+            href: "https://docs.oasis-open-projects.org/oslc-op/core/v3.0/resource-shape.html",
+            authors: ["Arthur Ryman", "Jim Amsden"],
+            status: "Project Specification",
+            publisher: "OASIS",
+          },
+          OSLCAM: {
+            title: "OSLC Architecture Management Version 3.0. Part 2: Vocabulary",
+            href: "https://docs.oasis-open-projects.org/oslc-op/am/v3.0/architecture-management-vocab.html",
+            status: "OASIS Standard",
+            publisher: "OASIS",
+          },
+        },
+      };
+    </script>
+  </head>
+  <body>
+    <section id="abstract">
+      <p>
+        This document describes the OSLC <a href="#ResourceShape">ResourceShape</a> constraints
+        applied to the <a href="https://www.omg.org/spec/BMM/1.3/">OMG Business Motivation Model
+        (BMM) 1.3</a> vocabulary. These constraints govern the BMM resources managed by the
+        <code>bmm-server</code>, an OSLC 3.0 server implementation built on the
+        <code>oslc-service</code> Express middleware.
+      </p>
+
+      <p>
+        The shapes define, for each BMM resource type, which properties are required, which are
+        optional, the allowed cardinality, value types, and whether each property is a link to
+        another resource or a literal value. They also drive the server's creation dialogs,
+        creation factories, and OSLC query capabilities.
+      </p>
+    </section>
+
+    <section id="toc"></section>
+    <section id="sotd">
+      <p>
+        This document is provided as user documentation for the bmm-server, an OSLC 3.0 server
+        for the OMG Business Motivation Model. It is not an OMG or OASIS standard — it describes
+        a specific implementation of OSLC ResourceShapes over the BMM vocabulary.
+      </p>
+    </section>
+
+    <section id="introduction" class="informative">
+      <h2>Introduction</h2>
+
+      <p>
+        The OMG Business Motivation Model [[BMM]] provides a scheme for developing, communicating,
+        and managing business plans in an organized manner. It captures the relationships between
+        an enterprise's <em>Ends</em> (what it wants to achieve), its <em>Means</em> (how it
+        intends to achieve them), and the <em>Influencers</em> and <em>Assessments</em> that shape
+        business motivation.
+      </p>
+
+      <p>
+        The BMM is defined as a UML model with Structured English fact types. To make it usable
+        as a linked-data vocabulary, the bmm-server publishes an RDFS representation of the BMM
+        vocabulary (<a href="BMM.ttl">BMM.ttl</a>) and accompanying OSLC ResourceShapes
+        (<a href="BMM-Shapes.ttl">BMM-Shapes.ttl</a>) that constrain how BMM resources are
+        authored, linked, and validated.
+      </p>
+
+      <p>
+        RDF vocabularies are intentionally open: they define terms but do not specify cardinality,
+        required vs. optional properties, or the expected types of property values. These
+        decisions are made by OSLC ResourceShapes [[OSLCShapes]], which close down the vocabulary
+        for a particular purpose. Different deployments can apply different sets of constraints
+        to the same vocabulary without modifying the vocabulary itself.
+      </p>
+
+      <p>
+        All BMM resource types inherit from <code>bmm:MotivationalElement</code>, which in turn
+        is a subclass of <code>oslc_am:Resource</code> [[OSLCAM]]. This gives every BMM resource
+        the standard OSLC Core properties (<code>dcterms:title</code>,
+        <code>dcterms:description</code>, <code>dcterms:identifier</code>,
+        <code>dcterms:creator</code>, <code>dcterms:created</code>, <code>dcterms:modified</code>,
+        and so on) in addition to its BMM-specific properties.
+      </p>
+
+      <section id="terminology" class="informative">
+        <h3>Terminology</h3>
+        <p>
+          Terminology for BMM resources (Vision, Goal, Objective, Mission, Strategy, Tactic,
+          Business Policy, Business Rule, Influencer, Assessment, Potential Impact, Organization
+          Unit, Business Process, Asset) is defined by the OMG BMM specification [[BMM]].
+          Terminology for OSLC resources and ResourceShape constructs is defined by the OSLC Core
+          specification [[!OSLCCore3]] and its ResourceShape part [[!OSLCShapes]].
+        </p>
+      </section>
+
+      <section id="references"><h3>References</h3></section>
+
+      <section id="conventions">
+        <h3>Conventions</h3>
+        <p>
+          In addition to the namespace URIs and namespace prefixes <code>oslc</code>,
+          <code>rdf</code>, <code>rdfs</code>, <code>xsd</code>, <code>dcterms</code>, and
+          <code>foaf</code> defined in the OSLC Core specification [[!OSLCCore3]], this document
+          uses the following namespace prefix definitions:
+        </p>
+
+        <ul>
+          <li><code>bmm</code> : <code>http://www.omg.org/spec/BMM#</code> [[BMM]]</li>
+          <li><code>oslc_am</code> : <code>http://open-services.net/ns/am#</code> [[OSLCAM]]</li>
+        </ul>
+      </section>
+    </section>
+
+    <section id="structure" class="informative">
+      <h2>BMM Resource Organization</h2>
+
+      <p>
+        The BMM vocabulary defines four groups of motivational elements. Each resource shape in
+        this document belongs to one of these groups:
+      </p>
+
+      <dl>
+        <dt><strong>Ends</strong> — what the enterprise wants to achieve</dt>
+        <dd><a href="#VisionShape">Vision</a>, <a href="#GoalShape">Goal</a>, <a href="#ObjectiveShape">Objective</a></dd>
+
+        <dt><strong>Means</strong> — how the enterprise intends to achieve its Ends</dt>
+        <dd>
+          <a href="#MissionShape">Mission</a>, <a href="#StrategyShape">Strategy</a>,
+          <a href="#TacticShape">Tactic</a>, <a href="#BusinessPolicyShape">Business Policy</a>,
+          <a href="#BusinessRuleShape">Business Rule</a>
+        </dd>
+
+        <dt><strong>Influencers and Assessments</strong> — factors shaping the Ends and Means</dt>
+        <dd>
+          <a href="#InfluencerShape">Influencer</a>,
+          <a href="#AssessmentShape">Assessment</a>,
+          <a href="#PotentialImpactShape">Potential Impact</a>
+        </dd>
+
+        <dt><strong>Organization, Process, and Asset</strong> — who, how, and with what</dt>
+        <dd>
+          <a href="#OrganizationUnitShape">Organization Unit</a>,
+          <a href="#BusinessProcessShape">Business Process</a>, <a href="#AssetShape">Asset</a>
+        </dd>
+      </dl>
+
+      <p>
+        Inherited OSLC Core and Architecture Management properties (title, description,
+        identifier, creator, contributor, created, modified, subject, type, instanceShape,
+        serviceProvider, shortTitle) are included on every BMM shape and are not repeated in
+        the prose descriptions below.
+      </p>
+    </section>
+
+    <section id="resourceConstraints">
+      <h2>Resource Constraints</h2>
+      <p>
+        This section specifies the constraints for each BMM resource shape served by bmm-server.
+        The resource properties are not limited to the ones defined here; BMM servers may provide
+        additional properties. Any additional properties should exist in their own unique
+        namespace and not use the namespaces defined in these specifications.
+      </p>
+
+      <!-- ===================== Ends ===================== -->
+
+      <section id="VisionShape">
+        <h3>Resource: Vision</h3>
+        <p>
+          A <code>bmm:Vision</code> describes the future state of the enterprise, without regard
+          to how it is to be achieved — the ultimate, possibly unattainable, state the enterprise
+          would like to reach. A Vision is amplified by Goals and made operative by a Mission.
+        </p>
+
+        <div
+          title="Shape for bmm:Vision"
+          data-include="./BMM-Shapes.ttl#VisionShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="GoalShape">
+        <h3>Resource: Goal</h3>
+        <p>
+          A <code>bmm:Goal</code> is a statement about a state or condition of the enterprise to
+          be brought about or sustained through appropriate Means. A Goal amplifies a Vision and
+          is quantified by one or more Objectives. Goals may be decomposed into sub-Goals.
+        </p>
+
+        <div
+          title="Shape for bmm:Goal"
+          data-include="./BMM-Shapes.ttl#GoalShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="ObjectiveShape">
+        <h3>Resource: Objective</h3>
+        <p>
+          A <code>bmm:Objective</code> is a statement of an attainable, time-targeted, and
+          measurable target that the enterprise seeks to meet in order to achieve its Goals. An
+          Objective quantifies a Goal and typically has a target date and a measure of progress.
+          Objectives may be decomposed into sub-Objectives.
+        </p>
+
+        <div
+          title="Shape for bmm:Objective"
+          data-include="./BMM-Shapes.ttl#ObjectiveShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <!-- ===================== Means ===================== -->
+
+      <section id="MissionShape">
+        <h3>Resource: Mission</h3>
+        <p>
+          A <code>bmm:Mission</code> indicates the ongoing operational activity of the
+          enterprise — what the business is or will be doing on a day-to-day basis. A Mission
+          makes a Vision operative and is planned by means of Strategies.
+        </p>
+
+        <div
+          title="Shape for bmm:Mission"
+          data-include="./BMM-Shapes.ttl#MissionShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="StrategyShape">
+        <h3>Resource: Strategy</h3>
+        <p>
+          A <code>bmm:Strategy</code> represents the essential Course of Action to achieve a
+          Goal. Strategies channel efforts toward Goals (and occasionally toward the Vision),
+          are governed by Directives (Business Policies and Business Rules), and are realized by
+          Tactics. Strategies may be composed of sub-Strategies.
+        </p>
+
+        <div
+          title="Shape for bmm:Strategy"
+          data-include="./BMM-Shapes.ttl#StrategyShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="TacticShape">
+        <h3>Resource: Tactic</h3>
+        <p>
+          A <code>bmm:Tactic</code> is a Course of Action that represents part of the detailing
+          of Strategies. A Tactic implements a Strategy, is governed by Directives, and may
+          effect the enforcement of a Business Rule. Tactics may be composed of sub-Tactics.
+        </p>
+
+        <div
+          title="Shape for bmm:Tactic"
+          data-include="./BMM-Shapes.ttl#TacticShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="BusinessPolicyShape">
+        <h3>Resource: Business Policy</h3>
+        <p>
+          A <code>bmm:BusinessPolicy</code> is a Directive that is not directly enforceable and
+          whose purpose is to govern or guide the enterprise. Business Policies govern Courses
+          of Action and Business Processes, and serve as the basis for practicable Business
+          Rules.
+        </p>
+
+        <div
+          title="Shape for bmm:BusinessPolicy"
+          data-include="./BMM-Shapes.ttl#BusinessPolicyShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="BusinessRuleShape">
+        <h3>Resource: Business Rule</h3>
+        <p>
+          A <code>bmm:BusinessRule</code> is a Directive, intended to govern, guide, or influence
+          business behavior, in support of a Business Policy. Business Rules are discrete,
+          atomic, and practicable; they guide Business Processes and have a specified enforcement
+          level (strictly enforced, deferred enforcement, override with explanation, and so on).
+        </p>
+
+        <div
+          title="Shape for bmm:BusinessRule"
+          data-include="./BMM-Shapes.ttl#BusinessRuleShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <!-- ===================== Influencers & Assessments ===================== -->
+
+      <section id="InfluencerShape">
+        <h3>Resource: Influencer</h3>
+        <p>
+          A <code>bmm:Influencer</code> is anything that has the capability to produce an effect
+          on the enterprise's employment of Means or achievement of Ends, without direct exercise
+          of command. Influencers are neutral; Assessments are required to judge their impact.
+          Common categories include Competition, Customer, Environment, Partner, Regulation,
+          Supplier, and Technology (external) and Assumption, Corporate Value, Habit,
+          Infrastructure, Issue, Management Prerogative, and Resource (internal).
+        </p>
+
+        <div
+          title="Shape for bmm:Influencer"
+          data-include="./BMM-Shapes.ttl#InfluencerShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="AssessmentShape">
+        <h3>Resource: Assessment</h3>
+        <p>
+          A <code>bmm:Assessment</code> is a judgment of some Influencer that affects the
+          organization's ability to employ its Means or achieve its Ends. Assessments are
+          typically categorized using SWOT — Strength, Weakness, Opportunity, or Threat — and
+          identify Potential Impacts, which in turn provide the impetus for Directives.
+        </p>
+
+        <div
+          title="Shape for bmm:Assessment"
+          data-include="./BMM-Shapes.ttl#AssessmentShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="PotentialImpactShape">
+        <h3>Resource: Potential Impact</h3>
+        <p>
+          A <code>bmm:PotentialImpact</code> quantifies or qualifies a specific aspect of an
+          Assessment. Potential Impacts are categorized as Risks (probability of loss) or
+          Potential Rewards (probability of gain) and can provide impetus for Directives that
+          govern Courses of Action or support the achievement of Ends.
+        </p>
+
+        <div
+          title="Shape for bmm:PotentialImpact"
+          data-include="./BMM-Shapes.ttl#PotentialImpactShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <!-- ===================== Organization ===================== -->
+
+      <section id="OrganizationUnitShape">
+        <h3>Resource: Organization Unit</h3>
+        <p>
+          A <code>bmm:OrganizationUnit</code> is any named group of people within the enterprise
+          with a purpose and a budget. Organization Units may be responsible for Ends, establish
+          Means, recognize Influencers, make Assessments, and be defined by Business Processes.
+          Organization Units may themselves contain sub-Organization Units.
+        </p>
+
+        <div
+          title="Shape for bmm:OrganizationUnit"
+          data-include="./BMM-Shapes.ttl#OrganizationUnitShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="BusinessProcessShape">
+        <h3>Resource: Business Process</h3>
+        <p>
+          A <code>bmm:BusinessProcess</code> realizes a Course of Action — it provides the
+          detail of activities, sequencing, control, and synchronization that enable the
+          enterprise to carry out its Strategies and Tactics. Business Processes are governed by
+          Business Policies and Business Rules and may realize Assets.
+        </p>
+
+        <div
+          title="Shape for bmm:BusinessProcess"
+          data-include="./BMM-Shapes.ttl#BusinessProcessShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+
+      <section id="AssetShape">
+        <h3>Resource: Asset</h3>
+        <p>
+          A <code>bmm:Asset</code> is a thing of value used in operating the enterprise —
+          either a Fixed Asset (equipment, buildings, patents, licenses) or a Resource (raw
+          materials, parts, finished goods, cash). Assets are deployed by Courses of Action and
+          realized by Business Processes.
+        </p>
+
+        <div
+          title="Shape for bmm:Asset"
+          data-include="./BMM-Shapes.ttl#AssetShape"
+          data-oninclude="shapeToSpec"
+          data-include-sync="true"
+          data-include-replace="true"
+          data-include-format="html"
+        ></div>
+      </section>
+    </section>
+
+    <section id="conformance">
+      <h2>Conformance</h2>
+      <p>
+        A bmm-server implementation <em>MUST</em> follow the constraints defined here where
+        required, and with the meanings defined here. A bmm-server <em>MAY</em> provide
+        additional constraints for specific purposes, and <em>MAY</em> provide additional
+        properties beyond those defined in the shapes — these additional properties <em>SHOULD</em>
+        exist in their own unique namespace and <em>SHOULD NOT</em> use the <code>bmm</code>,
+        <code>oslc</code>, or <code>oslc_am</code> namespaces.
+      </p>
+    </section>
+  </body>
+</html>
