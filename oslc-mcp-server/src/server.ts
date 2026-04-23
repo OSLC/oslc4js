@@ -24,6 +24,8 @@ import {
   resourceToJson,
 } from 'oslc-service/mcp';
 import type { GeneratedTool } from 'oslc-service/mcp';
+import { discover } from './discovery.js';
+import type { ServerConfig } from './server-config.js';
 
 /**
  * HTTP-based MCP context adapter that wraps OSLCClient for the generic handlers.
@@ -34,11 +36,30 @@ class HttpToolContext {
   readonly serverName: string;
   readonly serverBase: string;
   private client: OSLCClient;
+  private catalogURL: string;
 
-  constructor(client: OSLCClient, serverURL: string) {
+  constructor(client: OSLCClient, serverURL: string, catalogURL: string) {
     this.client = client;
     this.serverName = 'oslc-mcp-server';
     this.serverBase = serverURL;
+    this.catalogURL = catalogURL;
+  }
+
+  /**
+   * Create a new ServiceProvider by POSTing Turtle to the catalog URL.
+   */
+  async createServiceProvider(title: string, slug: string, description?: string): Promise<string> {
+    const descLine = description ? `\n   dcterms:description "${description}" .` : ' .';
+    const turtle = `@prefix dcterms: <http://purl.org/dc/terms/> .\n<> dcterms:title "${title}" ;${descLine}`;
+    const response = await (this.client as any).client.post(this.catalogURL, turtle, {
+      headers: {
+        'Content-Type': 'text/turtle',
+        'Accept': 'text/turtle',
+        'OSLC-Core-Version': '3.0',
+        'Slug': slug,
+      },
+    });
+    return response.headers?.location ?? `${this.catalogURL}/${slug}`;
   }
 
   async getResource(uri: string): Promise<{ turtle: string; etag: string }> {
@@ -125,6 +146,20 @@ class HttpToolContext {
 // Generic tool definitions (same as embedded middleware)
 const GENERIC_TOOLS: McpToolDefinition[] = [
   {
+    name: 'create_service_provider',
+    description:
+      'Create a new ServiceProvider in the catalog. A ServiceProvider is a container for OSLC resources — create one before creating domain resources. After creation, restart the MCP server to discover new create/query tools for this ServiceProvider.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: 'Display name for the ServiceProvider (e.g., "EU-Rent")' },
+        slug: { type: 'string', description: 'URL-safe identifier used in the ServiceProvider URI (e.g., "eu-rent" produces /oslc/eu-rent)' },
+        description: { type: 'string', description: 'Optional description of the ServiceProvider' },
+      },
+      required: ['title', 'slug'],
+    },
+  },
+  {
     name: 'get_resource',
     description: 'Fetch an OSLC resource by URI and return all its properties.',
     inputSchema: {
@@ -206,41 +241,45 @@ const GENERIC_TOOLS: McpToolDefinition[] = [
  */
 export async function startServer(
   client: OSLCClient,
-  discovery: DiscoveryResult,
-  serverURL: string
+  initialDiscovery: DiscoveryResult,
+  serverURL: string,
+  catalogURL: string,
+  config: ServerConfig
 ): Promise<void> {
-  const context = new HttpToolContext(client, serverURL);
+  const context = new HttpToolContext(client, serverURL, catalogURL);
 
-  // Generate per-type tools using the shared tool factory
-  const generatedTools = generateTools(context as any, discovery);
-  console.error(`[startup] Generated ${generatedTools.length} per-type tools`);
+  // Mutable state — rebuilt after create_service_provider so new SPs
+  // become usable without restarting the MCP server.
+  let discovery: DiscoveryResult = initialDiscovery;
+  let generatedHandlers = new Map<string, (args: any) => Promise<string>>();
+  let allTools: McpToolDefinition[] = [];
+  let mcpResources: McpResourceDefinition[] = [];
 
-  // Build MCP resources using the shared resource builder
-  const mcpResources = buildMcpResources(
-    discovery,
-    context.serverName,
-    context.serverBase
-  );
+  /** Rebuild tools and resources from the current discovery state. */
+  function rebuildToolsAndResources(): void {
+    const generatedTools = generateTools(context as any, discovery);
+    generatedHandlers = new Map<string, (args: any) => Promise<string>>();
+    for (const tool of generatedTools) {
+      generatedHandlers.set(tool.name, tool.handler);
+    }
+    allTools = [
+      ...generatedTools.map((t) => ({
+        name: t.name,
+        description: t.description,
+        inputSchema: t.inputSchema,
+      })),
+      ...GENERIC_TOOLS,
+    ];
+    mcpResources = buildMcpResources(discovery, context.serverName, context.serverBase);
+    console.error(`[rebuild] ${generatedTools.length} per-type tools, ${mcpResources.length} resources`);
+  }
+
+  rebuildToolsAndResources();
 
   const server = new Server(
     { name: 'oslc-mcp-server', version: '1.0.0' },
-    { capabilities: { tools: {}, resources: {} } }
+    { capabilities: { tools: { listChanged: true }, resources: { listChanged: true } } }
   );
-
-  // Build handler lookup for generated tools
-  const generatedHandlers = new Map<string, (args: any) => Promise<string>>();
-  for (const tool of generatedTools) {
-    generatedHandlers.set(tool.name, tool.handler);
-  }
-
-  const allTools: McpToolDefinition[] = [
-    ...generatedTools.map((t) => ({
-      name: t.name,
-      description: t.description,
-      inputSchema: t.inputSchema,
-    })),
-    ...GENERIC_TOOLS,
-  ];
 
   // Register handlers
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -258,6 +297,32 @@ export async function startServer(
         result = await generatedHandler(args ?? {});
       } else {
         switch (name) {
+          case 'create_service_provider': {
+            const spArgs = args as { title: string; slug: string; description?: string };
+            const spURI = await context.createServiceProvider(spArgs.title, spArgs.slug, spArgs.description);
+
+            // Rediscover catalog so the new SP's create/query tools become
+            // available to the AI without restarting the MCP server.
+            let rediscoverStatus = '';
+            try {
+              discovery = await discover(client, config);
+              rebuildToolsAndResources();
+              await server.notification({ method: 'notifications/tools/list_changed' });
+              await server.notification({ method: 'notifications/resources/list_changed' });
+              rediscoverStatus = 'New create/query tools for this ServiceProvider are now available.';
+            } catch (err) {
+              const msg = err instanceof Error ? err.message : String(err);
+              rediscoverStatus = `Rediscovery failed (${msg}); restart the MCP server to pick up the new ServiceProvider.`;
+            }
+
+            result = JSON.stringify({
+              uri: spURI,
+              title: spArgs.title,
+              slug: spArgs.slug,
+              message: `ServiceProvider "${spArgs.title}" created at ${spURI}. ${rediscoverStatus}`,
+            });
+            break;
+          }
           case 'get_resource':
             result = await handleGetResource(context as any, args as { uri: string });
             break;
