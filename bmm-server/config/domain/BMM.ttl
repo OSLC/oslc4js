@@ -184,55 +184,42 @@ bmm:InfluencerCategoryType-Threat
 
 # ============================================================
 # End Relationships
+#
+# Forward directions only. Inverse URIs (e.g., bmm:amplifies,
+# bmm:makesOperative, bmm:quantifies) are identifiers referenced by
+# ResourceShape oslc:inversePropertyDefinition but are never asserted
+# as triples, so they are not declared here.
 # ============================================================
 
-# Vision ↔ Mission
-bmm:amplifiedByMission
+# Vision → Mission
+bmm:amplifiedBy
   a rdf:Property ;
   rdfs:domain bmm:Vision ;
   rdfs:range bmm:Mission ;
-  dc11:description "The Mission that makes this Vision operative. A Vision is amplified by a Mission." .
+  dc11:description "The Mission that amplifies this Vision." .
 
-bmm:makesOperative
-  a rdf:Property ;
-  rdfs:domain bmm:Mission ;
-  rdfs:range bmm:Vision ;
-  dc11:description "The Vision that this Mission makes operative." .
-
-# Vision ↔ Goal
-bmm:madeOperativeByGoal
+# Vision → Goal
+bmm:madeOperativeBy
   a rdf:Property ;
   rdfs:domain bmm:Vision ;
   rdfs:range bmm:Goal ;
-  dc11:description "A Goal that amplifies this Vision — indicates what must be done to make the Vision a reality." .
+  dc11:description "A Goal that makes this Vision operative — indicates what must be done to make the Vision a reality." .
 
-bmm:amplifiesVision
-  a rdf:Property ;
-  rdfs:domain bmm:Goal ;
-  rdfs:range bmm:Vision ;
-  dc11:description "The Vision that this Goal amplifies." .
-
-# Goal ↔ Objective
-bmm:quantifiedByObjective
+# Goal → Objective
+bmm:quantifiedBy
   a rdf:Property ;
   rdfs:domain bmm:Goal ;
   rdfs:range bmm:Objective ;
   dc11:description "An Objective that quantifies this Goal by defining a specific, measurable target." .
 
-bmm:quantifiesGoal
-  a rdf:Property ;
-  rdfs:domain bmm:Objective ;
-  rdfs:range bmm:Goal ;
-  dc11:description "The Goal that this Objective quantifies." .
-
-# Goal ↔ Goal (part-whole)
+# Goal → Goal (part-whole)
 bmm:includesGoal
   a rdf:Property ;
   rdfs:domain bmm:Goal ;
   rdfs:range bmm:Goal ;
   dc11:description "A sub-Goal that is part of this Goal." .
 
-# Objective ↔ Objective (part-whole)
+# Objective → Objective (part-whole)
 bmm:includesObjective
   a rdf:Property ;
   rdfs:domain bmm:Objective ;
@@ -243,40 +230,21 @@ bmm:includesObjective
 # Means Relationships
 # ============================================================
 
-# CourseOfAction ↔ DesiredResult
+# CourseOfAction → End
 bmm:enablesEnd
   a rdf:Property ;
   rdfs:domain bmm:CourseOfAction ;
   rdfs:range bmm:End ;
   dc11:description "An End that this CourseOfAction enables or contributes to achieving." .
 
-bmm:enabledByCourseOfAction
-  a rdf:Property ;
-  rdfs:domain bmm:End ;
-  rdfs:range bmm:CourseOfAction ;
-  dc11:description "A CourseOfAction that enables or contributes to achieving this End." .
-
-# Strategy → Vision
-bmm:channelsEffortsTowardVision
+# Strategy → End (Vision or Goal)
+bmm:channelsEffortsToward
   a rdf:Property ;
   rdfs:domain bmm:Strategy ;
-  rdfs:range bmm:Vision ;
-  dc11:description "The Vision toward which this Strategy channels efforts." .
+  rdfs:range bmm:End ;
+  dc11:description "An End (Vision or Goal) toward which this Strategy channels efforts." .
 
-# Strategy → Goal
-bmm:channelsEffortsTowardGoal
-  a rdf:Property ;
-  rdfs:domain bmm:Strategy ;
-  rdfs:range bmm:Goal ;
-  dc11:description "A Goal toward which this Strategy channels efforts." .
-
-# Strategy ↔ Strategy (part-whole)
-bmm:componentOfStrategy
-  a rdf:Property ;
-  rdfs:domain bmm:Strategy ;
-  rdfs:range bmm:Strategy ;
-  dc11:description "A broader Strategy of which this Strategy is a component." .
-
+# Strategy → Strategy (part-whole)
 bmm:includesStrategy
   a rdf:Property ;
   rdfs:domain bmm:Strategy ;
@@ -284,19 +252,13 @@ bmm:includesStrategy
   dc11:description "A sub-Strategy that is a component of this Strategy." .
 
 # Tactic → Strategy
-bmm:implementsStrategy
+bmm:implements
   a rdf:Property ;
   rdfs:domain bmm:Tactic ;
   rdfs:range bmm:Strategy ;
   dc11:description "The Strategy that this Tactic implements." .
 
-# Tactic ↔ Tactic (part-whole)
-bmm:componentOfTactic
-  a rdf:Property ;
-  rdfs:domain bmm:Tactic ;
-  rdfs:range bmm:Tactic ;
-  dc11:description "A broader Tactic of which this Tactic is a component." .
-
+# Tactic → Tactic (part-whole)
 bmm:includesTactic
   a rdf:Property ;
   rdfs:domain bmm:Tactic ;
@@ -304,33 +266,21 @@ bmm:includesTactic
   dc11:description "A sub-Tactic that is a component of this Tactic." .
 
 # Directive → CourseOfAction
-bmm:governsCourseOfAction
+bmm:governs
   a rdf:Property ;
   rdfs:domain bmm:Directive ;
   rdfs:range bmm:CourseOfAction ;
   dc11:description "A CourseOfAction that is governed by this Directive." .
 
-bmm:governedByDirective
-  a rdf:Property ;
-  rdfs:domain bmm:CourseOfAction ;
-  rdfs:range bmm:Directive ;
-  dc11:description "A Directive that governs this CourseOfAction." .
-
-# BusinessPolicy → BusinessRule
-bmm:basedOnBusinessRule
-  a rdf:Property ;
-  rdfs:domain bmm:BusinessPolicy ;
-  rdfs:range bmm:BusinessRule ;
-  dc11:description "A BusinessRule that is the basis for or implements this BusinessPolicy." .
-
-bmm:basedOnBusinessPolicy
+# BusinessRule → BusinessPolicy
+bmm:basedOn
   a rdf:Property ;
   rdfs:domain bmm:BusinessRule ;
   rdfs:range bmm:BusinessPolicy ;
   dc11:description "The BusinessPolicy that this BusinessRule is based on." .
 
 # BusinessPolicy → BusinessProcess
-bmm:governsBusinessProcess
+bmm:governsProcess
   a rdf:Property ;
   rdfs:domain bmm:BusinessPolicy ;
   rdfs:range bmm:BusinessProcess ;
@@ -355,17 +305,11 @@ bmm:effectsEnforcementOfBusinessRule
 # ============================================================
 
 # Assessment → Influencer
-bmm:assessesInfluencer
+bmm:assesses
   a rdf:Property ;
   rdfs:domain bmm:Assessment ;
   rdfs:range bmm:Influencer ;
   dc11:description "The Influencer that this Assessment is about." .
-
-bmm:assessedByAssessment
-  a rdf:Property ;
-  rdfs:domain bmm:Influencer ;
-  rdfs:range bmm:Assessment ;
-  dc11:description "An Assessment made about this Influencer." .
 
 # Assessment → PotentialImpact
 bmm:identifiesPotentialImpact
@@ -373,12 +317,6 @@ bmm:identifiesPotentialImpact
   rdfs:domain bmm:Assessment ;
   rdfs:range bmm:PotentialImpact ;
   dc11:description "A PotentialImpact identified by this Assessment." .
-
-bmm:identifiedByAssessment
-  a rdf:Property ;
-  rdfs:domain bmm:PotentialImpact ;
-  rdfs:range bmm:Assessment ;
-  dc11:description "The Assessment that identified this PotentialImpact." .
 
 # Assessment → End
 bmm:affectsAchievementOfEnd
@@ -402,7 +340,7 @@ bmm:assessmentCategory
   dc11:description "The SWOT category of this Assessment: Strength, Weakness, Opportunity, or Threat." .
 
 # PotentialImpact → Directive
-bmm:providesImpetusForDirective
+bmm:providesImpetusFor
   a rdf:Property ;
   rdfs:domain bmm:PotentialImpact ;
   rdfs:range bmm:Directive ;
@@ -440,19 +378,19 @@ bmm:isRewardForMeans
 # OrganizationUnit Relationships
 # ============================================================
 
-bmm:isResponsibleForEnd
+bmm:isResponsibleFor
   a rdf:Property ;
   rdfs:domain bmm:OrganizationUnit ;
   rdfs:range bmm:End ;
   dc11:description "An End that this OrganizationUnit is responsible for achieving." .
 
-bmm:establishesMeans
+bmm:establishes
   a rdf:Property ;
   rdfs:domain bmm:OrganizationUnit ;
   rdfs:range bmm:Means ;
   dc11:description "A Means that this OrganizationUnit establishes or deploys." .
 
-bmm:recognizesInfluencer
+bmm:recognizes
   a rdf:Property ;
   rdfs:domain bmm:OrganizationUnit ;
   rdfs:range bmm:Influencer ;
@@ -464,7 +402,7 @@ bmm:makesAssessment
   rdfs:range bmm:Assessment ;
   dc11:description "An Assessment that this OrganizationUnit has made." .
 
-bmm:definedByBusinessProcess
+bmm:definedBy
   a rdf:Property ;
   rdfs:domain bmm:OrganizationUnit ;
   rdfs:range bmm:BusinessProcess ;
@@ -480,17 +418,11 @@ bmm:subOrganizationUnits
 # BusinessProcess Relationships
 # ============================================================
 
-bmm:realizesAsset
+bmm:realizes
   a rdf:Property ;
   rdfs:domain bmm:BusinessProcess ;
   rdfs:range bmm:Asset ;
   dc11:description "An Asset that this BusinessProcess uses or realizes." .
-
-bmm:governedByBusinessPolicy
-  a rdf:Property ;
-  rdfs:domain bmm:BusinessProcess ;
-  rdfs:range bmm:BusinessPolicy ;
-  dc11:description "A BusinessPolicy that governs this BusinessProcess." .
 
 bmm:governedByBusinessRule
   a rdf:Property ;

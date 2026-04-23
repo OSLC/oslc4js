@@ -14,6 +14,12 @@
 #
 # Property definitions are named nodes so that shared/inherited
 # properties are defined once and referenced by multiple shapes.
+#
+# Forward link properties carry oslc:inversePropertyDefinition and
+# oslc:inverseLabel metadata. The inverse URIs are identifiers only;
+# they are never asserted as triples. oslc-browser uses the inverse
+# URI + label to render incoming links (discovered via LDM) as if
+# they were outgoing, so link ownership is transparent to the user.
 # ================================================================
 
 
@@ -128,7 +134,7 @@
   oslc:valueType xsd:string .
 
 # ================================================================
-# SHARED PROPERTY DEFINITIONS — End relationships
+# SHARED PROPERTY DEFINITIONS — End/CourseOfAction relationship
 # ================================================================
 
 <#p-enablesEnd>
@@ -138,16 +144,9 @@
   dcterms:description "An End that this CourseOfAction enables." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-enabledByCourseOfAction>
-  a oslc:Property ;
-  oslc:name "enabledByCourseOfAction" ;
-  oslc:propertyDefinition bmm:enabledByCourseOfAction ;
-  dcterms:description "A CourseOfAction that enables this End." ;
-  oslc:occurs oslc:Zero-or-many ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:enabledBy ;
+  oslc:inverseLabel "Enabled By" .
 
 # ================================================================
 # SHARED PROPERTY DEFINITIONS — Assessment relationships
@@ -160,7 +159,9 @@
   dcterms:description "An End whose achievement is affected by this Assessment." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:achievementAffectedBy ;
+  oslc:inverseLabel "Achievement Affected By" .
 
 <#p-affectsEmploymentOfMeans>
   a oslc:Property ;
@@ -169,38 +170,46 @@
   dcterms:description "A Means whose employment is affected by this Assessment." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:employmentAffectedBy ;
+  oslc:inverseLabel "Employment Affected By" .
 
 # ================================================================
 # SHARED PROPERTY DEFINITIONS — OrganizationUnit relationships
 # ================================================================
 
-<#p-isResponsibleForEnd>
+<#p-isResponsibleFor>
   a oslc:Property ;
-  oslc:name "isResponsibleForEnd" ;
-  oslc:propertyDefinition bmm:isResponsibleForEnd ;
+  oslc:name "isResponsibleFor" ;
+  oslc:propertyDefinition bmm:isResponsibleFor ;
   dcterms:description "An End that this OrganizationUnit is responsible for." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:responsibilityOf ;
+  oslc:inverseLabel "Responsibility Of" .
 
-<#p-establishesMeans>
+<#p-establishes>
   a oslc:Property ;
-  oslc:name "establishesMeans" ;
-  oslc:propertyDefinition bmm:establishesMeans ;
+  oslc:name "establishes" ;
+  oslc:propertyDefinition bmm:establishes ;
   dcterms:description "A Means that this OrganizationUnit establishes." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:establishedBy ;
+  oslc:inverseLabel "Established By" .
 
-<#p-recognizesInfluencer>
+<#p-recognizes>
   a oslc:Property ;
-  oslc:name "recognizesInfluencer" ;
-  oslc:propertyDefinition bmm:recognizesInfluencer ;
+  oslc:name "recognizes" ;
+  oslc:propertyDefinition bmm:recognizes ;
   dcterms:description "An Influencer recognized by this OrganizationUnit." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:recognizedBy ;
+  oslc:inverseLabel "Recognized By" .
 
 <#p-makesAssessment>
   a oslc:Property ;
@@ -209,16 +218,20 @@
   dcterms:description "An Assessment made by this OrganizationUnit." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:madeBy ;
+  oslc:inverseLabel "Made By" .
 
-<#p-definedByBusinessProcess>
+<#p-definedBy>
   a oslc:Property ;
-  oslc:name "definedByBusinessProcess" ;
-  oslc:propertyDefinition bmm:definedByBusinessProcess ;
+  oslc:name "definedBy" ;
+  oslc:propertyDefinition bmm:definedBy ;
   dcterms:description "A BusinessProcess that defines this OrganizationUnit's operations." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:defines ;
+  oslc:inverseLabel "Defines" .
 
 <#p-subOrganizationUnits>
   a oslc:Property ;
@@ -227,64 +240,50 @@
   dcterms:description "Child OrganizationUnits." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:parentOrganizationUnit ;
+  oslc:inverseLabel "Parent Organization Unit" .
 
 # ================================================================
 # Vision-specific properties
 # ================================================================
 
-<#p-amplifiedByMission>
+<#p-amplifiedBy>
   a oslc:Property ;
-  oslc:name "amplifiedByMission" ;
-  oslc:propertyDefinition bmm:amplifiedByMission ;
-  dcterms:description "The Mission that makes this Vision operative." ;
+  oslc:name "amplifiedBy" ;
+  oslc:propertyDefinition bmm:amplifiedBy ;
+  dcterms:description "The Mission that amplifies this Vision." ;
   oslc:occurs oslc:Zero-or-one ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:amplifies ;
+  oslc:inverseLabel "Amplifies" .
 
-<#p-madeOperativeByGoal>
+<#p-madeOperativeBy>
   a oslc:Property ;
-  oslc:name "madeOperativeByGoal" ;
-  oslc:propertyDefinition bmm:madeOperativeByGoal ;
-  dcterms:description "Goals that amplify this Vision." ;
+  oslc:name "madeOperativeBy" ;
+  oslc:propertyDefinition bmm:madeOperativeBy ;
+  dcterms:description "Goals that make this Vision operative." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-# ================================================================
-# Mission-specific properties
-# ================================================================
-
-<#p-makesOperative>
-  a oslc:Property ;
-  oslc:name "makesOperative" ;
-  oslc:propertyDefinition bmm:makesOperative ;
-  dcterms:description "The Vision that this Mission makes operative." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:makesOperative ;
+  oslc:inverseLabel "Makes Operative" .
 
 # ================================================================
 # Goal-specific properties
 # ================================================================
 
-<#p-amplifiesVision>
+<#p-quantifiedBy>
   a oslc:Property ;
-  oslc:name "amplifiesVision" ;
-  oslc:propertyDefinition bmm:amplifiesVision ;
-  dcterms:description "The Vision that this Goal amplifies." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-quantifiedByObjective>
-  a oslc:Property ;
-  oslc:name "quantifiedByObjective" ;
-  oslc:propertyDefinition bmm:quantifiedByObjective ;
+  oslc:name "quantifiedBy" ;
+  oslc:propertyDefinition bmm:quantifiedBy ;
   dcterms:description "Objectives that quantify this Goal." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:quantifies ;
+  oslc:inverseLabel "Quantifies" .
 
 <#p-includesGoal>
   a oslc:Property ;
@@ -293,20 +292,13 @@
   dcterms:description "Sub-Goals that are part of this Goal." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:includedInGoal ;
+  oslc:inverseLabel "Included In" .
 
 # ================================================================
 # Objective-specific properties
 # ================================================================
-
-<#p-quantifiesGoal>
-  a oslc:Property ;
-  oslc:name "quantifiesGoal" ;
-  oslc:propertyDefinition bmm:quantifiesGoal ;
-  dcterms:description "The Goal that this Objective quantifies." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
 
 <#p-includesObjective>
   a oslc:Property ;
@@ -315,7 +307,9 @@
   dcterms:description "Sub-Objectives that are part of this Objective." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:includedInObjective ;
+  oslc:inverseLabel "Included In" .
 
 <#p-targetDate>
   a oslc:Property ;
@@ -337,32 +331,16 @@
 # Strategy-specific properties
 # ================================================================
 
-<#p-channelsEffortsTowardVision>
+<#p-channelsEffortsToward>
   a oslc:Property ;
-  oslc:name "channelsEffortsTowardVision" ;
-  oslc:propertyDefinition bmm:channelsEffortsTowardVision ;
-  dcterms:description "The Vision toward which this Strategy channels efforts." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-channelsEffortsTowardGoal>
-  a oslc:Property ;
-  oslc:name "channelsEffortsTowardGoal" ;
-  oslc:propertyDefinition bmm:channelsEffortsTowardGoal ;
-  dcterms:description "Goals toward which this Strategy channels efforts." ;
+  oslc:name "channelsEffortsToward" ;
+  oslc:propertyDefinition bmm:channelsEffortsToward ;
+  dcterms:description "The End (Vision or Goal) toward which this Strategy channels efforts." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-componentOfStrategy>
-  a oslc:Property ;
-  oslc:name "componentOfStrategy" ;
-  oslc:propertyDefinition bmm:componentOfStrategy ;
-  dcterms:description "A broader Strategy of which this Strategy is a component." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:effortsChanneledBy ;
+  oslc:inverseLabel "Efforts Channeled By" .
 
 <#p-includesStrategy>
   a oslc:Property ;
@@ -371,29 +349,24 @@
   dcterms:description "Sub-Strategies that are components of this Strategy." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:includedInStrategy ;
+  oslc:inverseLabel "Included In" .
 
 # ================================================================
 # Tactic-specific properties
 # ================================================================
 
-<#p-implementsStrategy>
+<#p-implements>
   a oslc:Property ;
-  oslc:name "implementsStrategy" ;
-  oslc:propertyDefinition bmm:implementsStrategy ;
+  oslc:name "implements" ;
+  oslc:propertyDefinition bmm:implements ;
   dcterms:description "The Strategy that this Tactic implements." ;
   oslc:occurs oslc:Zero-or-one ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-componentOfTactic>
-  a oslc:Property ;
-  oslc:name "componentOfTactic" ;
-  oslc:propertyDefinition bmm:componentOfTactic ;
-  dcterms:description "A broader Tactic of which this Tactic is a component." ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:implementedBy ;
+  oslc:inverseLabel "Implemented By" .
 
 <#p-includesTactic>
   a oslc:Property ;
@@ -402,7 +375,9 @@
   dcterms:description "Sub-Tactics that are components of this Tactic." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:includedInTactic ;
+  oslc:inverseLabel "Included In" .
 
 <#p-effectsEnforcementOfBusinessRule>
   a oslc:Property ;
@@ -411,64 +386,54 @@
   dcterms:description "BusinessRules whose enforcement is effected by this Tactic." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:enforcementEffectedBy ;
+  oslc:inverseLabel "Enforcement Effected By" .
 
 # ================================================================
 # Directive-specific properties
 # ================================================================
 
-<#p-governsCourseOfAction>
+<#p-governs>
   a oslc:Property ;
-  oslc:name "governsCourseOfAction" ;
-  oslc:propertyDefinition bmm:governsCourseOfAction ;
+  oslc:name "governs" ;
+  oslc:propertyDefinition bmm:governs ;
   dcterms:description "CoursesOfAction governed by this Directive." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-governedByDirective>
-  a oslc:Property ;
-  oslc:name "governedByDirective" ;
-  oslc:propertyDefinition bmm:governedByDirective ;
-  dcterms:description "Directives that govern this CourseOfAction." ;
-  oslc:occurs oslc:Zero-or-many ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:governedBy ;
+  oslc:inverseLabel "Governed By" .
 
 # ================================================================
 # BusinessPolicy-specific properties
 # ================================================================
 
-<#p-basedOnBusinessRule>
+<#p-governsProcess>
   a oslc:Property ;
-  oslc:name "basedOnBusinessRule" ;
-  oslc:propertyDefinition bmm:basedOnBusinessRule ;
-  dcterms:description "BusinessRules that implement this BusinessPolicy." ;
-  oslc:occurs oslc:Zero-or-many ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-governsBusinessProcess>
-  a oslc:Property ;
-  oslc:name "governsBusinessProcess" ;
-  oslc:propertyDefinition bmm:governsBusinessProcess ;
+  oslc:name "governsProcess" ;
+  oslc:propertyDefinition bmm:governsProcess ;
   dcterms:description "BusinessProcesses governed by this BusinessPolicy." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:processGovernedBy ;
+  oslc:inverseLabel "Process Governed By" .
 
 # ================================================================
 # BusinessRule-specific properties
 # ================================================================
 
-<#p-basedOnBusinessPolicy>
+<#p-basedOn>
   a oslc:Property ;
-  oslc:name "basedOnBusinessPolicy" ;
-  oslc:propertyDefinition bmm:basedOnBusinessPolicy ;
+  oslc:name "basedOn" ;
+  oslc:propertyDefinition bmm:basedOn ;
   dcterms:description "The BusinessPolicy this BusinessRule is based on." ;
   oslc:occurs oslc:Zero-or-one ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:basisFor ;
+  oslc:inverseLabel "Basis For" .
 
 <#p-enforcedByBusinessProcess>
   a oslc:Property ;
@@ -477,7 +442,9 @@
   dcterms:description "BusinessProcesses that enforce this BusinessRule." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:enforces ;
+  oslc:inverseLabel "Enforces" .
 
 <#p-enforcementLevel>
   a oslc:Property ;
@@ -491,15 +458,6 @@
 # Influencer-specific properties
 # ================================================================
 
-<#p-assessedByAssessment>
-  a oslc:Property ;
-  oslc:name "assessedByAssessment" ;
-  oslc:propertyDefinition bmm:assessedByAssessment ;
-  dcterms:description "Assessments made about this Influencer." ;
-  oslc:occurs oslc:Zero-or-many ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
 <#p-influencerCategory>
   a oslc:Property ;
   oslc:name "influencerCategory" ;
@@ -512,14 +470,16 @@
 # Assessment-specific properties
 # ================================================================
 
-<#p-assessesInfluencer>
+<#p-assesses>
   a oslc:Property ;
-  oslc:name "assessesInfluencer" ;
-  oslc:propertyDefinition bmm:assessesInfluencer ;
+  oslc:name "assesses" ;
+  oslc:propertyDefinition bmm:assesses ;
   dcterms:description "The Influencer this Assessment is about." ;
   oslc:occurs oslc:Exactly-one ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:assessedBy ;
+  oslc:inverseLabel "Assessed By" .
 
 <#p-identifiesPotentialImpact>
   a oslc:Property ;
@@ -528,7 +488,9 @@
   dcterms:description "PotentialImpacts identified by this Assessment." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:identifiedBy ;
+  oslc:inverseLabel "Identified By" .
 
 <#p-assessmentCategory>
   a oslc:Property ;
@@ -543,23 +505,16 @@
 # PotentialImpact-specific properties
 # ================================================================
 
-<#p-identifiedByAssessment>
+<#p-providesImpetusFor>
   a oslc:Property ;
-  oslc:name "identifiedByAssessment" ;
-  oslc:propertyDefinition bmm:identifiedByAssessment ;
-  dcterms:description "The Assessment that identified this PotentialImpact." ;
-  oslc:occurs oslc:Exactly-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-providesImpetusForDirective>
-  a oslc:Property ;
-  oslc:name "providesImpetusForDirective" ;
-  oslc:propertyDefinition bmm:providesImpetusForDirective ;
+  oslc:name "providesImpetusFor" ;
+  oslc:propertyDefinition bmm:providesImpetusFor ;
   dcterms:description "Directives for which this PotentialImpact provides impetus." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:impelledBy ;
+  oslc:inverseLabel "Impelled By" .
 
 <#p-isRiskForEnd>
   a oslc:Property ;
@@ -568,7 +523,9 @@
   dcterms:description "Ends for which this PotentialImpact is a risk." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:atRiskFrom ;
+  oslc:inverseLabel "At Risk From" .
 
 <#p-isRiskForMeans>
   a oslc:Property ;
@@ -577,7 +534,9 @@
   dcterms:description "Means for which this PotentialImpact is a risk." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:atRiskFrom ;
+  oslc:inverseLabel "At Risk From" .
 
 <#p-isRewardForEnd>
   a oslc:Property ;
@@ -586,7 +545,9 @@
   dcterms:description "Ends for which this PotentialImpact is a potential reward." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:potentialRewardFrom ;
+  oslc:inverseLabel "Potential Reward From" .
 
 <#p-isRewardForMeans>
   a oslc:Property ;
@@ -595,29 +556,24 @@
   dcterms:description "Means for which this PotentialImpact is a potential reward." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:potentialRewardFrom ;
+  oslc:inverseLabel "Potential Reward From" .
 
 # ================================================================
 # BusinessProcess-specific properties
 # ================================================================
 
-<#p-realizesAsset>
+<#p-realizes>
   a oslc:Property ;
-  oslc:name "realizesAsset" ;
-  oslc:propertyDefinition bmm:realizesAsset ;
+  oslc:name "realizes" ;
+  oslc:propertyDefinition bmm:realizes ;
   dcterms:description "Assets used by this BusinessProcess." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
-
-<#p-governedByBusinessPolicy>
-  a oslc:Property ;
-  oslc:name "governedByBusinessPolicy" ;
-  oslc:propertyDefinition bmm:governedByBusinessPolicy ;
-  dcterms:description "BusinessPolicies that govern this BusinessProcess." ;
-  oslc:occurs oslc:Zero-or-many ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:realizedBy ;
+  oslc:inverseLabel "Realized By" .
 
 <#p-governedByBusinessRule>
   a oslc:Property ;
@@ -626,7 +582,9 @@
   dcterms:description "BusinessRules that govern this BusinessProcess." ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition bmm:governsProcessVia ;
+  oslc:inverseLabel "Governs Process" .
 
 
 # ================================================================
@@ -645,8 +603,7 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-enabledByCourseOfAction>,
-    <#p-amplifiedByMission>, <#p-madeOperativeByGoal> .
+    <#p-amplifiedBy>, <#p-madeOperativeBy> .
 
 # ============================================================
 # Goal
@@ -660,8 +617,7 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-enabledByCourseOfAction>,
-    <#p-amplifiesVision>, <#p-quantifiedByObjective>, <#p-includesGoal> .
+    <#p-quantifiedBy>, <#p-includesGoal> .
 
 # ============================================================
 # Objective
@@ -675,8 +631,7 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-enabledByCourseOfAction>,
-    <#p-quantifiesGoal>, <#p-includesObjective>,
+    <#p-includesObjective>,
     <#p-targetDate>, <#p-measureOfProgress> .
 
 # ============================================================
@@ -690,8 +645,7 @@
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-makesOperative> .
+    <#p-serviceProvider>, <#p-shortTitle> .
 
 # ============================================================
 # Strategy
@@ -705,9 +659,8 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-enablesEnd>, <#p-governedByDirective>,
-    <#p-channelsEffortsTowardVision>, <#p-channelsEffortsTowardGoal>,
-    <#p-componentOfStrategy>, <#p-includesStrategy> .
+    <#p-enablesEnd>,
+    <#p-channelsEffortsToward>, <#p-includesStrategy> .
 
 # ============================================================
 # Tactic
@@ -721,8 +674,8 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-enablesEnd>, <#p-governedByDirective>,
-    <#p-implementsStrategy>, <#p-componentOfTactic>, <#p-includesTactic>,
+    <#p-enablesEnd>,
+    <#p-implements>, <#p-includesTactic>,
     <#p-effectsEnforcementOfBusinessRule> .
 
 # ============================================================
@@ -737,8 +690,7 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-governsCourseOfAction>,
-    <#p-basedOnBusinessRule>, <#p-governsBusinessProcess> .
+    <#p-governs>, <#p-governsProcess> .
 
 # ============================================================
 # BusinessRule
@@ -752,8 +704,8 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-governsCourseOfAction>,
-    <#p-basedOnBusinessPolicy>, <#p-enforcedByBusinessProcess>,
+    <#p-governs>,
+    <#p-basedOn>, <#p-enforcedByBusinessProcess>,
     <#p-enforcementLevel> .
 
 # ============================================================
@@ -768,7 +720,7 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-assessedByAssessment>, <#p-influencerCategory> .
+    <#p-influencerCategory> .
 
 # ============================================================
 # Assessment
@@ -782,7 +734,7 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-assessesInfluencer>, <#p-identifiesPotentialImpact>,
+    <#p-assesses>, <#p-identifiesPotentialImpact>,
     <#p-assessmentCategory>,
     <#p-affectsAchievementOfEnd>, <#p-affectsEmploymentOfMeans> .
 
@@ -798,7 +750,7 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-identifiedByAssessment>, <#p-providesImpetusForDirective>,
+    <#p-providesImpetusFor>,
     <#p-isRiskForEnd>, <#p-isRiskForMeans>,
     <#p-isRewardForEnd>, <#p-isRewardForMeans> .
 
@@ -814,9 +766,9 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-isResponsibleForEnd>, <#p-establishesMeans>,
-    <#p-recognizesInfluencer>, <#p-makesAssessment>,
-    <#p-definedByBusinessProcess>, <#p-subOrganizationUnits> .
+    <#p-isResponsibleFor>, <#p-establishes>,
+    <#p-recognizes>, <#p-makesAssessment>,
+    <#p-definedBy>, <#p-subOrganizationUnits> .
 
 # ============================================================
 # BusinessProcess
@@ -830,8 +782,7 @@
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
     <#p-subject>, <#p-type>, <#p-instanceShape>,
     <#p-serviceProvider>, <#p-shortTitle>,
-    <#p-realizesAsset>,
-    <#p-governedByBusinessPolicy>, <#p-governedByBusinessRule> .
+    <#p-realizes>, <#p-governedByBusinessRule> .
 
 # ============================================================
 # Asset
