@@ -184,6 +184,75 @@ curl -sf -X POST http://localhost:3005/mcp \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"create_service_provider","arguments":{"title":"EU-Rent","slug":"eu-rent","description":"EU-Rent BMM example from OMG BMM 1.3 Annex C"}}}'
 ```
 
+## What was created and how to navigate it
+
+### Instances per type
+
+| Type | Count | Representative titles |
+|------|------:|----------------------|
+| Vision | 1 | "Be the car rental brand of choice for business users" |
+| Goal | 4 | "Be a premium brand car rental company"; "Provide industry-leading customer service"; "Provide well-maintained cars"; "Vehicles available when and where expected" |
+| Objective | 4 | "A C Nielsen top 6 in EC countries by year-end"; "A C Nielsen top 9 in non-EC countries by year-end"; "85% customer satisfaction score by year-end"; "Less than 1% mechanical breakdown rate (Q4)" |
+| Mission | 1 | "Car rental service across Europe and North America" |
+| Strategy | 3 | "Nationwide on-airport head-to-head competition"; "Manage car purchase and disposal at local area level"; "Outsource loyalty rewards to third-party scheme" |
+| Tactic | 5 | "Encourage rental extensions"; "Outsource maintenance for small branches"; "Create standard specifications of car models"; "Equalize car usage across rentals"; "Comply with manufacturers' maintenance schedules" |
+| Business Policy | 5 | "Minimize depreciation of rental cars"; "Rental payments guaranteed in advance"; "Rental cars must not be exported"; "Rental contracts under pickup country law"; "Comply with laws and regulations" |
+| Business Rule | 6 | "Car must match standard specification"; "Assign lowest-mileage car in group"; "Valid driver license required"; "Service scheduling by odometer threshold"; "Extension requires car exchange if near service"; "Every driver must be over 21" |
+| Influencer | 20 | 14 external (Competitor, Customer, Environment, Partner, Regulation, Supplier, Technology) + 6 internal (Assumption, Habit, Infrastructure, Management Prerogative, Corporate Value) |
+| Assessment | 6 | SWOT coverage: 1 Strength (geographical distribution), 2 Weakness (corporate software, staff turnover), 2 Opportunity (premium market, depreciation), 1 Threat (budget airlines) |
+| Potential Impact | 5 | 3 Risks (15% customer loss, weekend idle, emissions penalties) + 2 Rewards (12% rate increase, 3% depreciation reduction) |
+| Business Process | 4 | "Rental reservation"; "Car pickup and return"; "Vehicle maintenance"; "Car purchase and disposal" |
+| Asset | 4 | "Vehicle rental fleet"; "Rental branch network"; "Internet rentals software platform"; "EU-Rent brand" |
+| Organization Unit | 4 | "EU-Rent Board"; "Operating Company (per country)"; "Local Area"; "Rental Branch" |
+| **Total** | **72** | |
+
+### The link graph
+
+The example exercises most BMM link types:
+
+- **Ends hierarchy**: Vision `amplifiedBy` Mission, `madeOperativeBy` the four Goals. Each Goal `quantifiedBy` one or two Objectives.
+- **Means aligned to Ends**: Strategies `channelsEffortsToward` Vision and/or Goals, `enablesEnd` one or more Ends. Tactics `implements` Strategies.
+- **Directives governing Courses of Action**: Business Policies `governs` Strategies/Tactics and `governsProcess` Business Processes. Business Rules `basedOn` Business Policies and `enforcedByBusinessProcess` Business Processes.
+- **Assessment chain** (SWOT analysis driving decisions): Assessments `assesses` an Influencer, carry an `assessmentCategory` (Strength/Weakness/Opportunity/Threat), `affectsAchievementOfEnd` one or more Goals, and `identifiesPotentialImpact` one or more Potential Impacts. Potential Impacts `providesImpetusFor` a Directive and/or are `isRiskForEnd`/`isRewardForEnd`.
+- **Organizational accountability**: Organization Units `isResponsibleFor` Ends, `establishes` Means, `recognizes` Influencers, `makesAssessment` Assessments, and are `definedBy` Business Processes.
+- **Process realizes Asset**: Business Processes `realizes` Assets (e.g., pickup and maintenance both realize the fleet; reservation realizes the internet software).
+
+### Good starting points for navigation
+
+Server-generated resource IDs change on every populator run (e.g., `moc3hti8gf9anb`), so the entry points below use **stable** URLs — the catalog, the ServiceProvider, type-filtered queries, and the web UI root. All URLs assume the default `http://localhost:3005` and the `eu-rent` slug.
+
+**oslc-browser (web UI)**
+
+| URL | What you see |
+|-----|-------------|
+| [`http://localhost:3005/`](http://localhost:3005/) | oslc-browser root — the ServiceProviderCatalog as a column. Click `EU-Rent` to drill into it; from there click `Vision` or `Goal` tiles to open a column of those resources, expand any resource accordion to see its outgoing link predicates, and click a predicate to follow the link. |
+| [`http://localhost:3005/oslc/eu-rent`](http://localhost:3005/oslc/eu-rent) | EU-Rent ServiceProvider document — lists all creation factories, query capabilities, and creation dialogs. |
+
+**Recommended starting points for exploring the link graph:**
+
+1. **Vision → Mission and Goals.** Query all Visions (only one), then follow `amplifiedBy` to the Mission and `madeOperativeBy` to the four Goals. From each Goal, follow `quantifiedBy` to its Objectives.
+2. **The "premium brand" decision chain (Section 8.5.8 of the BMM spec).** Start from the Influencer *"Premium brand competitors (Hertz, Avis)"* → the Assessment *"Opportunity: Room in premium brand market"* → its `identifiesPotentialImpact` targets (*"Reward: 12% rate increase"* and *"Risk: 15% customer loss"*) → the Potential Impact's `providesImpetusFor` Directive chain.
+3. **The depreciation-management chain.** Start from the Assessment *"Opportunity: Improved depreciation management"* → Potential Impact *"Reward: 3% depreciation cost reduction"* → Business Policy *"Minimize depreciation of rental cars"* → the three Tactics that implement it (*"Standard specs"*, *"Equalize car usage"*, *"Comply with maintenance schedules"*) → the Business Rules that enforce those Tactics (*"Car must match standard specification"*, *"Assign lowest-mileage car"*, *"Service scheduling by odometer threshold"*).
+4. **Organizational accountability.** Start from the `EU-Rent Board` OrganizationUnit → follow `isResponsibleFor` to the Vision, `establishes` to the Mission, `recognizes` to the *Eastern Europe growth* Influencer, `makesAssessment` to the *Opportunity: Premium market* Assessment.
+
+**OSLC query URLs (return Turtle listings by type)**
+
+```bash
+# All Visions
+curl http://localhost:3005/oslc/eu-rent/query?oslc.where=rdf:type=%3Chttp://www.omg.org/spec/BMM%23Vision%3E -H 'Accept: text/turtle'
+
+# All Goals
+curl http://localhost:3005/oslc/eu-rent/query?oslc.where=rdf:type=%3Chttp://www.omg.org/spec/BMM%23Goal%3E  -H 'Accept: text/turtle'
+
+# All Assessments (SWOT)
+curl http://localhost:3005/oslc/eu-rent/query?oslc.where=rdf:type=%3Chttp://www.omg.org/spec/BMM%23Assessment%3E -H 'Accept: text/turtle'
+
+# All external Influencers — filter by category literal
+curl 'http://localhost:3005/oslc/eu-rent/query?oslc.where=bmm:influencerCategory="Competitor"' -H 'Accept: text/turtle'
+```
+
+In oslc-browser's column view, each type has its own navigation column; click a resource title to open its details, expand the accordion to see predicate-grouped outgoing links, and click any link target to drill deeper. The explorer tab (if enabled) renders the link graph visually with typed edges.
+
 ## Fixes that made the end-to-end flow work
 
 Several bugs surfaced during this work, each fixed in turn:
