@@ -29,7 +29,7 @@ bmm-server is built from several modules in the oslc4js workspace:
 - **oslc-service** -- Express middleware providing OSLC 3.0 services
 - **ldp-service** -- Express middleware implementing the W3C LDP protocol
 - **storage-service** -- Abstract storage interface
-- **ldp-service-jena** -- Storage backend using Apache Jena Fuseki
+- **jena-storage-service** -- Storage backend using Apache Jena Fuseki
 
 ## Running
 

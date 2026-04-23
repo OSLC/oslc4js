@@ -4,7 +4,7 @@
 
 **Goal:** Convert 5 existing JavaScript modules to TypeScript and extract a new shared `storage-service` module, modernizing from CommonJS/callbacks to ESM/async-await with strict typing.
 
-**Architecture:** A shared `storage-service` package defines the `StorageService` interface and common vocabulary/media types. `oslc-service` and `ldp-service` are Express middleware that consume a `StorageService`. Three backends (`ldp-service-fs`, `ldp-service-mongodb`, `ldp-service-jena`) each implement `StorageService` directly.
+**Architecture:** A shared `storage-service` package defines the `StorageService` interface and common vocabulary/media types. `oslc-service` and `ldp-service` are Express middleware that consume a `StorageService`. Three backends (`fs-storage-service`, `mongodb-storage-service`, `jena-storage-service`) each implement `StorageService` directly.
 
 **Tech Stack:** TypeScript 5.x, Node 22, ESM modules, Express 5, rdflib.js, MongoDB driver 6.x, Node built-in fetch
 
@@ -811,22 +811,22 @@ git commit -m "feat(oslc-service): convert service and LDP handler to TypeScript
 
 ---
 
-### Task 9: Convert ldp-service-jena — Full Conversion
+### Task 9: Convert jena-storage-service — Full Conversion
 
 This backend implements `StorageService` using Apache Jena/Fuseki. Convert from callbacks + `request` library to async/await + `fetch`.
 
 **Files:**
-- Modify: `ldp-service-jena/package.json`
-- Create: `ldp-service-jena/tsconfig.json`
-- Create: `ldp-service-jena/.gitignore`
-- Create: `ldp-service-jena/src/storage.ts`
-- Create: `ldp-service-jena/src/index.ts`
+- Modify: `jena-storage-service/package.json`
+- Create: `jena-storage-service/tsconfig.json`
+- Create: `jena-storage-service/.gitignore`
+- Create: `jena-storage-service/src/storage.ts`
+- Create: `jena-storage-service/src/index.ts`
 
 **Step 1: Update package.json**
 
 ```json
 {
-  "name": "ldp-service-jena",
+  "name": "jena-storage-service",
   "version": "2.0.0",
   "description": "StorageService implementation using Apache Jena/Fuseki",
   "license": "Apache-2.0",
@@ -858,7 +858,7 @@ This backend implements `StorageService` using Apache Jena/Fuseki. Convert from 
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/OSLC/ldp-service-jena.git"
+    "url": "https://github.com/OSLC/jena-storage-service.git"
   }
 }
 ```
@@ -869,7 +869,7 @@ Note: `request` dependency removed. Uses Node built-in `fetch` instead.
 
 **Step 3: Write storage.ts**
 
-File: `ldp-service-jena/src/storage.ts`
+File: `jena-storage-service/src/storage.ts`
 
 Convert `storage.js` to TypeScript. Key changes:
 - Replace `request(options, callback)` with `await fetch(url, options)`
@@ -1028,31 +1028,31 @@ export { JenaStorageService } from './storage.js';
 
 **Step 5: Build to verify**
 
-Run: `cd ldp-service-jena && npm install && npm run build`
+Run: `cd jena-storage-service && npm install && npm run build`
 
 **Step 6: Commit**
 
 ```bash
-git add ldp-service-jena/
-git commit -m "feat(ldp-service-jena): convert to TypeScript with fetch and async/await"
+git add jena-storage-service/
+git commit -m "feat(jena-storage-service): convert to TypeScript with fetch and async/await"
 ```
 
 ---
 
-### Task 10: Convert ldp-service-mongodb — Full Conversion
+### Task 10: Convert mongodb-storage-service — Full Conversion
 
 **Files:**
-- Modify: `ldp-service-mongodb/package.json`
-- Create: `ldp-service-mongodb/tsconfig.json`
-- Create: `ldp-service-mongodb/.gitignore`
-- Create: `ldp-service-mongodb/src/storage.ts`
-- Create: `ldp-service-mongodb/src/index.ts`
+- Modify: `mongodb-storage-service/package.json`
+- Create: `mongodb-storage-service/tsconfig.json`
+- Create: `mongodb-storage-service/.gitignore`
+- Create: `mongodb-storage-service/src/storage.ts`
+- Create: `mongodb-storage-service/src/index.ts`
 
 **Step 1: Update package.json**
 
 ```json
 {
-  "name": "ldp-service-mongodb",
+  "name": "mongodb-storage-service",
   "version": "2.0.0",
   "description": "StorageService implementation using MongoDB",
   "license": "Apache-2.0",
@@ -1084,7 +1084,7 @@ git commit -m "feat(ldp-service-jena): convert to TypeScript with fetch and asyn
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/OSLC/ldp-service-mongodb.git"
+    "url": "https://github.com/OSLC/mongodb-storage-service.git"
   }
 }
 ```
@@ -1095,7 +1095,7 @@ Note: `n3` and `jsonld` dependencies removed — the StorageService interface wo
 
 **Step 3: Write storage.ts**
 
-File: `ldp-service-mongodb/src/storage.ts`
+File: `mongodb-storage-service/src/storage.ts`
 
 Convert `storage.js` to TypeScript using the MongoDB driver's native types and async API (MongoDB driver 6.x already supports Promises natively).
 
@@ -1216,33 +1216,33 @@ export { MongoStorageService } from './storage.js';
 
 **Step 5: Build to verify**
 
-Run: `cd ldp-service-mongodb && npm install && npm run build`
+Run: `cd mongodb-storage-service && npm install && npm run build`
 
 **Step 6: Commit**
 
 ```bash
-git add ldp-service-mongodb/
-git commit -m "feat(ldp-service-mongodb): convert to TypeScript with async/await"
+git add mongodb-storage-service/
+git commit -m "feat(mongodb-storage-service): convert to TypeScript with async/await"
 ```
 
 ---
 
-### Task 11: Convert ldp-service-fs — Full Conversion
+### Task 11: Convert fs-storage-service — Full Conversion
 
-Refactor `ldp-service-fs` to implement `StorageService` directly (no standalone service.js — aligning with mongodb/jena pattern).
+Refactor `fs-storage-service` to implement `StorageService` directly (no standalone service.js — aligning with mongodb/jena pattern).
 
 **Files:**
-- Modify: `ldp-service-fs/package.json`
-- Create: `ldp-service-fs/tsconfig.json`
-- Create: `ldp-service-fs/.gitignore`
-- Create: `ldp-service-fs/src/storage.ts`
-- Create: `ldp-service-fs/src/index.ts`
+- Modify: `fs-storage-service/package.json`
+- Create: `fs-storage-service/tsconfig.json`
+- Create: `fs-storage-service/.gitignore`
+- Create: `fs-storage-service/src/storage.ts`
+- Create: `fs-storage-service/src/index.ts`
 
 **Step 1: Update package.json**
 
 ```json
 {
-  "name": "ldp-service-fs",
+  "name": "fs-storage-service",
   "version": "2.0.0",
   "description": "StorageService implementation using the file system",
   "license": "Apache-2.0",
@@ -1284,7 +1284,7 @@ Note: `express`, `n3`, `jsonld`, `request` all removed — this is now a pure st
 
 **Step 3: Write storage.ts**
 
-File: `ldp-service-fs/src/storage.ts`
+File: `fs-storage-service/src/storage.ts`
 
 Convert from `db.js` (file-based JSON store) into a class implementing `StorageService`. Uses `node:fs/promises` for async file I/O.
 
@@ -1388,13 +1388,13 @@ export { FileStorageService } from './storage.js';
 
 **Step 5: Build to verify**
 
-Run: `cd ldp-service-fs && npm install && npm run build`
+Run: `cd fs-storage-service && npm install && npm run build`
 
 **Step 6: Commit**
 
 ```bash
-git add ldp-service-fs/
-git commit -m "feat(ldp-service-fs): convert to TypeScript, implement StorageService"
+git add fs-storage-service/
+git commit -m "feat(fs-storage-service): convert to TypeScript, implement StorageService"
 ```
 
 ---
@@ -1407,9 +1407,9 @@ git commit -m "feat(ldp-service-fs): convert to TypeScript, implement StorageSer
 cd storage-service && npm run build
 cd ../ldp-service && npm run build
 cd ../oslc-service && npm run build
-cd ../ldp-service-fs && npm run build
-cd ../ldp-service-mongodb && npm run build
-cd ../ldp-service-jena && npm run build
+cd ../fs-storage-service && npm run build
+cd ../mongodb-storage-service && npm run build
+cd ../jena-storage-service && npm run build
 ```
 
 Expected: All modules compile without errors.
@@ -1438,9 +1438,9 @@ For each module, remove the original `.js` files from the root directory (not fr
 Files to remove:
 - `ldp-service/service.js`, `ldp-service/storage.js`, `ldp-service/media.js`, `ldp-service/index.js`, `ldp-service/vocab/ldp.js`, `ldp-service/vocab/rdf.js`
 - `oslc-service/service.js`, `oslc-service/ldp.js`, `oslc-service/storage.js`, `oslc-service/media.js`, `oslc-service/vocab/ldp.js`, `oslc-service/vocab/rdf.js`, `oslc-service/vocab/oslc.js`
-- `ldp-service-fs/service.js`, `ldp-service-fs/db.js`, `ldp-service-fs/jsonld.js`, `ldp-service-fs/turtle.js`, `ldp-service-fs/media.js`, `ldp-service-fs/vocab/ldp.js`, `ldp-service-fs/vocab/rdf.js`
-- `ldp-service-mongodb/storage.js`, `ldp-service-mongodb/jsonld.js`, `ldp-service-mongodb/turtle.js`, `ldp-service-mongodb/media.js`, `ldp-service-mongodb/vocab/ldp.js`, `ldp-service-mongodb/vocab/rdf.js`
-- `ldp-service-jena/storage.js`, `ldp-service-jena/storage-jena.js`, `ldp-service-jena/vocab/ldp.js`, `ldp-service-jena/vocab/rdf.js`
+- `fs-storage-service/service.js`, `fs-storage-service/db.js`, `fs-storage-service/jsonld.js`, `fs-storage-service/turtle.js`, `fs-storage-service/media.js`, `fs-storage-service/vocab/ldp.js`, `fs-storage-service/vocab/rdf.js`
+- `mongodb-storage-service/storage.js`, `mongodb-storage-service/jsonld.js`, `mongodb-storage-service/turtle.js`, `mongodb-storage-service/media.js`, `mongodb-storage-service/vocab/ldp.js`, `mongodb-storage-service/vocab/rdf.js`
+- `jena-storage-service/storage.js`, `jena-storage-service/storage-jena.js`, `jena-storage-service/vocab/ldp.js`, `jena-storage-service/vocab/rdf.js`
 
 **Step 2: Rebuild to verify nothing broke**
 
@@ -1448,9 +1448,9 @@ Files to remove:
 cd storage-service && npm run build
 cd ../ldp-service && npm run build
 cd ../oslc-service && npm run build
-cd ../ldp-service-fs && npm run build
-cd ../ldp-service-mongodb && npm run build
-cd ../ldp-service-jena && npm run build
+cd ../fs-storage-service && npm run build
+cd ../mongodb-storage-service && npm run build
+cd ../jena-storage-service && npm run build
 ```
 
 **Step 3: Commit**

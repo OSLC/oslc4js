@@ -6,7 +6,7 @@ An OSLC 3.0 server for the MISA Municipal Reference Model (MRM). It exposes MRM 
 
 - **Node.js** v22.11.0 or later
 - **Apache Jena Fuseki** running with a dataset named `mrm` (or matching the `jenaURL` in `config.json`)
-- The `oslc4js` workspace dependencies installed (this module depends on `oslc-service`, `ldp-service-jena`, and `storage-service` from the monorepo)
+- The `oslc4js` workspace dependencies installed (this module depends on `oslc-service`, `jena-storage-service`, and `storage-service` from the monorepo)
 
 ## Build
 
@@ -125,7 +125,7 @@ mrm-server
 The server is a thin domain-specific layer on top of two shared libraries:
 
 - **`oslc-service`** -- Express middleware that reads `catalog-template.ttl` and provides the OSLC ServiceProviderCatalog, ServiceProviders, creation factories, query capabilities, resource shapes, and delegated UI dialogs.
-- **`ldp-service-jena`** -- `JenaStorageService` implementation of the `StorageService` interface. Handles all LDP container and resource CRUD operations against a Jena Fuseki SPARQL endpoint.
+- **`jena-storage-service`** -- `JenaStorageService` implementation of the `StorageService` interface. Handles all LDP container and resource CRUD operations against a Jena Fuseki SPARQL endpoint.
 
 The `catalog-template.ttl` file in `config/` defines the full OSLC service description using placeholder URIs (`urn:oslc:template/...`). At startup, `oslc-service` processes this template, replaces placeholders with the server's actual base URL, and exposes the resulting catalog at the server root.
 

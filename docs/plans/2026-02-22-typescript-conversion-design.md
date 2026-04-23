@@ -12,8 +12,8 @@ Convert the oslc4js JavaScript codebase to TypeScript with ESM modules, async/aw
 
 - All modules are plain JavaScript (CommonJS, callback-based)
 - `oslc-service` and `ldp-service` each contain duplicate copies of `storage.js`, `media.js`, and `vocab/`
-- `ldp-service-fs` has a standalone `service.js` instead of reusing the base middleware
-- `ldp-service-jena` uses the deprecated `request` library
+- `fs-storage-service` has a standalone `service.js` instead of reusing the base middleware
+- `jena-storage-service` uses the deprecated `request` library
 
 ### Target Architecture
 
@@ -22,9 +22,9 @@ storage-service (NEW — shared abstract interface)
        |
        +-- oslc-service      (OSLC middleware, consumes StorageService)
        +-- ldp-service       (LDP middleware, consumes StorageService)
-       +-- ldp-service-fs    (implements StorageService on file system)
-       +-- ldp-service-mongodb (implements StorageService on MongoDB)
-       +-- ldp-service-jena  (implements StorageService on Jena/Fuseki)
+       +-- fs-storage-service    (implements StorageService on file system)
+       +-- mongodb-storage-service (implements StorageService on MongoDB)
+       +-- jena-storage-service  (implements StorageService on Jena/Fuseki)
 ```
 
 **Key principle:** `storage-service` defines the abstract `StorageService` interface. `oslc-service` and `ldp-service` are Express middleware that consume a `StorageService`. The three backends (`-fs`, `-mongodb`, `-jena`) each implement `StorageService` directly.
@@ -37,7 +37,7 @@ storage-service (NEW — shared abstract interface)
 | Async pattern | `async`/`await` with Promises | Replaces callback-based APIs throughout |
 | Type strictness | `strict: true` | Maximum type safety, catches real bugs |
 | HTTP client (jena) | Node built-in `fetch` | Node 22 global, zero dependencies, replaces deprecated `request` |
-| Backend alignment | All backends implement StorageService | `ldp-service-fs` refactored to match `mongodb`/`jena` pattern |
+| Backend alignment | All backends implement StorageService | `fs-storage-service` refactored to match `mongodb`/`jena` pattern |
 | Shared types | Extracted to `storage-service` | Eliminates duplication of vocab, media, types across modules |
 | Typing approach | Strongly-typed interfaces | Compile-time contract enforcement across all modules |
 
@@ -90,15 +90,15 @@ Convert `service.js`, `ldp.js` to TypeScript. Remove local `storage.js`, `media.
 
 Convert `service.js` to TypeScript. Remove local `storage.js`, `media.js`, `vocab/` — import from `storage-service`. The middleware accepts a `StorageService` parameter via dependency injection.
 
-### ldp-service-fs
+### fs-storage-service
 
 Refactor to implement `StorageService` interface directly (aligning with mongodb/jena pattern). Convert `db.js`, `jsonld.js`, `turtle.js` to TypeScript.
 
-### ldp-service-mongodb
+### mongodb-storage-service
 
 Convert `storage.js`, `jsonld.js`, `turtle.js` to TypeScript. Replace callbacks with async/await. Use mongodb native driver types.
 
-### ldp-service-jena
+### jena-storage-service
 
 Convert `storage.js` to TypeScript. Replace `request` with Node built-in `fetch`. Remove duplicate `storage-jena.js`.
 
@@ -127,9 +127,9 @@ Shared dev dependencies: `typescript`, `@types/express` (where applicable), `@ty
 1. **storage-service** — foundation, no dependencies on other oslc4js modules
 2. **oslc-service** — depends only on storage-service
 3. **ldp-service** — depends only on storage-service
-4. **ldp-service-fs** — depends on storage-service
-5. **ldp-service-mongodb** — depends on storage-service
-6. **ldp-service-jena** — depends on storage-service
+4. **fs-storage-service** — depends on storage-service
+5. **mongodb-storage-service** — depends on storage-service
+6. **jena-storage-service** — depends on storage-service
 
 ## Original Files
 

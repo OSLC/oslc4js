@@ -355,12 +355,12 @@ RDF response (Turtle/JSON-LD/RDF-XML via content negotiation)
 | File | Change |
 |------|--------|
 | `storage-service/src/storage.ts` | Add `constructQuery`, `exportDataset`, `importDataset` to interface |
-| `ldp-service-jena/src/storage.ts` | Implement new methods; remove `FROM` in `getMembershipTriples` |
+| `jena-storage-service/src/storage.ts` | Implement new methods; remove `FROM` in `getMembershipTriples` |
 | `ldp-service/src/service.ts` | POST: skip `ldp:contains` for creation factory targets; GET: return 404/405 for creation factory URLs |
 | `oslc-service/src/catalog.ts` | Handle `oslc:queryCapability` in template instantiation; stop creating BasicContainer for creation factory paths |
 | `oslc-service/src/template.ts` | Parse `oslc:queryCapability` from template |
-| `ldp-service-fs/src/storage.ts` | Implement new interface methods |
-| `ldp-service-mongodb/src/storage.ts` | Implement new interface methods |
+| `fs-storage-service/src/storage.ts` | Implement new interface methods |
+| `mongodb-storage-service/src/storage.ts` | Implement new interface methods |
 
 ### New Utility
 

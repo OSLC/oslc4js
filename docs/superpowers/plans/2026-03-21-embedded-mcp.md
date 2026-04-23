@@ -387,7 +387,7 @@ git commit -m "feat(oslc-service): wire MCP middleware into OSLC service lifecyc
 ```bash
 cd /Users/jamsden/Developer/OSLC/oslc4js
 cd storage-service && npm run build && cd ..
-cd ldp-service-jena && npm run build && cd ..
+cd jena-storage-service && npm run build && cd ..
 cd ldp-service && npm run build && cd ..
 cd oslc-service && npm run build && cd ..
 cd bmm-server && npm run build && cd ..

@@ -526,7 +526,7 @@ writeFile('package.json', JSON.stringify({
   dependencies: {
     'cors': '^2.8.6',
     'express': '^5.0.1',
-    'ldp-service-jena': '*',
+    'jena-storage-service': '*',
     'oslc-service': '*',
     'storage-service': '*',
   },
@@ -594,14 +594,14 @@ writeFile('src/app.ts', `\
 /*
  * ${serverName}: An OSLC 3.0 server for ${title} that uses
  * oslc-service Express middleware. Initializes the server, connects
- * to Fuseki via ldp-service-jena, and serves OSLC resources.
+ * to Fuseki via jena-storage-service, and serves OSLC resources.
  */
 
 import express, { type Request, type Response, type NextFunction } from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { oslcService } from 'oslc-service';
-import { JenaStorageService } from 'ldp-service-jena';
+import { JenaStorageService } from 'jena-storage-service';
 import { env } from './env.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1139,7 +1139,7 @@ ${serverName} is built from several modules in the oslc4js workspace:
 - **${serverName}** -- Express application entry point and static assets
 - **oslc-service** -- Express middleware providing OSLC 3.0 services
 - **ldp-service** -- Express middleware implementing the W3C LDP protocol
-- **ldp-service-jena** -- Storage backend using Apache Jena Fuseki
+- **jena-storage-service** -- Storage backend using Apache Jena Fuseki
 - **storage-service** -- Abstract storage interface
 
 ## Running

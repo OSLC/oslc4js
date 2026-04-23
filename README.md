@@ -11,9 +11,9 @@ The workspace is organized into layered modules that build on each other:
 | Module | Description |
 |--------|-------------|
 | [storage-service](storage-service/) | Abstract TypeScript interface defining the contract for storage backends |
-| [ldp-service-jena](ldp-service-jena/) | Storage backend using Apache Jena Fuseki |
-| [ldp-service-fs](ldp-service-fs/) | Storage backend using the local file system |
-| [ldp-service-mongodb](ldp-service-mongodb/) | Storage backend using MongoDB |
+| [jena-storage-service](jena-storage-service/) | Storage backend using Apache Jena Fuseki |
+| [fs-storage-service](fs-storage-service/) | Storage backend using the local file system |
+| [mongodb-storage-service](mongodb-storage-service/) | Storage backend using MongoDB |
 
 ### Middleware Layer
 
@@ -27,6 +27,7 @@ The workspace is organized into layered modules that build on each other:
 | Module | Description |
 |--------|-------------|
 | [oslc-server](oslc-server/) | OSLC 3.0 reference server implementation |
+| [bmm-server](bmm-server/) | OSLC server for the OMG Business Motivation Model |
 | [mrm-server](mrm-server/) | OSLC server for the MISA Municipal Reference Model |
 | [ldp-app](ldp-app/) | Example LDP application demonstrating ldp-service |
 
@@ -87,7 +88,7 @@ Build modules in dependency order:
 
 ```bash
 cd storage-service && npm run build && cd ..
-cd ldp-service-jena && npm run build && cd ..
+cd jena-storage-service && npm run build && cd ..
 cd ldp-service && npm run build && cd ..
 cd oslc-service && npm run build && cd ..
 cd oslc-client && npm run build && cd ..

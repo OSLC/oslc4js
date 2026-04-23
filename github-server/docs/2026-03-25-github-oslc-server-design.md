@@ -242,7 +242,7 @@ For large change sets, delivery may return `202 Accepted` with an `oslc_config:A
 
 ### Approach
 
-Scaffold the server using `create-oslc-server.ts` from CM and SCM vocabulary/shapes files, then replace `ldp-service-jena` with a custom `github-storage-service` that implements the `StorageService` interface against the GitHub REST API.
+Scaffold the server using `create-oslc-server.ts` from CM and SCM vocabulary/shapes files, then replace `jena-storage-service` with a custom `github-storage-service` that implements the `StorageService` interface against the GitHub REST API.
 
 This approach:
 - Reuses all existing oslc-service infrastructure (discovery, dialogs, compact preview, MCP)
@@ -255,7 +255,7 @@ This approach:
 
 ### StorageService Refactoring
 
-The current `StorageService` interface has SPARQL-specific methods (`constructQuery()`, `sparqlQuery()`). These must be refactored to have generic, storage-agnostic names. The SPARQL implementations move into `ldp-service-jena`:
+The current `StorageService` interface has SPARQL-specific methods (`constructQuery()`, `sparqlQuery()`). These must be refactored to have generic, storage-agnostic names. The SPARQL implementations move into `jena-storage-service`:
 
 | Current Method | Refactored Method | Description |
 |---|---|---|
@@ -263,7 +263,7 @@ The current `StorageService` interface has SPARQL-specific methods (`constructQu
 | `sparqlQuery(sparql, accept)` | `rawQuery(queryExpression, accept)` | Execute a backend-specific raw query, return serialized results |
 
 Each `StorageService` implementation provides its own query translation:
-- `ldp-service-jena`: Accepts SPARQL, delegates to Fuseki
+- `jena-storage-service`: Accepts SPARQL, delegates to Fuseki
 - `github-storage-service`: Accepts OSLC query syntax, translates to GitHub API calls
 
 This refactoring means the Express routing in `oslc-service` does not need to change for different storage implementations — the query handler calls the abstract `query()` method, and each backend handles it appropriately.
@@ -585,7 +585,7 @@ Since changes are staged in change sets before delivery, concurrent modification
 - `rdflib` -- RDF graph building and parsing
 - Standard Express dependencies (`express`, `cors`, `dotenv`)
 
-No dependency on `ldp-service-jena` or any triple store.
+No dependency on `jena-storage-service` or any triple store.
 
 ---
 
@@ -594,7 +594,7 @@ No dependency on `ldp-service-jena` or any triple store.
 The github-server design requires changes to existing monorepo packages before implementation can proceed:
 
 1. **`storage-service`**: Refactor `constructQuery()` and `sparqlQuery()` to generic `query()` and `rawQuery()` abstract methods
-2. **`ldp-service-jena`**: Move SPARQL-specific implementations of the refactored methods into the Jena storage service
+2. **`jena-storage-service`**: Move SPARQL-specific implementations of the refactored methods into the Jena storage service
 3. **`oslc-service`**: Add optional configuration-awareness (`--config-enabled` parameter in `create-oslc-server.ts`), including `Configuration-Context` middleware, CORS headers, and config domain services in catalog templates
 4. **`oslc-service` query handler**: Update to call the abstract `query()` method instead of directly constructing SPARQL
 

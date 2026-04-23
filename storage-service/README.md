@@ -120,9 +120,9 @@ type MediaType = typeof media[keyof typeof media];
 
 Three backend modules implement the `StorageService` interface:
 
-- **`ldp-service-fs`** -- file-system-based storage, one Turtle file per resource.
-- **`ldp-service-jena`** -- Apache Jena Fuseki triplestore backend with native SPARQL support.
-- **`ldp-service-mongodb`** -- MongoDB-backed storage using document collections.
+- **`fs-storage-service`** -- file-system-based storage, one Turtle file per resource.
+- **`jena-storage-service`** -- Apache Jena Fuseki triplestore backend with native SPARQL support.
+- **`mongodb-storage-service`** -- MongoDB-backed storage using document collections.
 
 ## Usage
 

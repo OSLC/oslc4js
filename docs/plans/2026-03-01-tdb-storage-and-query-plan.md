@@ -82,7 +82,7 @@ git commit -m "feat: add exportDataset and importDataset to StorageService inter
 ## Task 3: Implement `constructQuery` in JenaStorageService
 
 **Files:**
-- Modify: `ldp-service-jena/src/storage.ts:68-190` (JenaStorageService class)
+- Modify: `jena-storage-service/src/storage.ts:68-190` (JenaStorageService class)
 
 **Step 1: Add `constructQuery` method to JenaStorageService**
 
@@ -109,13 +109,13 @@ Add before the `drop()` method (line 187):
 
 **Step 2: Build to verify compilation**
 
-Run: `cd ldp-service-jena && npm run build`
+Run: `cd jena-storage-service && npm run build`
 Expected: Compilation succeeds
 
 **Step 3: Commit**
 
 ```bash
-git add ldp-service-jena/src/storage.ts
+git add jena-storage-service/src/storage.ts
 git commit -m "feat: implement constructQuery in JenaStorageService"
 ```
 
@@ -126,7 +126,7 @@ git commit -m "feat: implement constructQuery in JenaStorageService"
 With `tdb:unionDefaultGraph true`, membership triples are visible through the union default graph without scoping to a specific named graph.
 
 **Files:**
-- Modify: `ldp-service-jena/src/storage.ts:169-185` (getMembershipTriples method)
+- Modify: `jena-storage-service/src/storage.ts:169-185` (getMembershipTriples method)
 
 **Step 1: Update the SPARQL query**
 
@@ -156,13 +156,13 @@ The only change is removing `FROM <${container.membershipResource}>` from the SP
 
 **Step 2: Build to verify**
 
-Run: `cd ldp-service-jena && npm run build`
+Run: `cd jena-storage-service && npm run build`
 Expected: Compilation succeeds
 
 **Step 3: Commit**
 
 ```bash
-git add ldp-service-jena/src/storage.ts
+git add jena-storage-service/src/storage.ts
 git commit -m "fix: remove FROM clause in getMembershipTriples for union default graph"
 ```
 
@@ -171,7 +171,7 @@ git commit -m "fix: remove FROM clause in getMembershipTriples for union default
 ## Task 5: Implement `exportDataset` and `importDataset` in JenaStorageService
 
 **Files:**
-- Modify: `ldp-service-jena/src/storage.ts` (JenaStorageService class)
+- Modify: `jena-storage-service/src/storage.ts` (JenaStorageService class)
 
 **Step 1: Add `exportDataset` method**
 
@@ -258,13 +258,13 @@ For TriG, upload directly to Fuseki. For Turtle, parse and distribute into named
 
 **Step 3: Build to verify**
 
-Run: `cd ldp-service-jena && npm run build`
+Run: `cd jena-storage-service && npm run build`
 Expected: Compilation succeeds
 
 **Step 4: Commit**
 
 ```bash
-git add ldp-service-jena/src/storage.ts
+git add jena-storage-service/src/storage.ts
 git commit -m "feat: implement exportDataset and importDataset in JenaStorageService"
 ```
 
@@ -275,12 +275,12 @@ git commit -m "feat: implement exportDataset and importDataset in JenaStorageSer
 Both backends need the new interface methods to compile. Implement as stubs that throw "not implemented" for now.
 
 **Files:**
-- Modify: `ldp-service-fs/src/storage.ts`
-- Modify: `ldp-service-mongodb/src/storage.ts`
+- Modify: `fs-storage-service/src/storage.ts`
+- Modify: `mongodb-storage-service/src/storage.ts`
 
 **Step 1: Add stub methods to FsStorageService**
 
-Add to the class in `ldp-service-fs/src/storage.ts`:
+Add to the class in `fs-storage-service/src/storage.ts`:
 
 ```typescript
   async constructQuery(_sparql: string): Promise<{ status: number; results: IndexedFormula | null }> {
@@ -298,7 +298,7 @@ Add to the class in `ldp-service-fs/src/storage.ts`:
 
 **Step 2: Add stub methods to MongoStorageService**
 
-Add the same three stub methods to `ldp-service-mongodb/src/storage.ts`, replacing "file system" with "MongoDB".
+Add the same three stub methods to `mongodb-storage-service/src/storage.ts`, replacing "file system" with "MongoDB".
 
 **Step 3: Build all packages**
 
@@ -308,7 +308,7 @@ Expected: All packages compile successfully
 **Step 4: Commit**
 
 ```bash
-git add ldp-service-fs/src/storage.ts ldp-service-mongodb/src/storage.ts
+git add fs-storage-service/src/storage.ts mongodb-storage-service/src/storage.ts
 git commit -m "feat: add stub constructQuery/exportDataset/importDataset to FS and MongoDB storage"
 ```
 

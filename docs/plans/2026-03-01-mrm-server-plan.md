@@ -2,11 +2,11 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Create an OSLC 3.0 server for the MISA Municipal Reference Model, reusing oslc-service/ldp-service-jena, with unified mrm: namespace and whole-document shape loading.
+**Goal:** Create an OSLC 3.0 server for the MISA Municipal Reference Model, reusing oslc-service/jena-storage-service, with unified mrm: namespace and whole-document shape loading.
 
 **Architecture:** mrm-server is a thin app over the shared oslc-service middleware, configured with MRM-specific catalog template, vocabulary, and shapes. The storeResourceShapes function in oslc-service is generalized to load whole shape documents (stripping fragments to deduplicate). Namespace is unified from mrms: to mrm: across all vocab and data files.
 
-**Tech Stack:** TypeScript, Express 5, rdflib.js, Apache Jena Fuseki, oslc-service/ldp-service-jena/storage-service packages
+**Tech Stack:** TypeScript, Express 5, rdflib.js, Apache Jena Fuseki, oslc-service/jena-storage-service/storage-service packages
 
 ---
 
@@ -247,7 +247,7 @@ Create `mrm-server/package.json`:
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.0.1",
-    "ldp-service-jena": "*",
+    "jena-storage-service": "*",
     "oslc-service": "*",
     "storage-service": "*"
   },
@@ -352,7 +352,7 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { oslcService } from 'oslc-service';
-import { JenaStorageService } from 'ldp-service-jena';
+import { JenaStorageService } from 'jena-storage-service';
 import { env } from './env.js';
 
 const __filename = fileURLToPath(import.meta.url);

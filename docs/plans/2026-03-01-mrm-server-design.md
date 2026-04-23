@@ -1,6 +1,6 @@
 # mrm-server Design
 
-**Goal:** Create an OSLC 3.0 server for the MISA Municipal Reference Model (MRM), reusing the shared oslc-service / ldp-service-jena / storage-service infrastructure.
+**Goal:** Create an OSLC 3.0 server for the MISA Municipal Reference Model (MRM), reusing the shared oslc-service / jena-storage-service / storage-service infrastructure.
 
 ## Namespace Unification
 
