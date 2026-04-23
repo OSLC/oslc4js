@@ -107,16 +107,30 @@ The spec PDF is included at `docs/BMM-formal-15-05-19.pdf`.
 
 **To populate the EU-Rent example:**
 
+There are two equivalent paths. Both exercise the same MCP create/query tools that an AI assistant uses — one interactively, one scripted.
+
+*Path A — AI-driven (demonstrates the Define-Instantiate-Activate vision):*
+
 1. Start bmm-server and Fuseki as described above.
 2. Connect an AI assistant (e.g., Claude Desktop) to the MCP endpoint at `http://localhost:3005/mcp`.
 3. Ask the assistant to read the BMM 1.3 specification and create the EU-Rent example artifacts.
 
-The `testing/` folder contains `.http` files for API verification:
+*Path B — Scripted (fast reload for development):*
+
+After starting bmm-server, run the populator:
+
+```bash
+./testing/populate-eurent.sh
+```
+
+The script opens an MCP session, creates the EU-Rent ServiceProvider (if not already present), and creates 72 linked resources — one Vision, four Goals and Objectives, one Mission, three Strategies, five Tactics, five Business Policies, six Business Rules, twenty Influencers, six SWOT Assessments, five Potential Impacts, four Business Processes, four Assets, and four Organization Units. All examples are sourced from OMG BMM 1.3 Chapter 8 and Annex C.
+
+The `testing/` folder also contains raw-OSLC `.http` files for API verification (not dependent on MCP):
 
 | File | Purpose |
 |------|---------|
 | `01-catalog.http` | Read the ServiceProviderCatalog |
-| `02-create-service-provider.http` | Create the "EU-Rent" ServiceProvider (smoke test) |
+| `02-create-service-provider.http` | Create a ServiceProvider (smoke test; uses a `SolarTech` slug, independent of EU-Rent) |
 | `08-query-resources.http` | Query templates for all BMM resource types |
 
 **What the spec contains for EU-Rent:**
