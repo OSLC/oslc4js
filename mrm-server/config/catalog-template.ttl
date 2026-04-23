@@ -31,49 +31,49 @@
     a oslc:CreationFactory ;
     dcterms:title "Programs" ;
     oslc:resourceType mrm:Program ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ProgramShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ProgramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Services" ;
     oslc:resourceType mrm:Service ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ServiceShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ServiceShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Processes" ;
     oslc:resourceType mrm:Process ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ProcessShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ProcessShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Resources" ;
     oslc:resourceType mrm:Resource ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ResourceShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ResourceShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Outcomes" ;
     oslc:resourceType mrm:Outcome ;
-    oslc:resourceShape <shapes/MRMS-Shapes#OutcomeShape>
+    oslc:resourceShape <domain/MRMS-Shapes#OutcomeShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Organization Units" ;
     oslc:resourceType mrm:OrganizationUnit ;
-    oslc:resourceShape <shapes/MRMS-Shapes#OrganizationUnitShape>
+    oslc:resourceShape <domain/MRMS-Shapes#OrganizationUnitShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Target Groups" ;
     oslc:resourceType mrm:TargetGroup ;
-    oslc:resourceShape <shapes/MRMS-Shapes#TargetGroupShape>
+    oslc:resourceShape <domain/MRMS-Shapes#TargetGroupShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Needs" ;
     oslc:resourceType mrm:Need ;
-    oslc:resourceShape <shapes/MRMS-Shapes#NeedShape>
+    oslc:resourceShape <domain/MRMS-Shapes#NeedShape>
   ] ;
 
   # ---- Diagram Creation Factories ----
@@ -82,67 +82,67 @@
     a oslc:CreationFactory ;
     dcterms:title "Create Organization Unit Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OrgUnitDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#OrgUnitDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create Program Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProgramDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#ProgramDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create Service Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ServiceDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#ServiceDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create Process Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProcessDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#ProcessDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create Resource Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ResourceDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#ResourceDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create Need Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#NeedDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#NeedDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create Outcome Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutcomeDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#OutcomeDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create Output Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutputDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#OutputDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create Target Group Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#TargetGroupDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#TargetGroupDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create PLM Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#PLMDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#PLMDiagramShape>
   ] ;
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Create SIAM Diagram" ;
     oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#SIAMDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#SIAMDiagramShape>
   ] ;
 
   # === Creation Dialogs ===
@@ -154,7 +154,7 @@
     oslc:resourceType mrm:Program ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ProgramShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ProgramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -163,7 +163,7 @@
     oslc:resourceType mrm:Service ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ServiceShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ServiceShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -172,7 +172,7 @@
     oslc:resourceType mrm:Process ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ProcessShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ProcessShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -181,7 +181,7 @@
     oslc:resourceType mrm:Resource ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ResourceShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ResourceShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -190,7 +190,7 @@
     oslc:resourceType mrm:Outcome ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-Shapes#OutcomeShape>
+    oslc:resourceShape <domain/MRMS-Shapes#OutcomeShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -199,7 +199,7 @@
     oslc:resourceType mrm:OrganizationUnit ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-Shapes#OrganizationUnitShape>
+    oslc:resourceShape <domain/MRMS-Shapes#OrganizationUnitShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -208,7 +208,7 @@
     oslc:resourceType mrm:TargetGroup ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-Shapes#TargetGroupShape>
+    oslc:resourceShape <domain/MRMS-Shapes#TargetGroupShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -217,7 +217,7 @@
     oslc:resourceType mrm:Need ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-Shapes#NeedShape>
+    oslc:resourceShape <domain/MRMS-Shapes#NeedShape>
   ] ;
 
   # ---- Diagram Creation Dialogs ----
@@ -229,7 +229,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OrgUnitDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#OrgUnitDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -238,7 +238,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProgramDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#ProgramDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -247,7 +247,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ServiceDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#ServiceDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -256,7 +256,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProcessDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#ProcessDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -265,7 +265,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ResourceDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#ResourceDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -274,7 +274,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#NeedDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#NeedDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -283,7 +283,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutcomeDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#OutcomeDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -292,7 +292,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutputDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#OutputDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -301,7 +301,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#TargetGroupDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#TargetGroupDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -310,7 +310,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#PLMDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#PLMDiagramShape>
   ] ;
   oslc:creationDialog [
     a oslc:Dialog ;
@@ -319,7 +319,7 @@
     oslc:resourceType dd:Diagram ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#SIAMDiagramShape>
+    oslc:resourceShape <domain/MRMS-DiagramShapes#SIAMDiagramShape>
   ] ;
 
   # ---- Diagram Selection Dialog ----
@@ -340,47 +340,47 @@
     a oslc:QueryCapability ;
     dcterms:title "Query Programs" ;
     oslc:resourceType mrm:Program ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ProgramShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ProgramShape>
   ] ;
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Services" ;
     oslc:resourceType mrm:Service ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ServiceShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ServiceShape>
   ] ;
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Processes" ;
     oslc:resourceType mrm:Process ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ProcessShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ProcessShape>
   ] ;
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Resources" ;
     oslc:resourceType mrm:Resource ;
-    oslc:resourceShape <shapes/MRMS-Shapes#ResourceShape>
+    oslc:resourceShape <domain/MRMS-Shapes#ResourceShape>
   ] ;
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Outcomes" ;
     oslc:resourceType mrm:Outcome ;
-    oslc:resourceShape <shapes/MRMS-Shapes#OutcomeShape>
+    oslc:resourceShape <domain/MRMS-Shapes#OutcomeShape>
   ] ;
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Organization Units" ;
     oslc:resourceType mrm:OrganizationUnit ;
-    oslc:resourceShape <shapes/MRMS-Shapes#OrganizationUnitShape>
+    oslc:resourceShape <domain/MRMS-Shapes#OrganizationUnitShape>
   ] ;
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Target Groups" ;
     oslc:resourceType mrm:TargetGroup ;
-    oslc:resourceShape <shapes/MRMS-Shapes#TargetGroupShape>
+    oslc:resourceShape <domain/MRMS-Shapes#TargetGroupShape>
   ] ;
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Needs" ;
     oslc:resourceType mrm:Need ;
-    oslc:resourceShape <shapes/MRMS-Shapes#NeedShape>
+    oslc:resourceShape <domain/MRMS-Shapes#NeedShape>
   ] .

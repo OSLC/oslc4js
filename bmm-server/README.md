@@ -95,10 +95,9 @@ Then open your browser to `http://localhost:3005/`.
 
 After scaffolding, you should:
 
-1. **Review or extend the vocabularies** in `config/vocab/` with your domain vocabulary definitions
-2. **Review or extend the resource shapes** in `config/shapes/` to describe your domain resources
-3. **Review or update the catalog template** in `config/catalog-template.ttl` to define your service provider's creation factories, query capabilities, and dialogs
-4. **Update the Fuseki dataset name** in `config.json` (`jenaURL`) to match your Fuseki configuration
+1. **Review or extend the domain definitions** in `config/domain/` — both vocabularies and resource shapes live here
+2. **Review or update the catalog template** in `config/catalog-template.ttl` to define your service provider's creation factories, query capabilities, and dialogs
+3. **Update the Fuseki dataset name** in `config.json` (`jenaURL`) to match your Fuseki configuration
 
 ## Example: EU-Rent (from BMM 1.3 Specification)
 

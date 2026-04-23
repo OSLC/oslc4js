@@ -98,7 +98,7 @@ For each resource type above, the server provides:
 
 - **Creation Factories** -- POST a new resource to create it in the triple store
 - **Query Capabilities** -- GET with OSLC query syntax to find resources
-- **Resource Shapes** -- defined in `config/shapes/MRMS-Shapes.ttl` (referenced but managed by `oslc-service`)
+- **Resource Shapes** -- defined in `config/domain/MRMS-Shapes.ttl` (referenced but managed by `oslc-service`)
 - **Delegated UI Dialogs** -- creation dialogs for each resource type, served from the `dialog/` directory
 
 ### Diagram Support
@@ -107,7 +107,7 @@ The server also supports OMG DD (Diagram Definition) diagrams via the `dd:` name
 
 Organization Unit, Program, Service, Process, Resource, Need, Outcome, Output, Target Group, PLM, and SIAM diagrams.
 
-Diagram shapes are defined in `config/shapes/MRMS-DiagramShapes.ttl`. A selection dialog is also available for choosing existing diagrams.
+Diagram shapes are defined in `config/domain/MRMS-DiagramShapes.ttl`. A selection dialog is also available for choosing existing diagrams.
 
 ## Architecture
 

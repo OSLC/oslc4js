@@ -8,8 +8,8 @@
  * Options:
  *   --name <name>          Server project name (required, e.g. bmm-server)
  *   --port <number>        Port number (default: 3001)
- *   --vocab <file>         RDF vocabulary file to copy into config/vocab/
- *   --shapes <file>        RDF shapes file to copy into config/shapes/
+ *   --vocab <file>         RDF vocabulary file to copy into config/domain/
+ *   --shapes <file>        RDF shapes file to copy into config/domain/
  *   --managed <classes>    Comma-separated class names for OSLC services
  *                          (requires --shapes; e.g. Means,End,Strategy)
  *
@@ -109,8 +109,8 @@ function parseArgs(argv: string[]): CliArgs {
 Options:
   --name <name>          Server project name (required, e.g. bmm-server)
   --port <number>        Port number (default: 3001)
-  --vocab <file>         RDF vocabulary file to copy into config/vocab/
-  --shapes <file>        RDF shapes file to copy into config/shapes/
+  --vocab <file>         RDF vocabulary file to copy into config/domain/
+  --shapes <file>        RDF shapes file to copy into config/domain/
   --managed <classes>    Comma-separated class names for OSLC services
                          (requires --shapes; e.g. Means,End,Strategy)
 
@@ -328,8 +328,8 @@ function generateCatalogTemplate(
   for (const mc of managedClasses) {
     const classNode = rdflib.sym(mc.classURI);
     // Use an absolute URI with the catalog base so rdflib serializes it as
-    // a relative reference (e.g. <shapes/MRMS-Shapes#ProgramShape>).
-    const shapeRef = rdflib.sym(`urn:oslc:template/shapes/${shapesBaseName}#${mc.shapeFragmentId}`);
+    // a relative reference (e.g. <domain/MRMS-Shapes#ProgramShape>).
+    const shapeRef = rdflib.sym(`urn:oslc:template/domain/${shapesBaseName}#${mc.shapeFragmentId}`);
 
     // Creation Factory
     const factoryNode = rdflib.blankNode();
@@ -808,14 +808,14 @@ if (useDomainConfig) {
     a oslc:CreationFactory ;
     dcterms:title "Change Management Resources" ;
     oslc:resourceType oslc_cm:ChangeRequest ;
-    oslc:resourceShape <shapes/ChangeRequest>
+    oslc:resourceShape <domain/ChangeRequest>
   ] ;
 
   oslc:creationFactory [
     a oslc:CreationFactory ;
     dcterms:title "Requirements Management Resources" ;
     oslc:resourceType oslc_rm:Requirement ;
-    oslc:resourceShape <shapes/Requirement>
+    oslc:resourceShape <domain/Requirement>
   ] ;
 
   oslc:creationDialog [
@@ -825,7 +825,7 @@ if (useDomainConfig) {
     oslc:resourceType oslc_cm:ChangeRequest ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/ChangeRequest>
+    oslc:resourceShape <domain/ChangeRequest>
   ] ;
 
   oslc:creationDialog [
@@ -835,31 +835,31 @@ if (useDomainConfig) {
     oslc:resourceType oslc_rm:Requirement ;
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
-    oslc:resourceShape <shapes/Requirement>
+    oslc:resourceShape <domain/Requirement>
   ] ;
 
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Change Requests" ;
     oslc:resourceType oslc_cm:ChangeRequest ;
-    oslc:resourceShape <shapes/ChangeRequest>
+    oslc:resourceShape <domain/ChangeRequest>
   ] ;
 
   oslc:queryCapability [
     a oslc:QueryCapability ;
     dcterms:title "Query Requirements" ;
     oslc:resourceType oslc_rm:Requirement ;
-    oslc:resourceShape <shapes/Requirement>
+    oslc:resourceShape <domain/Requirement>
   ] .
 `);
 }
 
-// ── config/shapes/ ───────────────────────────────────────────────
+// ── config/domain/ ───────────────────────────────────────────────
 
 if (cli.shapes) {
   copyFileSync(resolve(cli.shapes), join(projectDir, 'config', 'shapes', shapesFileName!));
 } else {
-  writeFile('config/shapes/ChangeRequest.ttl', `\
+  writeFile('config/domain/ChangeRequest.ttl', `\
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix oslc:    <http://open-services.net/ns/core#> .
@@ -912,7 +912,7 @@ if (cli.shapes) {
   ] .
 `);
 
-  writeFile('config/shapes/Requirement.ttl', `\
+  writeFile('config/domain/Requirement.ttl', `\
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix oslc:    <http://open-services.net/ns/core#> .
@@ -966,13 +966,13 @@ if (cli.shapes) {
 `);
 }
 
-// ── config/vocab/ ────────────────────────────────────────────────
+// ── config/domain/ ────────────────────────────────────────────────
 
 if (cli.vocab) {
   copyFileSync(resolve(cli.vocab), join(projectDir, 'config', 'vocab', vocabFileName!));
 } else {
-  copyFromOslcServer('config/vocab/DD.ttl');
-  copyFromOslcServer('config/vocab/DD-Shapes.ttl');
+  copyFromOslcServer('config/domain/DD.ttl');
+  copyFromOslcServer('config/domain/DD-Shapes.ttl');
 }
 
 // ── dialog/ — OSLC delegated UI dialogs ──────────────────────────
@@ -1200,10 +1200,9 @@ Then open your browser to \`http://localhost:${port}/\`.
 
 After scaffolding, you should:
 
-1. **Review or extend the vocabularies** in \`config/vocab/\` with your domain vocabulary definitions
-2. **Review or extend the resource shapes** in \`config/shapes/\` to describe your domain resources
-3. **Review or update the catalog template** in \`config/catalog-template.ttl\` to define your service provider's creation factories, query capabilities, and dialogs
-4. **Update the Fuseki dataset name** in \`config.json\` (\`jenaURL\`) to match your Fuseki configuration
+1. **Review or extend the domain definitions** in \`config/domain/\` — both vocabularies and resource shapes live here
+2. **Review or update the catalog template** in \`config/catalog-template.ttl\` to define your service provider's creation factories, query capabilities, and dialogs
+3. **Update the Fuseki dataset name** in \`config.json\` (\`jenaURL\`) to match your Fuseki configuration
 
 ## REST API
 
@@ -1236,7 +1235,6 @@ console.log(`  6. Start the server:      npm start`);
 if (!useDomainConfig) {
   console.log('');
   console.log('Then customize:');
-  console.log('  - config/vocab/        -- Replace sample vocabularies with your domain vocabulary');
-  console.log('  - config/shapes/       -- Replace sample shapes with your domain resource shapes');
+  console.log('  - config/domain/              -- Replace sample vocabularies and shapes with your domain definitions');
   console.log('  - config/catalog-template.ttl -- Update services for your resource types');
 }
