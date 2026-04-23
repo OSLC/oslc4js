@@ -4,6 +4,7 @@
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix oslc:    <http://open-services.net/ns/core#> .
 @prefix oslc_am: <http://open-services.net/ns/am#> .
+@prefix jazz_am: <http://jazz.net/ns/dm/linktypes#> .
 @prefix bmm:     <http://www.omg.org/spec/BMM#> .
 
 # ================================================================
@@ -12,8 +13,12 @@
 # bmm:MotivationalElement rdfs:subClassOf oslc_am:Resource, so all
 # BMM resource shapes inherit the standard OSLC Core and AM properties.
 #
-# Property definitions are named nodes so that shared/inherited
-# properties are defined once and referenced by multiple shapes.
+# OSLC ResourceShapes do NOT support inheritance — every concrete
+# shape must manually enumerate all properties it allows, including
+# those inherited through the class hierarchy. Shared property
+# definitions are named nodes (below) and referenced by each shape's
+# oslc:property list; this gives the appearance of inheritance while
+# remaining OSLC-conformant.
 #
 # Forward link properties carry oslc:inversePropertyDefinition and
 # oslc:inverseLabel metadata. The inverse URIs are identifiers only;
@@ -132,6 +137,92 @@
   dcterms:description "Shorter form of the title." ;
   oslc:occurs oslc:Zero-or-one ;
   oslc:valueType xsd:string .
+
+<#p-dctype>
+  a oslc:Property ;
+  oslc:name "dctype" ;
+  oslc:propertyDefinition dcterms:type ;
+  dcterms:description "A short string representation for the type, e.g. \"Goal\"." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType xsd:string .
+
+<#p-source>
+  a oslc:Property ;
+  oslc:name "source" ;
+  oslc:propertyDefinition dcterms:source ;
+  dcterms:description "A resource URI that can be fetched to obtain the original non-OSLC-formatted resource from which this BMM resource was derived." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — AM common link types
+# (inherited from oslc_am:Resource)
+# ================================================================
+
+<#p-derives>
+  a oslc:Property ;
+  oslc:name "derives" ;
+  oslc:propertyDefinition jazz_am:derives ;
+  dcterms:description "A resource from which this resource derives or is significantly influenced by. For example, a BMM Goal may derive from a requirement in a Requirements Management tool." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition jazz_am:derivedBy ;
+  oslc:inverseLabel "Derived By" .
+
+<#p-elaborates>
+  a oslc:Property ;
+  oslc:name "elaborates" ;
+  oslc:propertyDefinition jazz_am:elaborates ;
+  dcterms:description "A resource that this resource elaborates." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition jazz_am:elaboratedBy ;
+  oslc:inverseLabel "Elaborated By" .
+
+<#p-refine>
+  a oslc:Property ;
+  oslc:name "refine" ;
+  oslc:propertyDefinition jazz_am:refine ;
+  dcterms:description "A resource that this resource refines." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition jazz_am:refinedBy ;
+  oslc:inverseLabel "Refined By" .
+
+<#p-external>
+  a oslc:Property ;
+  oslc:name "external" ;
+  oslc:propertyDefinition jazz_am:external ;
+  dcterms:description "A generic link to an external resource or web page." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-satisfy>
+  a oslc:Property ;
+  oslc:name "satisfy" ;
+  oslc:propertyDefinition jazz_am:satisfy ;
+  dcterms:description "A resource that this resource satisfies (e.g., a requirement that this element satisfies)." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition jazz_am:satisfiedBy ;
+  oslc:inverseLabel "Satisfied By" .
+
+<#p-trace>
+  a oslc:Property ;
+  oslc:name "trace" ;
+  oslc:propertyDefinition jazz_am:trace ;
+  dcterms:description "A resource that this resource has a trace relationship to." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:inversePropertyDefinition jazz_am:tracedBy ;
+  oslc:inverseLabel "Traced By" .
 
 # ================================================================
 # SHARED PROPERTY DEFINITIONS — End/CourseOfAction relationship
@@ -601,8 +692,10 @@
   oslc:describes bmm:Vision ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-amplifiedBy>, <#p-madeOperativeBy> .
 
 # ============================================================
@@ -615,8 +708,10 @@
   oslc:describes bmm:Goal ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-quantifiedBy>, <#p-includesGoal> .
 
 # ============================================================
@@ -629,8 +724,10 @@
   oslc:describes bmm:Objective ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-includesObjective>,
     <#p-targetDate>, <#p-measureOfProgress> .
 
@@ -644,8 +741,10 @@
   oslc:describes bmm:Mission ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle> .
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace> .
 
 # ============================================================
 # Strategy
@@ -657,8 +756,10 @@
   oslc:describes bmm:Strategy ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-enablesEnd>,
     <#p-channelsEffortsToward>, <#p-includesStrategy> .
 
@@ -672,8 +773,10 @@
   oslc:describes bmm:Tactic ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-enablesEnd>,
     <#p-implements>, <#p-includesTactic>,
     <#p-effectsEnforcementOfBusinessRule> .
@@ -688,8 +791,10 @@
   oslc:describes bmm:BusinessPolicy ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-governs>, <#p-governsProcess> .
 
 # ============================================================
@@ -702,8 +807,10 @@
   oslc:describes bmm:BusinessRule ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-governs>,
     <#p-basedOn>, <#p-enforcedByBusinessProcess>,
     <#p-enforcementLevel> .
@@ -718,8 +825,10 @@
   oslc:describes bmm:Influencer ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-influencerCategory> .
 
 # ============================================================
@@ -732,8 +841,10 @@
   oslc:describes bmm:Assessment ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-assesses>, <#p-identifiesPotentialImpact>,
     <#p-assessmentCategory>,
     <#p-affectsAchievementOfEnd>, <#p-affectsEmploymentOfMeans> .
@@ -748,8 +859,10 @@
   oslc:describes bmm:PotentialImpact ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-providesImpetusFor>,
     <#p-isRiskForEnd>, <#p-isRiskForMeans>,
     <#p-isRewardForEnd>, <#p-isRewardForMeans> .
@@ -764,8 +877,10 @@
   oslc:describes bmm:OrganizationUnit ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-isResponsibleFor>, <#p-establishes>,
     <#p-recognizes>, <#p-makesAssessment>,
     <#p-definedBy>, <#p-subOrganizationUnits> .
@@ -780,8 +895,10 @@
   oslc:describes bmm:BusinessProcess ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
     <#p-realizes>, <#p-governedByBusinessRule> .
 
 # ============================================================
@@ -794,5 +911,7 @@
   oslc:describes bmm:Asset ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
-    <#p-subject>, <#p-type>, <#p-instanceShape>,
-    <#p-serviceProvider>, <#p-shortTitle> .
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace> .
