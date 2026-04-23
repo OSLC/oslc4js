@@ -251,6 +251,16 @@ curl http://localhost:3005/oslc/eu-rent/query?oslc.where=rdf:type=%3Chttp://www.
 curl 'http://localhost:3005/oslc/eu-rent/query?oslc.where=bmm:influencerCategory="Competitor"' -H 'Accept: text/turtle'
 ```
 
+**One-query navigation starter: hubs spanning the model**
+
+Paste this URL into a browser address bar (or curl) to get a single list of 11 highly-connected hub resources — the Vision (apex of the Ends hierarchy), all 6 SWOT Assessments (hubs of the analysis arc linking Influencers, Impacts, and Ends), and all 4 OrganizationUnits (hubs of the accountability arc linking Ends, Means, Influencers, Assessments, and Processes). Together they cover the three main narrative perspectives on the model:
+
+```
+http://localhost:3005/oslc/eu-rent/query?oslc.where=rdf:type%20in%20%5B%3Chttp://www.omg.org/spec/BMM%23Vision%3E,%3Chttp://www.omg.org/spec/BMM%23Assessment%3E,%3Chttp://www.omg.org/spec/BMM%23OrganizationUnit%3E%5D&oslc.select=dcterms:title,rdf:type
+```
+
+This uses the OSLC query `in` operator to combine multiple `rdf:type` values, plus `oslc.select` to include titles so the Turtle response is human-readable. From any result URI, drill in (fetch the resource itself) to see the outgoing links and jump across the graph.
+
 In oslc-browser's column view, each type has its own navigation column; click a resource title to open its details, expand the accordion to see predicate-grouped outgoing links, and click any link target to drill deeper. The explorer tab (if enabled) renders the link graph visually with typed edges.
 
 ## Fixes that made the end-to-end flow work
