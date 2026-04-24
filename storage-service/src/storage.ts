@@ -44,6 +44,21 @@ export interface MemberBinding {
 }
 
 /**
+ * An incoming link discovered by reverse query: a source resource has
+ * a predicate whose object is the target resource. Used to surface
+ * relationships that are stored on the source side (the normal OSLC
+ * link-ownership pattern) from the perspective of the target resource.
+ *
+ * Note: configurationContextURI (for GCM) is deferred to a future
+ * iteration.
+ */
+export interface IncomingLink {
+  sourceURI: string;
+  predicate: string;
+  targetURI: string;
+}
+
+/**
  * Abstract storage service interface.
  *
  * Provides a container of resources representing RDF graphs.
@@ -118,6 +133,22 @@ export interface StorageService {
    * Optional — only implemented by backends with SPARQL support.
    */
   sparqlQuery?(sparql: string, accept: string): Promise<{ status: number; contentType: string; body: string }>;
+
+  /**
+   * Discover incoming links to one or more target resources within
+   * this storage. Returns triples where a target URI appears as the
+   * object. Optional `predicates` filter restricts the result to
+   * specific link types (full predicate URIs).
+   *
+   * Implementations should exclude infrastructure predicates such as
+   * rdf:type, ldp:contains, oslc:serviceProvider, oslc:instanceShape —
+   * callers asking for "incoming links" want domain relationships, not
+   * the server's own housekeeping triples.
+   *
+   * Optional — only implemented by backends that can efficiently query
+   * for triples matching a given object (e.g., SPARQL-backed stores).
+   */
+  getIncomingLinks?(targetURIs: string[], predicates?: string[]): Promise<IncomingLink[]>;
 
   /**
    * Export the entire dataset in the specified format.
