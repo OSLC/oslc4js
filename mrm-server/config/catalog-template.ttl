@@ -334,53 +334,11 @@
     oslc:usage oslc:default
   ] ;
 
-  # === Query Capabilities ===
-
+  # === Query Capability ===
+  # Single QueryCapability — the server has one /query endpoint that
+  # accepts any OSLC query filter. Clients disambiguate by resource
+  # type (or any other property) via oslc.where.
   oslc:queryCapability [
     a oslc:QueryCapability ;
-    dcterms:title "Query Programs" ;
-    oslc:resourceType mrm:Program ;
-    oslc:resourceShape <domain/MRMS-Shapes#ProgramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Services" ;
-    oslc:resourceType mrm:Service ;
-    oslc:resourceShape <domain/MRMS-Shapes#ServiceShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Processes" ;
-    oslc:resourceType mrm:Process ;
-    oslc:resourceShape <domain/MRMS-Shapes#ProcessShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Resources" ;
-    oslc:resourceType mrm:Resource ;
-    oslc:resourceShape <domain/MRMS-Shapes#ResourceShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Outcomes" ;
-    oslc:resourceType mrm:Outcome ;
-    oslc:resourceShape <domain/MRMS-Shapes#OutcomeShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Organization Units" ;
-    oslc:resourceType mrm:OrganizationUnit ;
-    oslc:resourceShape <domain/MRMS-Shapes#OrganizationUnitShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Target Groups" ;
-    oslc:resourceType mrm:TargetGroup ;
-    oslc:resourceShape <domain/MRMS-Shapes#TargetGroupShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Needs" ;
-    oslc:resourceType mrm:Need ;
-    oslc:resourceShape <domain/MRMS-Shapes#NeedShape>
+    dcterms:title "Query MRM Resources"
   ] .
