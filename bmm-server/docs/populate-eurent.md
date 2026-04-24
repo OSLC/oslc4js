@@ -221,12 +221,15 @@ The example exercises most BMM link types:
 
 Server-generated resource IDs change on every populator run (e.g., `moc3hti8gf9anb`), so the entry points below use **stable** URLs — the catalog, the ServiceProvider, type-filtered queries, and the web UI root. All URLs assume the default `http://localhost:3005` and the `eu-rent` slug.
 
-**oslc-browser (web UI)**
+**URLs worth knowing**
 
-| URL | What you see |
-|-----|-------------|
-| [`http://localhost:3005/`](http://localhost:3005/) | oslc-browser root — the ServiceProviderCatalog as a column. Click `EU-Rent` to drill into it; from there click `Vision` or `Goal` tiles to open a column of those resources, expand any resource accordion to see its outgoing link predicates, and click a predicate to follow the link. |
-| [`http://localhost:3005/oslc/eu-rent`](http://localhost:3005/oslc/eu-rent) | EU-Rent ServiceProvider document — lists all creation factories, query capabilities, and creation dialogs. |
+| URL | Returns | What you see |
+|-----|---------|-------------|
+| [`http://localhost:3005/`](http://localhost:3005/) | HTML (always — no content negotiation on `/`) | oslc-browser SPA. It fetches the catalog on load and renders it as the first column. Click `EU-Rent` to drill in; then a type (`Vision`, `Goal`, …) to open a column of those resources; expand a resource accordion to see its outgoing link predicates; click a predicate to follow the link into a new column. |
+| [`http://localhost:3005/oslc`](http://localhost:3005/oslc) | `text/turtle` or `application/ld+json` | ServiceProviderCatalog — the RDF representation of the list of ServiceProviders. This is the OSLC entry point for machine clients. |
+| [`http://localhost:3005/oslc/eu-rent`](http://localhost:3005/oslc/eu-rent) | `text/turtle` or `application/ld+json` | EU-Rent ServiceProvider document — its single query capability, the creation factories per BMM type, creation dialogs, and publisher. |
+
+> **Note:** `GET /` ignores the `Accept` header and always returns the oslc-browser HTML. If you want the catalog in RDF, go to `/oslc`. Adding content negotiation on `/` (serve HTML for `Accept: text/html`, catalog for `Accept: text/turtle` / `application/rdf+xml` / `application/ld+json`) would be a reasonable future enhancement; currently those are two distinct paths.
 
 **Recommended starting points for exploring the link graph:**
 
