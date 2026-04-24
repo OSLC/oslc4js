@@ -238,6 +238,8 @@ Server-generated resource IDs change on every populator run (e.g., `moc3hti8gf9a
 3. **The depreciation-management chain.** Start from the Assessment *"Opportunity: Improved depreciation management"* → Potential Impact *"Reward: 3% depreciation cost reduction"* → Business Policy *"Minimize depreciation of rental cars"* → the three Tactics that implement it (*"Standard specs"*, *"Equalize car usage"*, *"Comply with maintenance schedules"*) → the Business Rules that enforce those Tactics (*"Car must match standard specification"*, *"Assign lowest-mileage car"*, *"Service scheduling by odometer threshold"*).
 4. **Organizational accountability.** Start from the `EU-Rent Board` OrganizationUnit → follow `isResponsibleFor` to the Vision, `establishes` to the Mission, `recognizes` to the *Eastern Europe growth* Influencer, `makesAssessment` to the *Opportunity: Premium market* Assessment.
 
+**A note on URL encoding.** The query URLs below are shown with their reserved characters percent-encoded — `%3C` for `<`, `%3E` for `>`, `%23` for `#`, `%20` for space, `%5B`/`%5D` for `[`/`]`. The `%23` (`#`) encoding is the critical one: every BMM class URI contains a `#` (e.g., `http://www.omg.org/spec/BMM#Vision`), and browsers treat an unencoded `#` in the address bar as the start of a page fragment — they silently drop everything after it before sending the request, so the server receives a truncated query and returns the wrong (or no) results. Browsers do auto-encode `<` and `>` when you paste them, but never `#`. Always keep the `%23` — decoding the URL "for readability" will break it.
+
 **OSLC query URLs (return Turtle listings by type)**
 
 ```bash
