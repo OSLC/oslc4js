@@ -1,26 +1,24 @@
 ###############################################################################
 # 02-create-service-provider.http — Create a ServiceProvider for an enterprise
 #
-# Creates an EU-Rent ServiceProvider as the container for BMM resources.
-# The actual EU-Rent BMM resources are populated by an AI assistant reading
-# the BMM 1.3 specification (see README.md for the AI-driven workflow).
+# Based on BMM 1.3 examples: a company's business motivation model.
 ###############################################################################
 
 @baseUrl = http://localhost:3005
 
-### Create "EU-Rent" enterprise
+### Create "SolarTech Inc." enterprise
 POST {{baseUrl}}/oslc
 Content-Type: text/turtle
-Slug: eu-rent
+Slug: solartech
 
 @prefix dcterms: <http://purl.org/dc/terms/> .
-<> dcterms:title "EU-Rent" ;
-   dcterms:description "Business Motivation Model for EU-Rent, a European car rental company. Based on the running example in the OMG BMM 1.3 specification." .
+<> dcterms:title "SolarTech Inc." ;
+   dcterms:description "Business Motivation Model for SolarTech Inc., a renewable energy technology company." .
 
 ### Verify the catalog now contains the ServiceProvider
 GET {{baseUrl}}/oslc
 Accept: text/turtle
 
 ### Read the ServiceProvider
-GET {{baseUrl}}/oslc/eu-rent
+GET {{baseUrl}}/oslc/solartech
 Accept: text/turtle

@@ -3,3 +3,6 @@
 /coverage/
 .worktrees/
 node_modules/
+
+# Fuseki runtime state (databases, logs, backups — local-only)
+/run/

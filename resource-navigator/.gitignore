@@ -1,8 +1,0 @@
-# Build artefacts
-build/
-node_modules/
-
-# IDE files
-.project
-.classpath
-.settings/

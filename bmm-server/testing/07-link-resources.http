@@ -1,0 +1,110 @@
+###############################################################################
+# 07-link-resources.http — Add cross-references between BMM resources
+#
+# Uses PUT with If-Match to update resources with links that express
+# the BMM relationships: Vision↔Goals, Goals↔Objectives, Strategies,
+# Assessments↔Influencers, etc.
+#
+# NOTE: Run 03-06 first to create the resources. Then use the actual
+# URIs returned by those POSTs. The URIs below assume the Slug values
+# were accepted as-is by the server.
+###############################################################################
+
+@baseUrl = http://localhost:3005
+@sp = solartech
+
+### ── Read resources to get ETags ─────────────────────────────────────
+
+### Read Vision (to get ETag for update)
+GET {{baseUrl}}/oslc/{{sp}}/resources/vision-market-leader
+Accept: text/turtle
+
+### Read Goal: Market Share
+GET {{baseUrl}}/oslc/{{sp}}/resources/goal-market-share
+Accept: text/turtle
+
+### Read Goal: Customer Satisfaction
+GET {{baseUrl}}/oslc/{{sp}}/resources/goal-customer-satisfaction
+Accept: text/turtle
+
+### Read Strategy: Product Innovation
+GET {{baseUrl}}/oslc/{{sp}}/resources/strategy-product-innovation
+Accept: text/turtle
+
+### Read Assessment: Tax Credit Opportunity
+GET {{baseUrl}}/oslc/{{sp}}/resources/assessment-tax-credit-opportunity
+Accept: text/turtle
+
+### ── Link Vision to Mission and Goals ────────────────────────────────
+# After reading the Vision, copy its ETag into the If-Match header below.
+
+### Update Vision with Mission and Goal links
+# PUT {{baseUrl}}/oslc/{{sp}}/resources/vision-market-leader
+# Content-Type: text/turtle
+# If-Match: "<paste-etag-here>"
+#
+# @prefix dcterms: <http://purl.org/dc/terms/> .
+# @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+# @prefix bmm:     <http://www.omg.org/spec/BMM#> .
+#
+# <> a bmm:Vision ;
+#    dcterms:title "Leading Renewable Energy Provider" ;
+#    dcterms:description "To be the leading provider of affordable, high-efficiency solar energy solutions for residential and commercial markets worldwide." ;
+#    bmm:amplifiedByMission <{{baseUrl}}/oslc/{{sp}}/resources/mission-solar-solutions> ;
+#    bmm:madeOperativeByGoal
+#      <{{baseUrl}}/oslc/{{sp}}/resources/goal-market-share> ,
+#      <{{baseUrl}}/oslc/{{sp}}/resources/goal-customer-satisfaction> ,
+#      <{{baseUrl}}/oslc/{{sp}}/resources/goal-operational-efficiency> .
+
+### ── Link Goals to Objectives ────────────────────────────────────────
+
+### Update Goal: Market Share → Objective
+# PUT {{baseUrl}}/oslc/{{sp}}/resources/goal-market-share
+# Content-Type: text/turtle
+# If-Match: "<paste-etag-here>"
+#
+# @prefix dcterms: <http://purl.org/dc/terms/> .
+# @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+# @prefix bmm:     <http://www.omg.org/spec/BMM#> .
+#
+# <> a bmm:Goal ;
+#    dcterms:title "Grow Market Share" ;
+#    dcterms:description "Increase market share in the residential solar panel market to become the top-three supplier by installed capacity." ;
+#    bmm:amplifiesVision <{{baseUrl}}/oslc/{{sp}}/resources/vision-market-leader> ;
+#    bmm:quantifiedByObjective <{{baseUrl}}/oslc/{{sp}}/resources/obj-market-share-30pct> .
+
+### ── Link Strategies to Goals and Tactics ────────────────────────────
+
+### Update Strategy: Product Innovation → Goal + Tactic
+# PUT {{baseUrl}}/oslc/{{sp}}/resources/strategy-product-innovation
+# Content-Type: text/turtle
+# If-Match: "<paste-etag-here>"
+#
+# @prefix dcterms: <http://purl.org/dc/terms/> .
+# @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+# @prefix bmm:     <http://www.omg.org/spec/BMM#> .
+#
+# <> a bmm:Strategy ;
+#    dcterms:title "Product Innovation Leadership" ;
+#    dcterms:description "Invest in R&D to develop next-generation solar cells with industry-leading efficiency ratings." ;
+#    bmm:channelsEffortsTowardGoal <{{baseUrl}}/oslc/{{sp}}/resources/goal-market-share> ;
+#    bmm:channelsEffortsTowardVision <{{baseUrl}}/oslc/{{sp}}/resources/vision-market-leader> ;
+#    bmm:includesStrategy <> .
+
+### ── Link Assessment to Influencer and PotentialImpact ───────────────
+
+### Update Assessment: Tax Credit → Influencer + Impact
+# PUT {{baseUrl}}/oslc/{{sp}}/resources/assessment-tax-credit-opportunity
+# Content-Type: text/turtle
+# If-Match: "<paste-etag-here>"
+#
+# @prefix dcterms: <http://purl.org/dc/terms/> .
+# @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+# @prefix bmm:     <http://www.omg.org/spec/BMM#> .
+#
+# <> a bmm:Assessment ;
+#    dcterms:title "Tax Credit Drives Residential Demand Growth" ;
+#    dcterms:description "The ITC extension is projected to increase residential solar adoption by 25-30% through 2030." ;
+#    bmm:assessesInfluencer <{{baseUrl}}/oslc/{{sp}}/resources/influencer-tax-credits> ;
+#    bmm:identifiesPotentialImpact <{{baseUrl}}/oslc/{{sp}}/resources/impact-market-window> ;
+#    bmm:affectsAchievementOfEnd <{{baseUrl}}/oslc/{{sp}}/resources/goal-market-share> .

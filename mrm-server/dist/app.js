@@ -6,7 +6,7 @@ import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { oslcService } from 'oslc-service';
-import { JenaStorageService } from 'ldp-service-jena';
+import { JenaStorageService } from 'jena-storage-service';
 import { env } from './env.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

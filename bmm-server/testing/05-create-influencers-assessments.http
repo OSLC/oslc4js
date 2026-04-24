@@ -1,0 +1,136 @@
+###############################################################################
+# 05-create-influencers-assessments.http — Influencers, Assessments, Impacts
+#
+# BMM Assessment model:
+#   Influencer → assessed by → Assessment → identifies → PotentialImpact
+#   Assessment uses SWOT categories (Strength, Weakness, Opportunity, Threat)
+###############################################################################
+
+@baseUrl = http://localhost:3005
+
+### ── Influencers ─────────────────────────────────────────────────────
+
+### Influencer 1: Government Tax Credits (External - Opportunity)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: influencer-tax-credits
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Influencer ;
+   dcterms:title "Federal Solar Investment Tax Credit Extension" ;
+   dcterms:description "The US federal government extended the 30% Investment Tax Credit (ITC) for residential solar installations through 2032 under the Inflation Reduction Act." ;
+   bmm:influencerCategory "Regulation" .
+
+### Influencer 2: Chinese Panel Dumping (External - Threat)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: influencer-price-competition
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Influencer ;
+   dcterms:title "Low-Cost Import Competition" ;
+   dcterms:description "Aggressive pricing from overseas manufacturers is compressing margins across the domestic solar panel market, with some imports priced 40% below domestic production cost." ;
+   bmm:influencerCategory "Competition" .
+
+### Influencer 3: Skilled Labor Shortage (Internal - Weakness)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: influencer-labor-shortage
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Influencer ;
+   dcterms:title "Certified Installer Shortage" ;
+   dcterms:description "Industry-wide shortage of NABCEP-certified solar installers is constraining installation capacity and extending lead times to 8+ weeks." ;
+   bmm:influencerCategory "Resource" .
+
+### Influencer 4: Perovskite Technology Breakthrough (Internal - Strength)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: influencer-perovskite
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Influencer ;
+   dcterms:title "Perovskite Tandem Cell Breakthrough" ;
+   dcterms:description "SolarTech's R&D lab has achieved a 31.2% efficiency perovskite-silicon tandem cell in laboratory conditions, ahead of competitors." ;
+   bmm:influencerCategory "Technology" .
+
+### ── Assessments ─────────────────────────────────────────────────────
+
+### Assessment 1: Tax Credit = Opportunity for Market Share goal
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: assessment-tax-credit-opportunity
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Assessment ;
+   dcterms:title "Tax Credit Drives Residential Demand Growth" ;
+   dcterms:description "The ITC extension is projected to increase residential solar adoption by 25-30% through 2030. This creates a significant window for market share capture if SolarTech can scale installation capacity to meet demand." .
+
+### Assessment 2: Import Competition = Threat to Efficiency goal
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: assessment-import-threat
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Assessment ;
+   dcterms:title "Import Pricing Threatens Margin Sustainability" ;
+   dcterms:description "Current import pricing is below SolarTech's variable manufacturing cost for standard panels. Without vertical integration or tariff protection, commodity panel margins will erode to unsustainable levels within 18 months." .
+
+### Assessment 3: Labor Shortage = Weakness affecting Customer Experience strategy
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: assessment-labor-weakness
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Assessment ;
+   dcterms:title "Installer Shortage Constrains Growth and Quality" ;
+   dcterms:description "The certified installer shortage limits both installation volume (constraining market share growth) and quality consistency (threatening NPS targets). The Certified Installer Network tactic directly addresses this by training and certifying new installers." .
+
+### ── Potential Impacts ───────────────────────────────────────────────
+
+### PotentialImpact 1: Market window from tax credits
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: impact-market-window
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:PotentialImpact ;
+   dcterms:title "5-Year Market Expansion Window" ;
+   dcterms:description "The ITC extension creates a 5-year window of accelerated residential solar demand. Reward: companies that scale fastest will capture durable market share. Risk: overinvestment if the credit is not renewed beyond 2032." .
+
+### PotentialImpact 2: Margin erosion from imports
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: impact-margin-erosion
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:PotentialImpact ;
+   dcterms:title "Commodity Panel Margin Collapse" ;
+   dcterms:description "If SolarTech competes on price in the commodity panel segment, gross margins will fall below 10%. This provides impetus for the Product Innovation strategy — differentiate on efficiency rather than competing on price." .

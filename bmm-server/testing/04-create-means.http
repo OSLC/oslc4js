@@ -1,0 +1,179 @@
+###############################################################################
+# 04-create-means.http — Create Mission, Strategies, Tactics, Policies, Rules
+#
+# BMM Means hierarchy:
+#   Mission (makes Vision operative)
+#   Strategy → Tactic (courses of action)
+#   BusinessPolicy → BusinessRule (directives)
+###############################################################################
+
+@baseUrl = http://localhost:3005
+
+### ── Mission ─────────────────────────────────────────────────────────
+
+### Create the enterprise Mission
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: mission-solar-solutions
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Mission ;
+   dcterms:title "Deliver Affordable Solar Energy Solutions" ;
+   dcterms:description "Design, manufacture, and install high-efficiency solar energy systems for residential and commercial customers, providing end-to-end service from site assessment through installation, monitoring, and maintenance." .
+
+### ── Strategies ──────────────────────────────────────────────────────
+
+### Strategy 1: Product Innovation (channels efforts toward Market Share goal)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: strategy-product-innovation
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Strategy ;
+   dcterms:title "Product Innovation Leadership" ;
+   dcterms:description "Invest in R&D to develop next-generation solar cells with industry-leading efficiency ratings. Differentiate through technology rather than price alone." .
+
+### Strategy 2: Customer Experience (channels efforts toward Satisfaction goal)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: strategy-customer-experience
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Strategy ;
+   dcterms:title "End-to-End Customer Experience" ;
+   dcterms:description "Own the entire customer journey from initial consultation through 25-year warranty, building long-term relationships and generating referrals." .
+
+### Strategy 3: Supply Chain Optimization (channels efforts toward Efficiency goal)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: strategy-supply-chain
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Strategy ;
+   dcterms:title "Vertical Supply Chain Integration" ;
+   dcterms:description "Reduce dependency on external suppliers by vertically integrating key components — silicon wafer production, cell manufacturing, and module assembly — to control costs and quality." .
+
+### ── Tactics ─────────────────────────────────────────────────────────
+
+### Tactic 1: R&D Lab Expansion (implements Product Innovation strategy)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: tactic-rd-lab
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Tactic ;
+   dcterms:title "Expand Perovskite Research Lab" ;
+   dcterms:description "Establish a dedicated perovskite tandem cell research facility with 30 researchers, targeting a 33% efficiency prototype by 2026." .
+
+### Tactic 2: Installer Certification (implements Customer Experience strategy)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: tactic-installer-cert
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Tactic ;
+   dcterms:title "Certified Installer Network" ;
+   dcterms:description "Build a network of certified installation partners with mandatory training, quality audits, and customer satisfaction scoring. Decertify partners below threshold." .
+
+### Tactic 3: Wafer Plant Construction (implements Supply Chain strategy)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: tactic-wafer-plant
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:Tactic ;
+   dcterms:title "Build Silicon Wafer Production Facility" ;
+   dcterms:description "Construct a 2GW silicon wafer production facility in Arizona to reduce raw material costs by 35% and eliminate single-supplier risk." .
+
+### ── Business Policies ───────────────────────────────────────────────
+
+### Policy 1: Quality Standards
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: policy-quality-standards
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:BusinessPolicy ;
+   dcterms:title "Product Quality Standards" ;
+   dcterms:description "All SolarTech products shall meet or exceed IEC 61215 and IEC 61730 certification standards. No product may ship without passing a full electroluminescence inspection." .
+
+### Policy 2: Customer Data Protection
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: policy-data-protection
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:BusinessPolicy ;
+   dcterms:title "Customer Data Protection" ;
+   dcterms:description "Customer energy production data, financial information, and personal details shall be protected in accordance with applicable privacy regulations and shall never be shared with third parties without explicit consent." .
+
+### ── Business Rules ──────────────────────────────────────────────────
+
+### Rule 1: Warranty Claim Response Time (based on Quality Standards policy)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: rule-warranty-response
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:BusinessRule ;
+   dcterms:title "Warranty Claim 48-Hour Response" ;
+   dcterms:description "All warranty claims must receive an initial response within 48 hours and a technician dispatch within 5 business days." ;
+   bmm:enforcementLevel "Strictly enforced" .
+
+### Rule 2: Panel Efficiency Floor (based on Quality Standards policy)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: rule-efficiency-floor
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:BusinessRule ;
+   dcterms:title "Minimum Panel Efficiency 22%" ;
+   dcterms:description "No solar panel may be released for sale with a rated efficiency below 22%. Panels below this threshold must be reworked or scrapped." ;
+   bmm:enforcementLevel "Strictly enforced" .
+
+### Rule 3: Data Retention Limit (based on Data Protection policy)
+POST {{baseUrl}}/oslc/solartech/resources
+Content-Type: text/turtle
+Slug: rule-data-retention
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bmm:     <http://www.omg.org/spec/BMM#> .
+
+<> a bmm:BusinessRule ;
+   dcterms:title "Customer Data Retained Maximum 7 Years" ;
+   dcterms:description "Customer personal data shall be purged within 7 years after the end of the warranty period unless the customer opts in to extended monitoring." ;
+   bmm:enforcementLevel "Override with explanation" .
