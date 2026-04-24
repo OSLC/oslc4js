@@ -65,8 +65,11 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
         </>
       )}
 
-      {/* Link properties */}
-      {resource.links.length > 0 && (
+      {/* Link properties — outgoing links and incoming links rendered
+          uniformly, with incoming links using their inverseLabel from
+          the source property's shape so link ownership is transparent. */}
+      {(resource.links.length > 0 ||
+        (resource.incomingLinks && resource.incomingLinks.length > 0)) && (
         <>
           <Divider sx={{ my: 1 }} />
           <Typography variant="overline" sx={{ fontSize: 11 }}>Links</Typography>
@@ -79,7 +82,7 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
             </TableHead>
             <TableBody>
               {resource.links.map((link, i) => (
-                <TableRow key={link.predicate + link.targetURI + i}>
+                <TableRow key={'out-' + link.predicate + link.targetURI + i}>
                   <TableCell sx={{ fontSize: 12 }} title={link.predicate}>
                     {link.predicateLabel}
                   </TableCell>
@@ -91,6 +94,26 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
                       title={link.targetURI}
                     >
                       {link.targetTitle ?? link.targetURI}
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {(resource.incomingLinks ?? []).map((link, i) => (
+                <TableRow key={'in-' + link.predicate + link.sourceURI + i}>
+                  <TableCell
+                    sx={{ fontSize: 12, fontStyle: 'italic' }}
+                    title={`${link.predicate} (incoming — stored on source)`}
+                  >
+                    {link.inverseLabel ?? link.predicateLabel}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 12 }}>
+                    <Link
+                      component="button"
+                      onClick={() => onLinkClick(link.sourceURI)}
+                      sx={{ fontSize: 12, textAlign: 'left' }}
+                      title={link.sourceURI}
+                    >
+                      {link.sourceTitle ?? link.sourceURI}
                     </Link>
                   </TableCell>
                 </TableRow>

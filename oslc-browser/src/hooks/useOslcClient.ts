@@ -1,7 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
+import * as rdflib from 'rdflib';
 import OSLCClient, { type OSLCResource } from 'oslc-client';
 import {
   type ConnectionState,
+  type IncomingLink,
   type LoadedResource,
   type ResourceProperty,
   type ResourceLink,
@@ -21,6 +23,9 @@ export interface UseOslcClientReturn {
   fetchRawResource: (uri: string) => Promise<OSLCResource | null>;
   /** Get the underlying OSLCClient instance (for diagram auto-generation) */
   getClient: () => OSLCClient | null;
+  /** Fetch incoming links targeting a resource. Merges same-server and
+   *  cross-server sources. */
+  fetchIncomingLinks: (targetURI: string) => Promise<IncomingLink[]>;
 }
 
 interface RdfStatement {
@@ -496,6 +501,137 @@ async function resolveLinkTitles(
   }
 }
 
+/** Cache of resolved resource titles used as link labels. */
+const incomingTitleCache = titleCache;
+
+/**
+ * Resolve source titles for a list of incoming links, mutating in place.
+ * Reuses the same title resolution logic (compact → GET → localName) and
+ * title cache used for outgoing links. Cross-origin source URIs are
+ * routed through the current server's /resource?uri= lookup so a single
+ * browser origin can resolve links that live on other servers.
+ */
+async function resolveIncomingLinkSourceTitles(
+  incoming: IncomingLink[],
+  client: OSLCClient,
+  serverURL: string
+): Promise<void> {
+  const toResolve = new Map<string, IncomingLink[]>();
+  for (const link of incoming) {
+    if (incomingTitleCache.has(link.sourceURI)) {
+      link.sourceTitle = incomingTitleCache.get(link.sourceURI);
+      continue;
+    }
+    if (!toResolve.has(link.sourceURI)) {
+      toResolve.set(link.sourceURI, []);
+    }
+    toResolve.get(link.sourceURI)!.push(link);
+  }
+
+  if (toResolve.size === 0) return;
+
+  const serverOrigin = serverURL ? new URL(serverURL).origin : '';
+  const entries = [...toResolve.entries()];
+  const batchSize = 10;
+  for (let i = 0; i < entries.length; i += batchSize) {
+    const batch = entries.slice(i, i + batchSize);
+    await Promise.all(batch.map(async ([uri, linkRefs]) => {
+      let title: string | undefined;
+
+      if (serverOrigin) {
+        try {
+          const compactURL = `${serverOrigin}/compact?uri=${encodeURIComponent(uri)}`;
+          const compactResource = await client.getResource(compactURL, '3.0', 'text/turtle');
+          title = compactResource.getTitle();
+        } catch { /* compact not available */ }
+      }
+
+      if (!title) {
+        try {
+          let fetchURI = uri;
+          if (serverOrigin && !uri.startsWith(serverOrigin)) {
+            fetchURI = `${serverOrigin}/resource?uri=${encodeURIComponent(uri)}`;
+          }
+          const resource = await client.getResource(fetchURI, '3.0', 'text/turtle');
+          title = resource.getTitle();
+        } catch { /* resource not fetchable */ }
+      }
+
+      if (!title) title = localName(uri);
+      incomingTitleCache.set(uri, title);
+      for (const ref of linkRefs) ref.sourceTitle = title;
+    }));
+  }
+}
+
+/**
+ * POST Turtle to `{origin}/discover-links` for same-server incoming
+ * link discovery. Returns [] if the endpoint is absent (501, 404) or
+ * the server is unreachable — callers should degrade gracefully.
+ */
+async function fetchSameServerIncomingLinks(
+  targetURI: string,
+  username: string,
+  password: string,
+  getInverseLabel: (predicateURI: string) => string | undefined
+): Promise<IncomingLink[]> {
+  let serverBase: string;
+  try {
+    serverBase = new URL(targetURI).origin;
+  } catch {
+    return [];
+  }
+
+  const turtle =
+    `@prefix oslc_ldm: <http://open-services.net/ns/ldm#> .\n` +
+    `[] oslc_ldm:resources <${targetURI}> .\n`;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'text/turtle',
+    'Accept': 'text/turtle',
+  };
+  if (username && password) {
+    headers['Authorization'] = 'Basic ' + btoa(`${username}:${password}`);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${serverBase}/discover-links`, {
+      method: 'POST',
+      headers,
+      body: turtle,
+      credentials: 'include',
+    });
+  } catch {
+    return [];
+  }
+
+  if (!response.ok) return [];
+
+  const responseTurtle = await response.text();
+  if (!responseTurtle) return [];
+
+  const store = rdflib.graph();
+  try {
+    rdflib.parse(responseTurtle, store, serverBase, 'text/turtle');
+  } catch {
+    return [];
+  }
+
+  const targetSym = rdflib.sym(targetURI);
+  const statements = store.statementsMatching(null, null, targetSym);
+
+  return statements
+    .filter(st => st.subject.termType === 'NamedNode')
+    .map(st => ({
+      sourceURI: st.subject.value,
+      predicate: st.predicate.value,
+      predicateLabel: localName(st.predicate.value),
+      inverseLabel: getInverseLabel(st.predicate.value),
+      origin: 'same-server' as const,
+    }));
+}
+
 export function useOslcClient(): UseOslcClientReturn {
   const [connection, setConnection] = useState<ConnectionState>(() => {
     const saved = loadSavedConnection();
@@ -508,7 +644,10 @@ export function useOslcClient(): UseOslcClientReturn {
     };
   });
   const clientRef = useRef<OSLCClient | null>(null);
-  const { getShape } = useShapeCache();
+  const { getShape, getInverseLabel } = useShapeCache();
+  // Tracks ServiceProvider URIs whose shapes have already been seeded
+  // into the cache, so repeat visits don't re-crawl the catalog.
+  const seededSPs = useRef<Set<string>>(new Set());
 
   /** Fetch a shape using the current OSLCClient */
   const shapeLookup = useCallback(async (shapeURI: string): Promise<ParsedShape | null> => {
@@ -517,6 +656,62 @@ export function useOslcClient(): UseOslcClientReturn {
     const fetchFn = async (uri: string) => client.getResource(uri, '3.0', 'text/turtle');
     return getShape(shapeURI, fetchFn);
   }, [getShape]);
+
+  /**
+   * Walk a ServiceProvider's CreationFactories and pre-fetch every
+   * declared oslc:resourceShape into the shape cache.
+   *
+   * Why: `getInverseLabel(predicate)` searches cached shapes for an
+   * inverseLabel declared on the property definition for `predicate`.
+   * That definition lives on the *source* side of the relationship
+   * (e.g., `channelsEffortsToward` is declared on StrategyShape). When
+   * the user navigates to a Vision resource, only VisionShape ends up
+   * cached by instanceShape parsing — so incoming-link inverse labels
+   * would miss. Seeding the cache from the catalog fixes that.
+   *
+   * This runs once per ServiceProvider URI. Failures are swallowed —
+   * labels will fall back to the forward predicate's local name.
+   */
+  const seedShapesFromServiceProvider = useCallback(async (spURI: string): Promise<void> => {
+    if (seededSPs.current.has(spURI)) return;
+    seededSPs.current.add(spURI);
+
+    const client = clientRef.current;
+    if (!client) return;
+
+    try {
+      const sp = await client.getResource(spURI, '3.0', 'text/turtle');
+      const store = sp?.store;
+      if (!store) return;
+
+      const spSym = store.sym(spURI);
+      const oslcSym = (local: string) => store.sym(`http://open-services.net/ns/core#${local}`);
+
+      const shapeURIs = new Set<string>();
+
+      // Walk Services → CreationFactories → resourceShape
+      const services = store.each(spSym, oslcSym('service'), null);
+      for (const service of services) {
+        const factories = store.each(service, oslcSym('creationFactory'), null);
+        for (const factory of factories) {
+          const shapeNodes = store.each(factory, oslcSym('resourceShape'), null);
+          for (const sn of shapeNodes) {
+            if (sn.termType === 'NamedNode') shapeURIs.add(sn.value);
+          }
+        }
+      }
+
+      // Fetch each unique shape URI in parallel (bounded by shape count,
+      // which is fixed per domain).
+      await Promise.all(
+        [...shapeURIs].map(uri =>
+          shapeLookup(uri).catch(() => null)
+        )
+      );
+    } catch {
+      // Seeding is best-effort; silently continue
+    }
+  }, [shapeLookup]);
 
   const setServerURL = useCallback((url: string) => {
     setConnection(prev => ({ ...prev, serverURL: url }));
@@ -529,6 +724,36 @@ export function useOslcClient(): UseOslcClientReturn {
   const setPassword = useCallback((pass: string) => {
     setConnection(prev => ({ ...prev, password: pass }));
   }, []);
+
+  const fetchIncomingLinks = useCallback(async (
+    targetURI: string
+  ): Promise<IncomingLink[]> => {
+    if (targetURI.startsWith('_:')) return [];
+
+    // Same-server and cross-server lookup run in parallel. Cross-server
+    // discovery via oslc-client LDMClient is not yet wired up — when an
+    // LDM provider / LQE is configured in the future, invoke it here
+    // and return the triples mapped to IncomingLink with origin
+    // 'cross-server'.
+    const [same, cross] = await Promise.all([
+      fetchSameServerIncomingLinks(
+        targetURI,
+        connection.username,
+        connection.password,
+        getInverseLabel
+      ).catch(() => [] as IncomingLink[]),
+      Promise.resolve([] as IncomingLink[]),
+    ]);
+
+    // Deduplicate on (sourceURI, predicate). Prefer same-server when the
+    // same triple appears in both (e.g., LQE replicated data).
+    const seen = new Map<string, IncomingLink>();
+    for (const link of [...same, ...cross]) {
+      const key = `${link.sourceURI}|${link.predicate}`;
+      if (!seen.has(key)) seen.set(key, link);
+    }
+    return [...seen.values()];
+  }, [connection.username, connection.password, getInverseLabel]);
 
   const fetchResource = useCallback(async (uri: string): Promise<LoadedResource | null> => {
     const client = clientRef.current;
@@ -548,15 +773,39 @@ export function useOslcClient(): UseOslcClientReturn {
       const resource = await client.getResource(fetchURI);
       const loaded = await parseOslcResource(resource, uri, shapeLookup);
 
+      // Seed the shape cache from the resource's ServiceProvider before
+      // fetching incoming links. Inverse labels for incoming predicates
+      // live on the source-side shape (e.g., Strategy's
+      // channelsEffortsToward), which otherwise would never be fetched
+      // when the user is viewing just a Vision.
+      const spLink = loaded.links.find(
+        l => l.predicate === 'http://open-services.net/ns/core#serviceProvider'
+      ) ?? loaded.members?.[0]?.links.find(
+        l => l.predicate === 'http://open-services.net/ns/core#serviceProvider'
+      );
+      if (spLink) {
+        await seedShapesFromServiceProvider(spLink.targetURI);
+      }
+
       // Resolve human-readable titles for link targets
       await resolveLinkTitles(loaded.links, client, connection.serverURL);
+
+      // Incoming link discovery — skip for query results (they are
+      // containers, not individual resources) and for blank nodes.
+      if (!loaded.isQueryResult && !uri.startsWith('_:')) {
+        const incoming = await fetchIncomingLinks(uri);
+        if (incoming.length > 0) {
+          await resolveIncomingLinkSourceTitles(incoming, client, connection.serverURL);
+          loaded.incomingLinks = incoming;
+        }
+      }
 
       return loaded;
     } catch (err) {
       console.error('Error fetching resource:', uri, err);
       return null;
     }
-  }, [connection.serverURL, shapeLookup]);
+  }, [connection.serverURL, shapeLookup, fetchIncomingLinks, seedShapesFromServiceProvider]);
 
   const connect = useCallback(async (): Promise<LoadedResource | null> => {
     setConnection(prev => ({ ...prev, connecting: true, error: undefined }));
@@ -613,5 +862,15 @@ export function useOslcClient(): UseOslcClientReturn {
     return clientRef.current;
   }, []);
 
-  return { connection, setServerURL, setUsername, setPassword, connect, fetchResource, fetchRawResource, getClient };
+  return {
+    connection,
+    setServerURL,
+    setUsername,
+    setPassword,
+    connect,
+    fetchResource,
+    fetchRawResource,
+    getClient,
+    fetchIncomingLinks,
+  };
 }

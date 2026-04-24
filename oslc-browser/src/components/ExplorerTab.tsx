@@ -15,10 +15,17 @@ interface GraphNode {
   isCenter: boolean;
 }
 
+interface EdgeLabel {
+  text: string;
+  /** Incoming labels are italicized to indicate the underlying triple
+   *  is stored on another resource (this resource doesn't own it). */
+  italic: boolean;
+}
+
 interface GraphEdge {
   source: GraphNode;
   target: GraphNode;
-  label: string;
+  labels: EdgeLabel[];
 }
 
 function computeLayout(resource: LoadedResource, width: number, height: number): { nodes: GraphNode[]; edges: GraphEdge[] } {
@@ -33,34 +40,65 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
     isCenter: true,
   };
 
-  // Deduplicate targets by URI
-  const uniqueLinks = new Map<string, { label: string; targetTitle: string }>();
+  // Collect neighbors — outgoing links contribute directly; incoming
+  // links are rendered in the same center→neighbor direction using the
+  // inverseLabel declared on the source property's shape (so link
+  // ownership is transparent), but italicized to signal the underlying
+  // triple is stored on the source side.
+  interface Neighbor {
+    title: string;
+    labels: EdgeLabel[];
+  }
+  const neighbors = new Map<string, Neighbor>();
+
+  const pushUnique = (labels: EdgeLabel[], next: EdgeLabel): void => {
+    if (!labels.some(l => l.text === next.text && l.italic === next.italic)) {
+      labels.push(next);
+    }
+  };
+
   for (const link of resource.links) {
-    if (!uniqueLinks.has(link.targetURI)) {
-      uniqueLinks.set(link.targetURI, {
-        label: link.predicateLabel,
-        targetTitle: link.targetTitle ?? link.targetURI.split('/').pop() ?? link.targetURI,
-      });
+    const existing = neighbors.get(link.targetURI) ?? {
+      title: link.targetTitle ?? link.targetURI.split('/').pop() ?? link.targetURI,
+      labels: [],
+    };
+    pushUnique(existing.labels, { text: link.predicateLabel, italic: false });
+    neighbors.set(link.targetURI, existing);
+  }
+
+  if (resource.incomingLinks) {
+    for (const link of resource.incomingLinks) {
+      const text = link.inverseLabel ?? link.predicateLabel;
+      const existing = neighbors.get(link.sourceURI) ?? {
+        title: link.sourceTitle ?? link.sourceURI.split('/').pop() ?? link.sourceURI,
+        labels: [],
+      };
+      pushUnique(existing.labels, { text, italic: true });
+      neighbors.set(link.sourceURI, existing);
     }
   }
 
-  const count = uniqueLinks.size;
+  const count = neighbors.size;
   const radius = Math.min(width, height) * 0.35;
   const nodes: GraphNode[] = [centerNode];
   const edges: GraphEdge[] = [];
 
   let i = 0;
-  for (const [uri, info] of uniqueLinks) {
-    const angle = (2 * Math.PI * i) / count - Math.PI / 2;
-    const targetNode: GraphNode = {
+  for (const [uri, info] of neighbors) {
+    const angle = count === 0 ? 0 : (2 * Math.PI * i) / count - Math.PI / 2;
+    const neighborNode: GraphNode = {
       uri,
-      label: info.targetTitle,
+      label: info.title,
       x: cx + radius * Math.cos(angle),
       y: cy + radius * Math.sin(angle),
       isCenter: false,
     };
-    nodes.push(targetNode);
-    edges.push({ source: centerNode, target: targetNode, label: info.label });
+    nodes.push(neighborNode);
+    edges.push({
+      source: centerNode,
+      target: neighborNode,
+      labels: info.labels,
+    });
     i++;
   }
 
@@ -80,10 +118,14 @@ export function ExplorerTabComponent({ resource, onNodeClick }: ExplorerTabProps
     [resource, width, height]
   );
 
-  if (resource.links.length === 0) {
+  const hasLinks =
+    resource.links.length > 0 ||
+    (resource.incomingLinks && resource.incomingLinks.length > 0);
+
+  if (!hasLinks) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Typography color="text.secondary" fontSize={13}>No outgoing links to visualize</Typography>
+        <Typography color="text.secondary" fontSize={13}>No links to visualize</Typography>
       </Box>
     );
   }
@@ -117,7 +159,16 @@ export function ExplorerTabComponent({ resource, onNodeClick }: ExplorerTabProps
           return (
             <g key={`edge-${i}`}>
               <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#999" strokeWidth={1} markerEnd="url(#arrowhead)" />
-              <text x={mx} y={my - 4} textAnchor="middle" fontSize={10} fill="#666">{edge.label}</text>
+              <text x={mx} y={my - 4} textAnchor="middle" fontSize={10} fill="#666">
+                {edge.labels.map((lab, li) => (
+                  <tspan
+                    key={li}
+                    fontStyle={lab.italic ? 'italic' : 'normal'}
+                  >
+                    {li > 0 ? ', ' : ''}{lab.text}
+                  </tspan>
+                ))}
+              </text>
             </g>
           );
         })}
