@@ -176,8 +176,8 @@ The actual command that scaffolded `bmm-server`:
 
 ```bash
 npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
-  --vocab  "mrm-server/archive/Municipal Reference Model/Municipal Reference Model/BMM.ttl" \
-  --shapes "mrm-server/archive/Municipal Reference Model/Municipal Reference Model/BMM-Shapes.ttl" \
+  --vocab  "bmm-server/config/domain/BMM.ttl" \
+  --shapes "bmm-server/config/domain/BMM-Shapes.ttl" \
   --managed Vision,Goal,Objective,Mission,Strategy,Tactic,BusinessPolicy,
             BusinessRule,Influencer,Assessment,PotentialImpact,
             OrganizationUnit,BusinessProcess,Asset

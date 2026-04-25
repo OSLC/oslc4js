@@ -64,12 +64,12 @@ The actual command used to scaffold `bmm-server`, run from the `oslc4js` workspa
 
 ```bash
 npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
-  --vocab  "mrm-server/archive/Municipal Reference Model/Municipal Reference Model/BMM.ttl" \
-  --shapes "mrm-server/archive/Municipal Reference Model/Municipal Reference Model/BMM-Shapes.ttl" \
+  --vocab  "bmm-server/config/domain/BMM.ttl" \
+  --shapes "bmm-server/config/domain/BMM-Shapes.ttl" \
   --managed Vision,Goal,Objective,Mission,Strategy,Tactic,BusinessPolicy,BusinessRule,Influencer,Assessment,PotentialImpact,OrganizationUnit,BusinessProcess,Asset
 ```
 
-The vocabulary and shapes lived in the MRM workspace's archive at the time (legacy of an earlier exploration); the script copied them into `bmm-server/config/domain/`. The `--managed` list names the 14 instantiable BMM classes that get creation factories, query capabilities, and creation dialogs. Anything not in that list still has a vocabulary entry and a shape but doesn't get an OSLC service surface — useful for abstract classes (Means, End, Directive, CourseOfAction) that exist as supertypes but are never instantiated directly.
+The `--managed` list names the 14 instantiable BMM classes that get creation factories, query capabilities, and creation dialogs. Anything not in that list still has a vocabulary entry and a shape but doesn't get an OSLC service surface — useful for abstract classes (Means, End, Directive, CourseOfAction) that exist as supertypes but are never instantiated directly.
 
 After the command completes, `cd bmm-server && npm install && npm run build && npm start` brings up the running server. The entire authored surface area of `bmm-server` after that is its declarative `config/` content; no domain code was written.
 
