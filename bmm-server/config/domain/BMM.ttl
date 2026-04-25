@@ -1,17 +1,29 @@
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix dc11:    <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix oslc_am: <http://open-services.net/ns/am#> .
 @prefix bmm:     <http://www.omg.org/spec/BMM#> .
+@prefix vann:        <http://purl.org/vocab/vann/> .
 
 # Ontology declaration
 <http://www.omg.org/spec/BMM>
   a owl:Ontology ;
   owl:imports <http://open-services.net/ns/am> ;
-  dc11:title "OMG Business Motivation Model Vocabulary" ;
-  dc11:description "RDF vocabulary for the OMG Business Motivation Model (BMM) 1.3 metamodel, adapted for OSLC. BMM provides a scheme for developing, communicating, and managing business plans in an organized manner." .
+  dcterms:title "OMG Business Motivation Model Vocabulary" ;
+  dcterms:description "RDF vocabulary for the OMG Business Motivation Model (BMM) 1.3 metamodel, adapted for OSLC. BMM provides a scheme for developing, communicating, and managing business plans in an organized manner." ;
+  rdfs:label "OMG Business Motivation Model Vocabulary" ;
+  vann:preferredNamespacePrefix "bmm" ;
+  dcterms:publisher <https://open-services.net/about/> ;
+  dcterms:issued "2026-04-24"^^<http://www.w3.org/2001/XMLSchema#date> ;
+  dcterms:license <http://www.apache.org/licenses/LICENSE-2.0> ;
+  dcterms:source </Users/jamsden/Developer/OSLC/oslc4js/bmm-server/config/domain/BMM.ttl> ;
+  dcterms:isPartOf </Users/jamsden/Developer/OSLC/oslc4js/bmm-server/config/domain/BMM.ttl> ;
+  dcterms:hasVersion "WD" ;
+  dcterms:dateCopyrighted  "2012-2022" .
+
 
 # ============================================================
 # Abstract / Mixin Classes
@@ -191,19 +203,19 @@ bmm:InfluencerCategoryType-Threat
 # as triples, so they are not declared here.
 # ============================================================
 
-# Vision → Mission
+# Vision → Goal
 bmm:amplifiedBy
   a rdf:Property ;
   rdfs:domain bmm:Vision ;
-  rdfs:range bmm:Mission ;
-  dc11:description "The Mission that amplifies this Vision." .
+  rdfs:range bmm:Goal ;
+  dc11:description "A Goal that amplifies this Vision into more specific desired results." .
 
-# Vision → Goal
+# Vision → Mission
 bmm:madeOperativeBy
   a rdf:Property ;
   rdfs:domain bmm:Vision ;
-  rdfs:range bmm:Goal ;
-  dc11:description "A Goal that makes this Vision operative — indicates what must be done to make the Vision a reality." .
+  rdfs:range bmm:Mission ;
+  dc11:description "The Mission that makes this Vision operative — indicates what must be done to make the Vision a reality." .
 
 # Goal → Objective
 bmm:quantifiedBy
@@ -421,8 +433,8 @@ bmm:subOrganizationUnits
 bmm:realizes
   a rdf:Property ;
   rdfs:domain bmm:BusinessProcess ;
-  rdfs:range bmm:Asset ;
-  dc11:description "An Asset that this BusinessProcess uses or realizes." .
+  rdfs:range bmm:Tactic ;
+  dc11:description "A Tactic that this BusinessProcess realizes." .
 
 bmm:governedByBusinessRule
   a rdf:Property ;

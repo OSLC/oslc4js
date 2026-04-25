@@ -278,49 +278,6 @@ mk ASSET_BRAND create_assets '{
 }' "Asset: EU-Rent brand"
 
 # ============================================================
-# Layer 0: Business Processes (no outgoing BMM links to new
-# types; realizes Assets and governedByBusinessRule set later)
-# ============================================================
-echo ""
-echo "── Business Processes ────────────────────────────────────"
-
-mk PROC_RESERVATION create_business_processes "$(cat <<JSON
-{
-  "title": "Rental reservation process",
-  "description": "Advance rental bookings accepted by phone, internet, or in person at any EU-Rent branch.",
-  "realizes": "$ASSET_INET_SW"
-}
-JSON
-)" "Process: Reservation"
-
-mk PROC_PICKUP create_business_processes "$(cat <<JSON
-{
-  "title": "Car pickup and return",
-  "description": "In-branch handling of customer arrival, car assignment (lowest mileage in group), documentation, and car return including odometer/service checks.",
-  "realizes": "$ASSET_FLEET"
-}
-JSON
-)" "Process: Pickup & return"
-
-mk PROC_MAINTENANCE create_business_processes "$(cat <<JSON
-{
-  "title": "Vehicle maintenance",
-  "description": "Scheduled maintenance per manufacturer schedule, with small branches outsourcing maintenance and larger branches performing it in-house.",
-  "realizes": "$ASSET_FLEET"
-}
-JSON
-)" "Process: Maintenance"
-
-mk PROC_PURCHASE create_business_processes "$(cat <<JSON
-{
-  "title": "Car purchase and disposal",
-  "description": "National-level guidance on which models to buy, mix and numbers, when to dispose by mileage and age, and phasing of purchasing and delivery.",
-  "realizes": "$ASSET_FLEET"
-}
-JSON
-)" "Process: Car purchase/disposal"
-
-# ============================================================
 # Layer 1: Objectives (no outgoing BMM links - Goals will
 # point to them via quantifiedBy)
 # ============================================================
@@ -401,7 +358,7 @@ mk MISSION create_missions '{
 }' "Mission"
 
 # ============================================================
-# Vision (amplifiedBy -> Mission, madeOperativeBy -> Goals)
+# Vision (amplifiedBy -> Goals, madeOperativeBy -> Mission)
 # ============================================================
 echo ""
 echo "── Vision ────────────────────────────────────────────────"
@@ -410,8 +367,8 @@ mk VISION create_visions "$(cat <<JSON
 {
   "title": "Be the car rental brand of choice for business users",
   "description": "Be the car rental brand of choice for business users in the countries in which we operate.",
-  "amplifiedBy": "$MISSION",
-  "madeOperativeBy": ["$GOAL_PREMIUM", "$GOAL_SERVICE", "$GOAL_MAINTAINED", "$GOAL_AVAILABILITY"]
+  "amplifiedBy": ["$GOAL_PREMIUM", "$GOAL_SERVICE", "$GOAL_MAINTAINED", "$GOAL_AVAILABILITY"],
+  "madeOperativeBy": "$MISSION"
 }
 JSON
 )" "Vision"
@@ -505,6 +462,50 @@ mk TACTIC_MAINT_SCHED create_tactics "$(cat <<JSON
 }
 JSON
 )" "Tactic: Comply with maintenance schedules"
+
+# ============================================================
+# Business Processes (realizes -> Tactic). Created after Tactics
+# so the realizes URIs resolve. BusinessRules will reference these
+# via enforcedByBusinessProcess; OrgUnits via definedBy.
+# ============================================================
+echo ""
+echo "── Business Processes ────────────────────────────────────"
+
+mk PROC_RESERVATION create_business_processes "$(cat <<JSON
+{
+  "title": "Rental reservation process",
+  "description": "Advance rental bookings accepted by phone, internet, or in person at any EU-Rent branch.",
+  "realizes": "$TACTIC_EXTEND"
+}
+JSON
+)" "Process: Reservation"
+
+mk PROC_PICKUP create_business_processes "$(cat <<JSON
+{
+  "title": "Car pickup and return",
+  "description": "In-branch handling of customer arrival, car assignment (lowest mileage in group), documentation, and car return including odometer/service checks.",
+  "realizes": "$TACTIC_EQUALIZE"
+}
+JSON
+)" "Process: Pickup & return"
+
+mk PROC_MAINTENANCE create_business_processes "$(cat <<JSON
+{
+  "title": "Vehicle maintenance",
+  "description": "Scheduled maintenance per manufacturer schedule, with small branches outsourcing maintenance and larger branches performing it in-house.",
+  "realizes": ["$TACTIC_OUTSOURCE_MAINT", "$TACTIC_MAINT_SCHED"]
+}
+JSON
+)" "Process: Maintenance"
+
+mk PROC_PURCHASE create_business_processes "$(cat <<JSON
+{
+  "title": "Car purchase and disposal",
+  "description": "National-level guidance on which models to buy, mix and numbers, when to dispose by mileage and age, and phasing of purchasing and delivery.",
+  "realizes": "$TACTIC_STANDARD_SPEC"
+}
+JSON
+)" "Process: Car purchase/disposal"
 
 # ============================================================
 # Business Policies (governs -> CourseOfAction,

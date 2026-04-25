@@ -80,7 +80,7 @@ Starting `bmm-server` yields, from the declarative Define inputs alone:
 - **A ServiceProvider catalog** at `/oslc` listing the factories, query capabilities, and shapes for each ServiceProvider on the server.
 - **A ServiceProvider creation template** — what ELM calls a project area — that instantiates a new scope and mounts per-scope factories/queries.
 - **Creation factories** for every BMM class, accepting `POST` requests with Turtle bodies and validating against the shape.
-- **Query capabilities** for every BMM class, accepting OSLC query URIs like `?oslc.where=rdf:type=<bmm:Vision>`.
+- **Query capability** for every BMM class, accepting OSLC query URIs like `?oslc.where=rdf:type=<bmm:Vision>`.
 - **Creation dialogs** for every class, rendered from the shape's `oslc:hintWidth`/`oslc:hintHeight`/label metadata.
 - **Compact resource previews** at `/compact?uri=…` that return formatted summaries for hover tooltips.
 - **An OSLC browser** at `/` — the column-based navigator in `oslc-browser`, serving human-facing navigation, Properties tab, Explorer graph, and diagram views for every shape. Incoming links render with inverse labels automatically because the browser reflects off `oslc:inverseLabel` declarations in the shapes.
