@@ -172,16 +172,21 @@ Two new properties on `oslc:Property`, proposed for OSLC-OP:
 
 # Define — `create-oslc-server.ts`
 
-```
-config/domain/BMM.ttl          ─┐
-config/domain/BMM-Shapes.ttl   ─┤── create-oslc-server.ts ──► bmm-server
-config/domain/BMM-Shapes.html  ─┘
+The actual command that scaffolded `bmm-server`:
+
+```bash
+npx tsx create-oslc-server.ts \
+  --name bmm-server --port 3005 \
+  --vocab BMM.ttl --shapes BMM-Shapes.ttl \
+  --managed Vision,Goal,Objective,Mission,Strategy,Tactic, \
+            BusinessPolicy,BusinessRule,Influencer,Assessment, \
+            PotentialImpact,BusinessProcess,Asset,OrganizationUnit
 ```
 
-- Reads the vocabulary and shapes.
-- Generates `config/catalog-template.ttl` — one creation factory per shape, one query capability per class.
+- Generates `config/catalog-template.ttl` — one ServiceProvider creation template, one creation factory per managed class, one query capability per managed class.
 - Emits a thin `src/app.ts` that mounts `oslc-service` against a Jena Fuseki backend via `jena-storage-service`.
-- The authored surface area of `bmm-server` is its config + a handful of startup lines. **No domain code.**
+- Scaffolds a `ui/` directory wrapping the `oslc-browser` library.
+- Authored surface area: declarative `config/` content. **No domain code.**
 
 ---
 

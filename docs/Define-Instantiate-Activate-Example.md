@@ -58,7 +58,22 @@ The BMM vocabulary in `bmm-server/config/domain/BMM.ttl`, the shapes in `BMM-Sha
 
 ### 3.3 AI as server generator
 
-`bmm-server` itself was not hand-written. The `create-oslc-server.ts` script reads the vocabulary and shapes in `config/domain/`, synthesizes a `config/catalog-template.ttl` that describes one creation factory per shape and one query capability per class, and emits a thin `src/app.ts` that mounts the `oslc-service` Express middleware against a Jena Fuseki backend via `jena-storage-service`. The entire authored surface area of `bmm-server` is its config and a few lines of startup wiring — no domain code.
+`bmm-server` itself was not hand-written. The `create-oslc-server.ts` script in the workspace root reads a vocabulary and a shapes file, synthesizes a `config/catalog-template.ttl` that describes one ServiceProvider creation template, one creation factory per shape, and one query capability per managed class, and emits a thin `src/app.ts` that mounts the `oslc-service` Express middleware against a Jena Fuseki backend via `jena-storage-service`. It also scaffolds a `ui/` directory wrapping the `oslc-browser` library, an `env.ts`, and a `package.json` with the right workspace dependencies.
+
+The actual command used to scaffold `bmm-server`, run from the `oslc4js` workspace root with `BMM.ttl` and `BMM-Shapes.ttl` in the current directory:
+
+```bash
+npx tsx create-oslc-server.ts \
+  --name bmm-server \
+  --port 3005 \
+  --vocab BMM.ttl \
+  --shapes BMM-Shapes.ttl \
+  --managed Vision,Goal,Objective,Mission,Strategy,Tactic,BusinessPolicy,BusinessRule,Influencer,Assessment,PotentialImpact,BusinessProcess,Asset,OrganizationUnit
+```
+
+The `--managed` list names the 14 instantiable BMM classes that get creation factories, query capabilities, and creation dialogs. Anything not in that list still has a vocabulary entry and a shape, but doesn't get an OSLC service surface — useful for abstract classes (Means, End, Directive, CourseOfAction) that exist as supertypes but are never instantiated directly.
+
+After the command completes, `cd bmm-server && npm install && npm run build && npm start` brings up the running server. The entire authored surface area of `bmm-server` after that is its declarative `config/` content; no domain code was written.
 
 ### 3.4 What you get with zero domain code
 
