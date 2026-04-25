@@ -175,12 +175,12 @@ Two new properties on `oslc:Property`, proposed for OSLC-OP:
 The actual command that scaffolded `bmm-server`:
 
 ```bash
-npx tsx create-oslc-server.ts \
-  --name bmm-server --port 3005 \
-  --vocab BMM.ttl --shapes BMM-Shapes.ttl \
-  --managed Vision,Goal,Objective,Mission,Strategy,Tactic, \
-            BusinessPolicy,BusinessRule,Influencer,Assessment, \
-            PotentialImpact,BusinessProcess,Asset,OrganizationUnit
+npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
+  --vocab  "mrm-server/archive/Municipal Reference Model/Municipal Reference Model/BMM.ttl" \
+  --shapes "mrm-server/archive/Municipal Reference Model/Municipal Reference Model/BMM-Shapes.ttl" \
+  --managed Vision,Goal,Objective,Mission,Strategy,Tactic,BusinessPolicy,
+            BusinessRule,Influencer,Assessment,PotentialImpact,
+            OrganizationUnit,BusinessProcess,Asset
 ```
 
 - Generates `config/catalog-template.ttl` — one ServiceProvider creation template, one creation factory per managed class, one query capability per managed class.
