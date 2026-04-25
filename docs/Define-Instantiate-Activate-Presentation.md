@@ -5,15 +5,15 @@ paginate: true
 size: 16:9
 style: |
   section {
-    font-size: 24px;
+    font-size: 26px;
   }
   h1 {
     color: #1a5276;
-    font-size: 34px;
+    font-size: 36px;
   }
   h2 {
     color: #2c3e50;
-    font-size: 26px;
+    font-size: 28px;
   }
   .columns {
     display: grid;
@@ -30,7 +30,7 @@ style: |
     font-size: 20px;
   }
   section.small-text {
-    font-size: 20px;
+    font-size: 22px;
   }
   section.toc ul {
     columns: 2;
@@ -40,20 +40,13 @@ style: |
     display: block;
     margin: 0 auto;
   }
-  code {
-    font-size: 20px;
-  }
-  .incoming {
-    font-style: italic;
-    color: #555;
-  }
 ---
 
 # Define — Instantiate — Activate
 
-## AI-Assisted OSLC, Walked End-to-End
+## A Semantic Value Chain for AI-Integrated Knowledge Management
 
-### Using the OMG Business Motivation Model as the Working Example
+### Using the OMG BMM Server as a Working Example
 
 ---
 
@@ -61,436 +54,394 @@ style: |
 
 # Contents
 
-- The Problem BMM Lets Us Tell
-- Why BMM Is the Right Lens
-- The Three-Layer Framework
-- Define — Authoring with AI
-- Define — Our Shape Extensions
-- Define — `create-oslc-server.ts`
-- Define — What You Get for Free
-- Instantiate — Why EU-Rent
-- Instantiate — Populating with AI
-- Instantiate — The Browser View
-- Activate — AI Analysis
-- Activate — Programmatic Consumers
-- Activate — LDM and Human Users
-- What Changed About OSLC
-- The Three Extensions
-- Why Structure + AI > Either Alone
-- The AI-Assisted V-Model (pointer)
-- Thank You
+- [The Problem](#the-problem)
+- [The Three-Layer Framework](#the-three-layer-framework)
+- [Layer 1 — Define](#layer-1--define)
+- [Layer 1 Example: BMM Vocabulary](#layer-1-example-bmm-vocabulary)
+- [Layer 2 — Instantiate](#layer-2--instantiate)
+- [Layer 2 Example: EU-Rent](#layer-2-example-eu-rent)
+- [AI Transforms Layer 2](#ai-transforms-layer-2)
+- [Layer 3 — Activate](#layer-3--activate)
+- [Layer 3 Example: MCP Endpoint](#layer-3-example-mcp-endpoint)
+- [The Feedback Loop](#the-feedback-loop)
+- [Why Not Just Use AI Alone?](#why-not-just-use-ai-alone)
+- [BMM Server: Working Example](#bmm-server-working-example)
+- [Key Takeaway](#key-takeaway)
+- [AI-Assisted V-Model](#ai-assisted-v-model)
+- [Three Layers of AI Assistance](#three-layers-of-ai-assistance)
+- [Scenario: Requirements Change](#scenario-requirements-change)
+- [The V-Model Feedback Loop](#the-v-model-feedback-loop)
 
 ---
 
 # The Problem
 
-**Business motivation has no home in the application lifecycle.**
+Organizations invest heavily in tools and data — but struggle to turn that data into decisions.
 
-- A requirement realizes *some* Goal. A test case verifies *some* Requirement. A Strategy makes *some* Vision operative.
-- But today's lifecycle tools — ELM, MID Connectors, Jira, ServiceNow — capture the realization, not the motivation behind it.
-- No widely deployed OSLC server exists for BMM, SBVR, or similar business-intent vocabularies.
-- So traceability stops at the requirement and the real "why" lives in PowerPoint decks.
+**Common failure modes:**
 
-**Goal of this walkthrough:** Build an OSLC BMM server end-to-end, populate it with EU-Rent, and show how AI assistants make every step — authoring, instantiation, analysis — first-class.
+- Tools are connected but use **different vocabularies** for the same concepts
+- Data exists but has **no governance** — no versioning, no audit trail, no review process
+- Beautiful knowledge graphs are built but **never activated** — no one queries them, no one acts on them
 
----
-
-# Why BMM Is the Right Lens
-
-- **Realistic ontology.** 25 classes, ~49 properties. Visions, Goals, Missions, Strategies, Tactics, Policies, Rules, Influencers, Assessments, Potential Impacts, Business Processes, Assets, Organization Units.
-- **Genuinely useful.** Populated BMM models answer portfolio questions: "which Goals are unrealized?", "which Influencers lack Assessments?"
-- **Non-trivial but comprehensible.** A week to internalize. Small enough to render as a single graph.
-- **Has a published running example.** EU-Rent, worked through BMM 1.3 Annex C. Reader can check every resource against the spec.
-- **No existing OSLC server for it.** Exactly the gap oslc4js exists to close — connecting BMM motivation to ELM requirements/models/tests and MID OSLC Connectors.
+> The classic ontology project failure: a beautifully governed but unused knowledge graph.
 
 ---
 
 # The Three-Layer Framework
 
-| Layer | Answers | What's new with AI |
-|---|---|---|
-| **Define** — schema | What kinds of things exist, how they relate, what UI metadata drives authoring | AI authors vocabulary + shapes from spec documents |
-| **Instantiate** — artifacts | What are the actual Visions, Goals, Strategies in this organization | AI populates through MCP, translating SME intent into shape-conformant resources |
-| **Activate** — value | What decisions, reports, analyses, and agent actions the data enables | AI queries the governed graph for gaps, summaries, proposed actions — with humans in the governance loop |
+A semantic value chain requires three distinct layers:
 
-![h:260px](image.png)
+| Layer | Purpose | Answers |
+|-------|---------|---------|
+| **1. Define** | Vocabulary governance | What kinds of things exist? How do they relate? |
+| **2. Instantiate** | Artifact creation & governance | What are the actual resources in this project? |
+| **3. Activate** | Outcomes & value delivery | What decisions can we make from this data? |
 
----
-
-# Part 2 — Define
-
-## Authoring the BMM domain with an AI assistant
-
-- One reference prompt, reading the OMG BMM 1.3 spec.
-- Three artifacts produced: `BMM.ttl`, `BMM-Shapes.ttl`, `BMM-Shapes.html`.
-- Zero application code written by humans.
-- Key guidance: naming discipline and proposed shape extensions.
+This maps onto the classic **schema / instance / use** distinction from information architecture, applied to an AI assisted OSLC linked data ecosystem.
 
 ---
 
-# Define — The Authoring Prompt (excerpt)
+# Layer 1 — Define
 
-> *Read the OMG BMM 1.3 specification. Produce:*
->
-> *1. `BMM.ttl` — RDF vocabulary: one class per BMM class, one property per attribute/relationship, with domains, ranges, labels, comments.*
->
-> *2. `BMM-Shapes.ttl` — one `oslc:ResourceShape` per instantiable class, with `oslc:property` constraints covering every supported property.*
->
-> *3. `BMM-Shapes.html` — human-browsable rendering.*
->
-> **Naming rule:** short, domain-agnostic predicates. `amplifiedBy`, not `amplifiedByMission`. `quantifies`, not `quantifiesGoal`.
->
-> **Inverse metadata rule:** every link property declares `oslc:inversePropertyDefinition` (URI for reverse direction) and `oslc:inverseLabel` (human-readable inverse wording). *See `docs/OSLC-Shape-Inverse-Extensions.md`.*
+**The meaning layer**: It establishes shared understanding before any data is created.
 
-Full prompt: `docs/prompts/01-author-bmm-vocabulary.md`
+**Two complementary mechanisms:**
+
+- **Ontology governance** (e.g., TopBraid EDG) — stakeholder review workflows, change history, version control of the vocabulary, multi-user authoring
+- **OSLC ResourceShapes** — formalize the vocabulary as a REST API contract: required properties, cardinality, allowed values, UI metadata for creation dialogs
+
+**Without Layer 1:** Layer 2 produces a connected but semantically incoherent graph — links exist but mean different things in different tools.
 
 ---
 
-# Define — Our Shape Extensions
+# Layer 1 Example: BMM Vocabulary
 
-Two new properties on `oslc:Property`, proposed for OSLC-OP:
+The **bmm-server** defines the OMG Business Motivation Model 1.3 as an RDF ontology:
 
-| Property | Purpose |
-|---|---|
-| `oslc:inversePropertyDefinition` | URI identifier for the reverse direction of a link property. |
-| `oslc:inverseLabel` | Human-readable label for that reverse direction. |
+<div class="columns">
+<div>
 
-```turtle
-<#p-channelsEffortsToward>
-  a oslc:Property ;
-  oslc:name "channelsEffortsToward" ;
-  oslc:propertyDefinition bmm:channelsEffortsToward ;
-  oslc:valueType oslc:Resource ;
-  oslc:inversePropertyDefinition bmm:effortsChanneledBy ;
-  oslc:inverseLabel "Efforts Channeled By" .
-```
+**Ends** (what to achieve)
+- Vision
+- Goal
+- Objective
 
-**Why it matters:** the inverse URI is an *identifier*, not asserted as an `rdf:Property`. The triple is stored once. Clients render incoming links by reflecting off the shape — no hardcoded inverse-type tables like DOORS Next or `oslc-client.LDMClient.INVERSE_LINK_TYPES`.
+**Means** (how to achieve it)
+- Mission
+- Strategy, Tactic
+- Business Policy, Business Rule
 
----
+</div>
+<div>
 
-# Define — `create-oslc-server.ts`
+**Influencers & Assessment**
+- Influencer (External/Internal)
+- Assessment (SWOT)
+- Potential Impact (Risk/Reward)
 
-```
-config/domain/BMM.ttl          ─┐
-config/domain/BMM-Shapes.ttl   ─┤── create-oslc-server.ts ──► bmm-server
-config/domain/BMM-Shapes.html  ─┘
-```
+**Organization**
+- Organization Unit
+- Business Process
+- Asset
 
-- Reads the vocabulary and shapes.
-- Generates `config/catalog-template.ttl` — one creation factory per shape, one query capability per class.
-- Emits a thin `src/app.ts` that mounts `oslc-service` against a Jena Fuseki backend via `jena-storage-service`.
-- The authored surface area of `bmm-server` is its config + a handful of startup lines. **No domain code.**
+</div>
+</div>
 
----
-
-# Define — What You Get for Free
-
-Starting `bmm-server` yields, from the declarative inputs alone:
-
-- **Service Provider catalog** at `/oslc` — factories, queries, shapes per ServiceProvider
-- **Service Provider creation template** (what ELM calls a *project area*)
-- **Creation factories + creation dialogs + query capabilities** per BMM class
-- **Compact resource previews** for hover tooltips
-- **OSLC browser** at `/` — column navigation, Properties, Explorer graph, diagrams
-- **LDM `/discover-links` endpoint** — standard OSLC Link Discovery Management, answered from this server's storage
-- **Embedded MCP endpoint** at `/mcp` — catalog/vocabulary/shapes as resources, `create_*` and `query_*` tools
-
-**The shape IS the contract.** Every operational surface is generated from it.
+**25 classes, 49 properties, 14 ResourceShapes**
 
 ---
 
-# Define — The Payoff
+# Layer 1 Example: BMM Relationships
 
-From a spec PDF to a running, fully-featured OSLC service for a non-trivial domain:
+The ontology defines precisely how concepts connect. These typed relationships are what make queries, traceability, and AI analysis precise.
 
-- **AI authored the vocabulary and shapes.**
-- **The scaffold script generated the server.**
-- **The declarative contract drives the REST API, the browser UI, the LDM endpoint, and the MCP tool schemas.**
-
-No domain-specific application code. No hand-wired UI. No hardcoded link-type maps.
-
-The next question: what does populating this server look like?
+![w:750](images/bmm-relationships.png)
 
 ---
 
-# Part 3 — Instantiate
+# Layer 2 — Instantiate
 
-## Populating the EU-Rent example with an AI assistant
+**The artifact layer**: Here we transition from ontology experts to **subject matter experts** in the domain.
 
-- BMM 1.3 Annex C develops EU-Rent, a fictitious European car rental company, as the running example.
-- ~72 linked resources across every BMM class.
-- Reader can check every resource against the published spec.
-- Again driven by a reference prompt through the MCP endpoint.
+**What it produces:**
+- Actual resources — requirements, plans, assessments, strategies
+- Typed links between resources
+- Version history and governance state (draft, approved, baselined)
 
----
+**Configuration management** (streams, baselines, change sets) gives this layer its temporal dimension — reasoning about "the system as of this baseline" rather than just today's snapshot.
 
-# Instantiate — The Population Prompt (shape)
-
-**1. Discover.** Read `oslc://catalog`, `oslc://vocabulary`, `oslc://shapes` via MCP. Understand what the server supports before creating anything.
-
-**2. Create the ServiceProvider.** `create_service_provider` for "EU-Rent Board".
-
-**3. Populate by class.**
-
-- 1 Vision, ~4 Goals + Objectives, 1 Mission
-- ~3 Strategies, ~5 Tactics
-- ~5 Policies, ~6 Rules
-- ~20 Influencers, ~6 Assessments, ~5 Potential Impacts
-- ~4 Business Processes, ~4 Assets, ~4 Organization Units
-
-**4. Link.** Every BMM relationship type (`channelsEffortsToward`, `amplifiedBy`, `quantifiedBy`, `assesses`, `enablesEnd`, …) exercised at least once.
-
-**5. Report.** Query each class, spot-check link graphs, summarize counts.
-
-Full prompt: `docs/prompts/02-populate-eu-rent-example.md`
-
----
-
-# Instantiate — Runtime
-
-**Interactive:** Claude Desktop MCP session, ~15–25 minutes for the full 72-resource population. The assistant discovers the catalog, creates the ServiceProvider, creates resources by class with proper links, reports counts.
-
-**Scripted:** `bmm-server/testing/populate-eurent.sh` does the same work non-interactively in ~60 seconds for fast dev-loop replays.
-
-**Either path produces the same populated graph.** The interactive path is the authoritative Define-Instantiate-Activate demonstration; the script is a time-saver.
-
----
-
-# Instantiate — The Browser View: Properties
-
-![bg right:50% w:90%](images/bmm-vision-properties.png)
-
-**Vision properties, with incoming links.**
-
-- Outgoing links (`amplifiedBy`, `madeOperativeBy`) — regular type.
-- Incoming links (`Efforts Channeled By`, `Responsibility Of`) — italicized in the same Links table.
-- Labels come from `oslc:inverseLabel` on the source-side shape.
-- Italics signal the triple is stored on the source; the user navigates transparently.
-
----
-
-# Instantiate — The Browser View: Column Navigator
-
-![bg right:50% w:90%](images/bmm-column-navigation.png)
-
-**Expanded Vision accordion.**
-
-- Mixed outgoing + incoming predicates.
-- Click outgoing → fetch targets into next column.
-- Click incoming (italic) → fetch source resources via `/discover-links`, render as the next column.
-- User navigates bidirectionally without thinking about storage ownership.
-
----
-
-# Instantiate — The Browser View: Explorer Graph
-
-![bg right:50% w:90%](images/bmm-explorer-eu-rent.png)
-
-**Radial graph around the Vision.**
-
-- Center = selected Vision. Perimeter = directly related resources.
-- Outgoing and incoming edges both point from center outward.
-- Incoming edge labels italicized via SVG `<tspan>`.
-- A neighbor linked in both directions shows both labels on a single edge.
-
----
-
-# Instantiate — The Payoff
-
-Manually authoring 72 linked BMM resources from a 200-page PDF is a multi-day SME engagement.
-
-**The AI does it in a session.**
-
-This inverts the traditional difficulty curve:
-
-- *Before:* users struggled to create models; understanding was the easier half.
-- *Now:* creation is fast; the SME's job shifts to reviewing, correcting, and steering.
-
-The AI is not replacing subject-matter expertise. It removes the translation-into-OSLC-REST-calls bottleneck that kept SMEs out of the authoring loop.
-
----
-
-# Part 4 — Activate
-
-## One contract, four kinds of consumer
-
-The same Define-Instantiate deliverables serve four consumer archetypes without additional code:
-
-1. **AI assistants** asking analytical questions
-2. **Programmatic OSLC consumers** running standard queries
-3. **LDM clients** discovering incoming links
-4. **Human users** in the browser
-
-Every one of them reflects off the shapes, vocabulary, and OSLC contract declared in Define.
-
----
-
-# Activate — AI Analysis Prompts
-
-Reference prompts in `docs/prompts/03-analyze-bmm-model.md`:
-
-- **Gap analysis.** *"Which Goals have no realizing Tactic chain?"*
-- **Structural summary.** *"Summarize the influence landscape: Assessments → Influencers → Potential Impacts → Directives → OrgUnits."*
-- **Multi-hop traversal.** *"Walk the realization chain from the EU-Rent Vision through Goals, Strategies, Tactics, Processes, Assets — identify the weakest link."*
-- **Observe-Propose-Execute.** *"Propose a new Business Rule for the customer-retention Policy responding to the competitor-modernization Influencer. Do not create it — format it for my review."*
-- **Compliance validation.** *"Verify every OrgUnit `isResponsibleFor` at least one End. Report violations as a SHACL-style assertion."*
-
----
-
-# Activate — Why These Work
-
-Every analysis prompt uses the **same three MCP resources**:
-
-- `oslc://catalog` — what ServiceProviders exist
-- `oslc://vocabulary` — BMM classes and relationships
-- `oslc://shapes` — required fields, cardinalities, **inverse metadata**
-
-and the **same MCP tools**:
-
-- `query_*` per class
-- `fetch_resource` for details
-- `create_*` and `update_*` for Observe-Propose-Execute authoring
-
-The AI carries **no BMM-specific code**. It reads the shape, queries the data, reasons with both. Any new domain works the same way.
-
----
-
-# Activate — Programmatic OSLC
-
-Standard OSLC 3.0 query against the query base:
-
-```
-GET /oslc/eu-rent/query?oslc.where=rdf:type=<http://www.omg.org/spec/BMM%23Vision>
-  Accept: application/ld+json
-```
-
-Any OSLC-conformant client consumes this — existing ELM adapters, MID Connectors, custom integrations.
-
-A **federating consumer** (an LQE or dedicated LDM provider) could aggregate BMM resources alongside requirements, test cases, and change requests from ELM via TRS feeds. Answers cross-domain questions: *"which test cases verify requirements realizing Goals that amplify the EU-Rent Vision?"*
-
-TRS feeds in `oslc-service` are a future extension; the `/discover-links` endpoint we built today covers same-server reverse queries in the meantime.
-
----
-
-# Activate — LDM and Human Users
-
-**LDM `/discover-links`** — a specialized client posts a target URI, gets back the reverse triples. Labels resolved client-side from the shape cache via `oslc:inverseLabel`. Same wire format as a dedicated LDM/LQE provider, so clients work interchangeably.
-
-**Human users** — the same BMM server, same vocabulary, same shapes, same data, rendered as a column browser, Properties panels, and dependency graphs for stakeholder walkthroughs.
-
-A product manager who doesn't know RDF exists browses the EU-Rent Vision, follows `amplifiedBy` to Goals, sees the incoming *"Efforts Channeled By"* Strategies, and understands the realization structure without reading the spec.
-
----
-
-# Activate — The Payoff
-
-**Four kinds of consumers, one declarative contract.**
-
-- Define once.
-- Instantiate once.
-- Activate arbitrarily.
-
-Adding a new consumer kind — a GraphQL gateway, a SHACL validator, a natural-language translator — costs **shape reads**, not a new inverse-type table or a domain-specific adapter.
-
----
-
-# Part 5 — What Changed About OSLC
-
-**Old framing:**
-
-> "RDF + typed links + delegated dialogs for lifecycle tool integration."
-
-Still accurate. Still valuable.
-
-**New framing demonstrated by this walkthrough:**
-
-> "OSLC now supports **knowledge integration in collaboration with AI assistants**."
-
-The RDF, the links, and the delegated dialogs are still there. But the server has become an **AI-addressable structured knowledge store**, not just a human-facing web application.
-
----
-
-# The Three Extensions That Closed the Loop
-
-None of these changed OSLC Core or the RDF model. Each earns its place by removing a specific point of coordination that used to block AI-assisted workflows.
-
-| Extension | Removes |
-|---|---|
-| **Embedded MCP endpoint** in `oslc-service` | The gap between OSLC servers and AI assistants — no separate MCP bridge to build or run. |
-| **LDM `/discover-links`** per server | The need for a dedicated LDM provider before incoming-link discovery is usable. |
-| **Shape inverse metadata** (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`) | Hardcoded client-side inverse-type tables. Vocabulary governance replaces client-rebuild cycles. |
-
----
-
-# Why Structure + AI > Either Alone
-
-**AI alone:** ephemeral. No auditability, no persistence, no interoperability, no governance. A conversation produces text, not artifacts.
-
-**Ontology + OSLC alone:** governed but under-populated. The authoring bottleneck kept these systems from accumulating the instance data that makes them valuable.
-
-**Together:** the AI is the most capable authoring and analysis tool a governed knowledge graph has ever had. The governed knowledge graph is the persistent, auditable, queryable substrate the AI needs to produce decisions rather than conversations.
-
-**Neither alone is as valuable as both together.**
-
----
-
-# Define → Instantiate → Activate
-
-![h:400px](image.png)
-
-- **Define** — AI authors vocabulary + shapes from spec. Zero domain code.
-- **Instantiate** — AI populates through MCP. Removes the SME authoring bottleneck.
-- **Activate** — AI analyzes the graph. Programmatic consumers, LDM clients, and humans share the same contract.
-
-Feedback flows back from Activate into new Instantiate actions, which the governed Define layer keeps semantically coherent.
-
----
-
-# The AI-Assisted V-Model
-
-**BMM anchors the motivation layer. The same pattern extends upward along the traceability chain:**
-
-An OSLC link graph across requirements (DOORS Next) → design (Rhapsody, RMM) → verification (ELM Test Management) *is* the V-model's traceability substrate.
-
-An AI assistant that queries LQE for structural gaps, proposes cross-tool action plans through OSLC integration endpoints, and executes authoring through tool-specific MCPs realizes a **continuous, quantifiable governance loop** that document-based V-model processes cannot.
-
-> *Requirement-change impact becomes a queryable, auditable cycle: discover in LQE, plan in OSLC, author in tool MCPs, verify closure in LQE.*
-
-Full V-model scenario is beyond this walkthrough — a natural extension of the loop demonstrated here.
-
----
-
-# Key Takeaways
-
-1. **The shape is the contract.** Define it with AI help. Every operational surface — REST, UI, LDM, MCP — follows.
-2. **AI participates in all three layers.** Authoring (Define), population (Instantiate), analysis (Activate). Humans stay in the governance loop where it matters.
-3. **Small extensions, large consequences.** Embedded MCP + LDM `/discover-links` + shape inverse metadata together make OSLC an AI-addressable knowledge integration substrate.
-4. **Structure and AI are complementary.** The system of record supplies auditability, persistence, interoperability, governance. The AI supplies authoring speed and analytical depth.
-5. **BMM is the demo; the pattern generalizes.** Any ontology expressible as RDF + shapes works the same way.
-
----
-
-# References
-
-- **`docs/Define-Instantiate-Activate.md`** — the full walkthrough document
-- **`docs/OSLC-Shape-Inverse-Extensions.md`** — proposed OSLC-OP property definitions
-- **`docs/prompts/`** — canonicalized reference prompts for vocabulary authoring, EU-Rent population, and analysis
-- **`bmm-server/README.md`** — server setup and EU-Rent population script
-- **`oslc-browser/README.md`** — incoming-link rendering pipeline
-- **OMG Business Motivation Model 1.3** — `bmm-server/docs/BMM-formal-15-05-19.pdf`
-- **OASIS OSLC Core 3.0** — the baseline this work extends
+**Without Layer 2 governance:** Layer 3 can't answer versioned questions.
 
 ---
 
 <!-- _class: small-text -->
 
+# Layer 2 Example: EU-Rent
+
+| BMM Concept | EU-Rent Examples in Spec |
+|-------------|------------------------|
+| Vision | 1 — premium brand car rental |
+| Goals | 4 — premium brand, customer service, well-maintained cars, availability |
+| Objectives | 4 — A C Nielsen ratings, customer satisfaction, breakdown rate |
+| Mission | 1 — car rental across Europe and North America |
+| Strategies | 3+ — nationwide operation, car purchase/disposal, rewards scheme |
+| Tactics | 5+ — encourage extensions, outsource maintenance, standard specs, etc. |
+| Business Policies | 5+ — minimize depreciation, guarantee payments, no exports, etc. |
+| Business Rules | 6+ — match spec, lowest mileage, driver's license, service scheduling, etc. |
+| Influencers | 28+ — competitors, customers, regulations, technology, etc. |
+| Assessments | 6+ — SWOT: strengths, weaknesses, opportunities, threats |
+| Potential Impacts | 5+ — risks and rewards |
+
+All examples from the actual OMG specification, populated by AI reading the PDF.
+
+---
+
+# AI Transforms Layer 2
+
+Traditionally, Layer 2 was the bottleneck — entirely human-authored through forms and structured editors.
+
+**With MCP (Model Context Protocol), AI becomes a first-class participant:**
+
+1. AI **learns the domain model** from MCP resources (vocabulary, shapes, catalog)
+2. AI **reads source documents** (specifications, plans, policy documents)
+3. AI **identifies instances** — Visions, Goals, Strategies, Assessments
+4. AI **creates and links resources** directly via the OSLC server API
+5. AI **validates** against ResourceShape constraints
+
+> *"Read the BMM 1.3 specification and create all the EU-Rent example artifacts and relationships described in the document."*
+
+---
+
+# Layer 3 — Activate
+
+**The value layer**: Without it, Layers 1 and 2 produce a beautifully governed but unused knowledge graph.
+
+**Three activation mechanisms:**
+
+| Mechanism | Use | Example |
+|-----------|-----|---------|
+| **LQE - SPARQL/SQL** | Analytical | Traceability reports, coverage metrics, validation |
+| **MCP Endpoint** | Agentic | AI agents reasoning over live data, proposing changes |
+| **Tool Integrations** | Operational | Engineers seeing linked data in DOORS Next, EWM, Polarion |
+
+---
+
+# Layer 3 Example: MCP Endpoint
+
+The bmm-server exposes an MCP endpoint at `/mcp` with **34 dynamically generated tools:**
+
+<div class="columns">
+<div>
+
+**14 create tools**
+- one per BMM resource type
+
+**14 query tools**
+- one per BMM resource type
+
+</div>
+<div>
+
+**6 generic tools**
+- create_service_provider
+- get_resource, update_resource
+- delete_resource
+- list_resource_types, query_resources
+
+**3 MCP resources (for AI learning)**
+- oslc://vocabulary
+- oslc://shapes
+- oslc://catalog
+
+</div>
+</div>
+
+---
+
+# The Feedback Loop
+
+This creates a virtuous cycle that didn't exist before MCP:
+
+![w:800](images/feedback-loop.png)
+
+---
+
+# Why Not Just Use AI Alone?
+
+> *"Can't we just feed all our documents to an LLM and ask it questions?"*
+
+**Yes — but AI outputs are ephemeral.** A conversation produces text, not governed artifacts.
+
+| Concern | AI Alone | AI + OSLC Server |
+|---------|----------|-------------------|
+| **Audit trail** | "Claude said so" | Versioned artifact with provenance |
+| **Persistence** | Different answer next month | Living model with change history |
+| **Interoperability** | Prose output | Machine-consumable linked data (RDF) |
+| **Governance** | Chat session | Review workflows, access controls, sign-off |
+| **Precision** | Fluent non-answers | Visible, queryable gaps |
+| **Repeatability** | Statistical approximation | Deterministic queries on governed data |
+
+---
+
+# AI Needs Structure to Be Reliable
+
+- **Better patterns, better results.** RDF assertions governed by ResourceShapes are consistent in expression, precisely typed, and richly linked.
+
+- **The ontology gives the AI a map.** Without it, the AI is a very expensive search engine that produces fluent but structurally ungrounded answers.
+
+- **Explicit gaps vs. hallucination.** The system of record forces explicit representation of what is known vs. unknown. A gap in the model is a visible, queryable gap — not a fluent non-answer.
+
+- **Quantitative analytics.** Ontology-structured data delivers precise, repeatable results for compliance reporting and impact analysis.
+
+---
+
+# What AI Brings to the System of Record
+
+**Authoring acceleration**
+SMEs who can't write RDF or navigate complex tool UIs can now contribute their knowledge conversationally. The AI translates intent into ontology-conformant resources.
+
+**Analytical depth**
+AI can consume the entire linked data graph and perform analysis impractical for humans with queries and reports alone — identifying gaps, contradictions, and inconsistencies across hundreds of interconnected resources.
+
+**Humans in the loop**
+Ontologies provide stakeholder viewpoints — structured perspectives tailored to different roles. These keep humans meaningfully engaged, which matters because humans take responsibility for action and outcome.
+
+---
+
+# The Integrated Architecture
+
+![w:800](images/integrated-architecture.png)
+
+---
+
+<!-- _class: small-text -->
+
+# BMM Server: A Complete Working Example
+
+| Aspect | Implementation |
+|--------|---------------|
+| **Domain** | OMG Business Motivation Model 1.3 |
+| **Layer 1** | 25 classes, 49 properties in BMM.ttl; 14 ResourceShapes |
+| **Layer 2** | RDF triple store (Jena Fuseki); EU-Rent example from BMM 1.3 spec, populated by AI |
+| **Layer 3** | OSLC REST API + MCP endpoint (34 tools) + oslc-browser UI |
+| **AI Integration** | MCP endpoint exposes vocabulary/shapes for learning; tools for CRUD |
+| **Port** | localhost:3005 |
+
+**Try it:** Start Fuseki, then `cd bmm-server && npm start`
+
+AI prompt: *"Read docs/BMM-formal-15-05-19.pdf and create all the EU-Rent example artifacts and relationships from the spec."*
+
+---
+
+# Key Takeaway
+
+The **Define-Instantiate-Activate** framing positions ontologies and OSLC servers not as alternatives to AI, but as the infrastructure that makes AI-assisted work:
+
+- **Auditable** — every resource has provenance and version history
+- **Repeatable** — deterministic queries on governed data, not statistical approximation
+- **Governable** — review workflows, access controls, multi-stakeholder sign-off
+- **Interoperable** — machine-consumable linked data across tools and organizations
+
+> The OSLC server is the **system of record**.
+> The AI is the most capable **authoring and analysis tool** that system of record has ever had.
+> The ontology is what makes their collaboration **semantically precise** rather than statistically approximate.
+
+---
+
+# Applying Define-Instantiate-Activate to an AI-Assisted V-Model
+
+The framework applies not just to individual OSLC servers, but to the **entire systems engineering lifecycle**.
+
+![w:700](images/v-model.png)
+
+In OSLC terms, each traceability link is **typed** — the V-model's traceability is a **live link graph** spanning tools.
+
+---
+
+# Three Layers of AI Assistance
+
+An AI assistant could be connected via MCP to an integrated tool chain operates at three layers:
+
+| Layer | Scope | MCP Access | Example |
+|-------|-------|------------|---------|
+| **1. Tool-Local** | Single tool | Tool's own MCP | DOORS Next AI improves requirement quality |
+| **2. Integration** | Cross-tool | OSLC server MCP | "Which requirements lack test cases?" |
+| **3. Analytics** | Lifecycle-wide | LQE/TRS MCP | Coverage ratios, compliance, impact analysis |
+
+**Layer 1** improves authoring within each tool silo.
+**Layer 2** enables cross-tool reasoning over the OSLC link graph.
+**Layer 3** provides efficient read-only analytics across the entire lifecycle.
+
+---
+
+<!-- _class: small-text -->
+
+# Scenario: Requirements Change Impact
+
+An engineer changes a system requirement: performance threshold from 100ms to 50ms.
+
+**Phase 1 — Impact Discovery (Layer 3, LQE)**
+AI queries the materialized graph for full downstream impact.
+Result: "3 subsystem requirements, 12 component requirements, 8 test cases (2 passing, 3 draft, 3 missing), 4 work items affected"
+
+**Phase 2 — Triage and Planning (Layer 2, OSLC)**
+AI traverses live links to assess each affected artifact. Flags test cases needing updates. Identifies pre-existing coverage gaps made urgent by the change.
+
+**Phase 3 — Assisted Authoring (Layer 1, Tools)**
+ETM: drafts updated test procedures. DOORS Next: proposes revised subsystem allocations. EWM: creates linked change requests.
+
+**Phase 4 — Verification (Layer 3, LQE)**
+AI re-queries to confirm all gaps closed, coverage restored.
+
+---
+
+# The V-Model Feedback Loop
+
+![w:700](images/v-model-feedback-loop.png)
+
+This is **Define-Instantiate-Activate applied to the lifecycle**: vocabularies define valid traceability, tools instantiate artifacts and links, analytics activate the data — feeding back into new versions.
+
+---
+
+# Governance: Authority and Approval
+
+Governance helps ensure we achieve intended outcomes with proper authority and approval traceability. 
+
+| Level | AI Action | Approval | Example |
+|-------|-----------|----------|---------|
+| **Observe** | Query and report | None needed | LQE gap analysis, coverage reports |
+| **Propose** | Draft artifacts in "Draft" state | Human review required | AI-generated test cases, requirement updates |
+| **Execute** | Create links by policy | Pre-authorized | Mechanical linking: test case to requirement |
+
+The AI operates within OSLC access controls — it does not bypass governance. The AI authenticates with the user's identity; the same role-based permissions apply whether the request comes from a browser or from an AI through MCP.
+
+---
+
+# Governance: Traceability and Metrics
+
+**Traceability of AI actions** — Every AI action records provenance: what triggered it, what analysis justified it, what policy authorized it, what human approved it. TRS propagates these records to LQE.
+
+**Quantifiable outcomes:**
+
+| Metric | What It Measures |
+|--------|-----------------|
+| Coverage ratio | Requirement-to-test traceability before and after |
+| Gap closure rate | Gaps resolved per cycle |
+| Change propagation completeness | Downstream artifacts updated within time window |
+| Consistency scores | SHACL validation against V-model structural rules |
+| Cycle time | Requirement change to verified traceability closure |
+
+> These metrics measure the **engineering process**, not the AI. The AI makes the process faster and more complete.
+
+---
+
 # Thank You
 
-## Questions, suggestions, and OSLC-OP submissions welcome.
+**Resources:**
 
-- **Repository:** `github.com/OSLC/oslc4js`
-- **Proposed extensions:** `docs/OSLC-Shape-Inverse-Extensions.md`
-- **Reproduce the walkthrough:** start `bmm-server`, run `testing/populate-eurent.sh`, open `http://localhost:3005/`
-
-*The deeper claim: OSLC has evolved from lifecycle tool integration to knowledge integration. BMM makes that visible. The pattern applies wherever structured meaning meets AI assistants.*
+- oslc4js repository: github.com/jamsden/oslc4js
+- BMM Server: oslc4js/bmm-server/
+- Define-Instantiate-Activate: oslc4js/docs/Define-Instantiate-Activate.md
+- OSLC specifications: open-services.net
+- OMG BMM 1.3: omg.org/spec/BMM/1.3
