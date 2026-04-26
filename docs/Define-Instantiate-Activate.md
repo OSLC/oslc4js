@@ -1,5 +1,7 @@
 # Define-Instantiate-Activate: AI Assisted OSLC
 
+> For the higher-level "why does this matter" framing — the three ontology barriers (creating ontology-based models, connecting domains, and creating/consuming model data) and how oslc4js addresses each — see [`oslc4js-stakeholder-presentation.md`](oslc4js-stakeholder-presentation.md). This document is the architectural framework; the [`Define-Instantiate-Activate-Example.md`](Define-Instantiate-Activate-Example.md) companion grounds it in a concrete BMM walkthrough.
+
 To enable a semantic value chain, organizations need is a framework that is fundamentally about making shared meaning actionable across an enterprise. That's the core value proposition. The three layers that need to be addressed are:
 
 1. Define shared meaning (vocabulary governance)
