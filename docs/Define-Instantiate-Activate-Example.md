@@ -56,6 +56,63 @@ The BMM vocabulary in `bmm-server/config/domain/BMM.ttl`, the shapes in `BMM-Sha
 
 **Sidebar: our proposed OSLC shape extensions.** The full rationale, property definitions, and contrast with hardcoded inverse-type tables (as used in IBM DOORS Next and `oslc-client`'s `LDMClient`) are in `docs/OSLC-Shape-Inverse-Extensions.md`. Short version: making the shape the single source of truth for inverse labels lets clients reflect off the vocabulary at runtime rather than carrying a static inverse-type map that must be updated whenever a new domain is introduced.
 
+**What the AI produced — a fragment for the Goal class.** To make the output of this Define step concrete, here is the small slice of the generated artifacts that defines `bmm:Goal` and its relationships.
+
+From `BMM.ttl` (the vocabulary):
+
+```turtle
+bmm:Goal
+  a rdfs:Class ;
+  rdfs:subClassOf bmm:DesiredResult ;
+  dc11:description "A statement about a state or condition of the enterprise to be brought about or sustained through appropriate Means. A Goal is a long-term, ongoing, qualitative statement of intent. A Goal amplifies a Vision — that is, it indicates what must be done to make the Vision a reality." .
+
+# Goal → Objective
+bmm:quantifiedBy
+  a rdf:Property ;
+  rdfs:domain bmm:Goal ;
+  rdfs:range bmm:Objective ;
+  dc11:description "An Objective that quantifies this Goal by defining a specific, measurable target." .
+
+# Goal → Goal (part-whole)
+bmm:includesGoal
+  a rdf:Property ;
+  rdfs:domain bmm:Goal ;
+  rdfs:range bmm:Goal ;
+  dc11:description "A sub-Goal that is part of this Goal." .
+```
+
+From `BMM-Shapes.ttl` (the OSLC service contract):
+
+```turtle
+<#p-quantifiedBy>
+  a oslc:Property ;
+  oslc:name "quantifiedBy" ;
+  oslc:propertyDefinition bmm:quantifiedBy ;
+  dcterms:description "Objectives that quantify this Goal." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range bmm:Objective ;
+  oslc:inversePropertyDefinition bmm:quantifies ;
+  oslc:inverseLabel "Quantifies" .
+
+<#GoalShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Goal" ;
+  oslc:describes bmm:Goal ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
+    <#p-subject>, <#p-type>, <#p-dctype>, <#p-instanceShape>,
+    <#p-serviceProvider>, <#p-shortTitle>, <#p-source>,
+    <#p-derives>, <#p-elaborates>, <#p-refine>, <#p-external>,
+    <#p-satisfy>, <#p-trace>,
+    <#p-quantifiedBy>, <#p-includesGoal> .
+```
+
+The shape declaratively pulls in shared OSLC AM properties (`<#p-title>`, `<#p-creator>`, `<#p-trace>`, …) plus the Goal-specific link properties. `<#p-quantifiedBy>` carries the inverse metadata (`bmm:quantifies` / "Quantifies") that lets `oslc-browser` render an Objective's incoming Goals as if the relationship were outgoing — see `oslc-browser/README.md`.
+
+For the full vocabulary and all 14 shapes — including their ranges, cardinalities, descriptions, and inverse metadata — see the AI-generated browsable reference at `bmm-server/config/domain/BMM-Shapes.html`.
+
 ### 3.3 AI as server generator
 
 `bmm-server` itself was not hand-written. The `create-oslc-server.ts` script in the workspace root reads a vocabulary and a shapes file, synthesizes a `config/catalog-template.ttl` that describes one ServiceProvider creation template, one creation factory per shape, and one query capability per managed class, and emits a thin `src/app.ts` that mounts the `oslc-service` Express middleware against a Jena Fuseki backend via `jena-storage-service`. It also scaffolds a `ui/` directory wrapping the `oslc-browser` library, an `env.ts`, and a `package.json` with the right workspace dependencies.
@@ -144,6 +201,43 @@ Through MCP, an assistant can answer questions no single resource view exposes:
 - *"Propose a new Business Rule that reinforces the customer-retention policy in response to the competitor-modernization Influencer. Do not create it — format it for my review."* — Observe-Propose-Execute authoring, where the AI drafts the artifact against the shape but stops short of creation until a human approves.
 
 Each of these uses the same vocabulary + shapes + LDM endpoint that the server exposes declaratively. The AI carries no BMM-specific code; it reads the shape, queries the data, and reasons with both.
+
+#### A worked example — running the gap-analysis prompt
+
+To make this concrete, here is a representative result of running the first prompt against the populated EU-Rent ServiceProvider on the `bmm-server` MCP endpoint at `http://localhost:3005/mcp`.
+
+**Prompt (paraphrased from `docs/prompts/03-analyze-bmm-model.md`):**
+
+> Read `oslc://catalog`, `oslc://vocabulary`, and `oslc://shapes` first so you understand this server. Then identify Goals in the EU-Rent ServiceProvider that have no realizing Tactic chain — the expected chain is `Goal ← Strategy (channelsEffortsToward / enablesEnd) ← Tactic (implements)`. For each gap, list the Goal's title and URI, the nearest existing coverage, and what kind of Tactic would close the gap. Don't create anything — just report.
+
+**What the assistant does (visible via MCP tool calls):**
+
+1. Reads `oslc://shapes` → learns that `Strategy.channelsEffortsToward` and `CourseOfAction.enablesEnd` both target Ends, and that `Tactic.implements` targets Strategy.
+2. `query_goals` → 4 Goals with URIs and titles.
+3. `query_strategies` → 3 Strategies; for each, fetches `channelsEffortsToward` and `enablesEnd` targets.
+4. `query_tactics` → 5 Tactics; for each, fetches `implements` target.
+5. Joins the three layers in memory.
+
+**Representative answer:**
+
+> Out of 4 Goals on the EU-Rent ServiceProvider, **3 have a realizing Tactic chain and 1 has a coverage gap.**
+>
+> | Goal | Strategy(ies) channelling effort | Tactics implementing those Strategies | Coverage |
+> |---|---|---|---|
+> | Be a premium brand car rental company | Nationwide on-airport head-to-head competition | Encourage rental extensions | ✅ |
+> | Provide well-maintained cars | Car purchase and disposal | Outsource maintenance for small branches; Create standard specifications of car models; Equalize car usage; Comply with manufacturers' maintenance schedules | ✅ |
+> | Vehicles available when and where expected | Car purchase and disposal *(via `enablesEnd`)* | (same four Tactics as above) | ✅ |
+> | **Provide industry-leading customer service** | **Rewards scheme** *(targets this Goal)* | **— none — no Tactic `implements` the Rewards Strategy** | ❌ |
+>
+> **The gap:** the *Provide industry-leading customer service* Goal has a Strategy aimed at it (the rewards scheme), but no Tactic operationalizes that Strategy. The chain stops at the Strategy level.
+>
+> **What would close the gap:** Tactics that implement the rewards scheme — for example, "Issue tiered loyalty cards at branch sign-up", "Apply automatic discount on the next rental after a 3-rental streak", or "Train branch staff to upsell loyalty enrolment at car return". Each of these would be a Tactic with `implements → <strategy/rewards-scheme>` and ideally `enablesEnd → <goal/customer-service>`.
+>
+> Resource URIs (so the gap is verifiable on the server):
+> - Goal: `http://localhost:3005/oslc/eu-rent/resources/<goal-customer-service-id>`
+> - Strategy: `http://localhost:3005/oslc/eu-rent/resources/<strategy-rewards-id>`
+
+**Why this matters for the framework.** The assistant didn't carry hardcoded BMM knowledge. It read the shapes to learn the chain shape, queried the populated data to find the actual instances, and joined them to find the missing edge. Replacing BMM with another domain vocabulary would let the same prompt archetype find analogous gaps without code changes.
 
 ### 5.2 Programmatic OSLC consumers
 

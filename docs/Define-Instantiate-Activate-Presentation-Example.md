@@ -55,6 +55,8 @@ style: |
 
 ### Companion to the Define-Instantiate-Activate framework deck
 
+The detailed worked example for this deck — every shape fragment, prompt, and MCP response shown here, plus the full reproduction steps — lives in **`docs/Define-Instantiate-Activate-Example.md`**. This deck summarizes the journey; that document grounds it.
+
 ---
 
 <!-- _class: toc -->
@@ -479,8 +481,9 @@ Full V-model scenario is beyond this walkthrough — a natural extension of the 
 
 # References
 
-- **`docs/Define-Instantiate-Activate.md`** — the full walkthrough document
-- **`docs/OSLC-Shape-Inverse-Extensions.md`** — proposed OSLC-OP property definitions
+- **`docs/Define-Instantiate-Activate-Example.md`** — **companion document** for this deck: every shape fragment, prompt, and MCP-response example shown here, with the full reproduction steps
+- **`docs/Define-Instantiate-Activate.md`** — the abstract Define-Instantiate-Activate framework that this worked example demonstrates
+- **`docs/OSLC-Shape-Inverse-Extensions.md`** — proposed OSLC-OP property definitions (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`)
 - **`docs/prompts/`** — canonicalized reference prompts for vocabulary authoring, EU-Rent population, and analysis
 - **`bmm-server/README.md`** — server setup and EU-Rent population script
 - **`oslc-browser/README.md`** — incoming-link rendering pipeline
