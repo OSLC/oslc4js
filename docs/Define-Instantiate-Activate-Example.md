@@ -237,6 +237,8 @@ To make this concrete, here is a representative result of running the first prom
 > - Goal: `http://localhost:3005/oslc/eu-rent/resources/<goal-customer-service-id>`
 > - Strategy: `http://localhost:3005/oslc/eu-rent/resources/<strategy-rewards-id>`
 
+*(Screenshot: `docs/images/bmm-gap-analysis-claude-desktop.png` — the Claude Desktop conversation showing the prompt, the MCP tool-call activity, and the assistant's answer table.)*
+
 **Why this matters for the framework.** The assistant didn't carry hardcoded BMM knowledge. It read the shapes to learn the chain shape, queried the populated data to find the actual instances, and joined them to find the missing edge. Replacing BMM with another domain vocabulary would let the same prompt archetype find analogous gaps without code changes.
 
 ### 5.2 Programmatic OSLC consumers
@@ -334,20 +336,24 @@ The same three-layer loop applies upward to the SSE V-model: an AI assistant tha
 
 ## 8. Capturing the walkthrough screenshots
 
-The Instantiate section references three screenshots that should be captured against a live `bmm-server` with the EU-Rent example populated. Save to `docs/images/` with these names so the document's references resolve:
+These screenshots should be captured against a live `bmm-server` running on `http://localhost:3005/` with the EU-Rent example populated. Save them to `docs/images/` with the exact filenames below so the document's and presentation deck's image references resolve.
 
-| Filename | View to capture |
-|---|---|
-| `bmm-vision-properties.png` | `bmm-server` at `http://localhost:3005/` → connect → query `Vision` → select "Be the car rental brand of choice for business users" → Properties tab. Frame to include the outgoing `amplifiedBy`/`madeOperativeBy` rows AND at least two italicized incoming rows ("Efforts Channeled By", "Responsibility Of"). |
-| `bmm-column-navigation.png` | Same starting point → expand the Vision accordion in the column → frame to show both outgoing predicates (regular type) and the italicized incoming predicates inline. Good if you can also show a second column open from a predicate click. |
-| `bmm-explorer-eu-rent.png` | Same starting point → Explorer tab on the Vision. Frame the radial graph so the center Vision and ~6 neighbors are legible, with at least one italicized inverse label visible on an edge. |
+**Required — referenced inline in the walkthrough:**
 
-Optional:
+| Filename | View to capture | Used in |
+|---|---|---|
+| `bmm-vision-properties.png` | Connect, navigate to a Vision (e.g., "Be the car rental brand of choice for business users"), select the row, switch to the **Properties tab**. Frame to show: title, description, outgoing **Links** rows (`amplifiedBy` → 4 Goals, `madeOperativeBy` → Mission), AND at least two italicized incoming rows (*"Efforts Channeled By"* from Strategies, *"Responsibility Of"* from an OrgUnit). | §4.3 + presentation slide |
+| `bmm-column-navigation.png` | Same Vision in the **Column view**: click the chevron to expand. Frame so you see outgoing predicates (regular: `amplifiedBy`, `madeOperativeBy`, etc.) and italicized incoming predicates (*Efforts Channeled By*, *Responsibility Of*) intermixed. Bonus if a second column is open from a predicate click. | §4.3 + presentation slide |
+| `bmm-explorer-eu-rent.png` | Same Vision selected, switch to the **Explorer tab**. Frame the radial graph so the center Vision and ~5–6 neighbors are legible, with at least one italicized inverse-label visible on an incoming edge. | §4.3 + presentation slide |
+| `bmm-gap-analysis-claude-desktop.png` | A Claude Desktop conversation pane showing the gap-analysis prompt being run against `bmm-server`'s MCP endpoint: the prompt, the assistant's tool-call activity (read shapes, query goals/strategies/tactics), and the resulting table that identifies the *Provide industry-leading customer service* Goal as having a Strategy but no implementing Tactics. | §5.1 |
 
-| Filename | View |
-|---|---|
-| `bmm-mcp-population.png` | Terminal capture of `./testing/populate-eurent.sh` showing ~10 resource-creation log lines — evidence of the scripted replay path. |
-| `define-instantiate-activate-summary.svg` | A single diagram summarizing the three layers and the AI feedback arrow. Export to PNG for Marp inclusion. |
+**Optional — pure visual reinforcement:**
+
+| Filename | View to capture | Used in |
+|---|---|---|
+| `bmm-customer-service-goal-no-chain.png` | The *Provide industry-leading customer service* Goal opened in the column browser, expanded, with the lack of any incoming Tactic visible. Complements the Claude Desktop screenshot above with a "raw evidence" view of the same gap. | optional supplementary visual for §5.1 |
+| `bmm-mcp-population.png` | Terminal capture of `./testing/populate-eurent.sh` running, showing ~10 resource-creation log lines. Evidence of the scripted replay path. | §8 reference only |
+| `define-instantiate-activate-summary.svg` | A custom three-layer diagram with AI feedback arrow. PNG export for Marp inclusion. | §8 reference only — only worth doing if you want a custom summary diagram rather than reusing the existing `image.png` |
 
 ---
 
