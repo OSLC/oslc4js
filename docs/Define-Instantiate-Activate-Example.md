@@ -171,13 +171,17 @@ A single Claude Desktop session populates the entire example in 15–25 minutes.
 
 Once populated, the server holds a real BMM model. The browser at `http://localhost:3005/` surfaces it in three complementary views.
 
-*(Screenshots to capture — see section 8. Filenames referenced: `docs/images/bmm-vision-properties.png`, `docs/images/bmm-column-navigation.png`, `docs/images/bmm-explorer-eu-rent.png`.)*
-
 **Properties tab — Vision selected.** Shows the Vision's literal properties and its outgoing links ("amplifiedBy" to Goals, "madeOperativeBy" to the Mission). Below them, incoming links render in the same table, italicized: "Efforts Channeled By" with the Strategies that target this Vision, "Responsibility Of" with the OrgUnits accountable for it. The inverse wording comes from the *source-side* shape's `oslc:inverseLabel` — for instance, Strategy's `channelsEffortsToward` property declares inverse label "Efforts Channeled By", and that's what the Vision sees. Italics signal that the underlying triple is stored on the source, not on the Vision, but the user navigates as if the relationship were bidirectional.
+
+![Vision Properties tab showing outgoing links to Goals and Mission, plus italicized incoming "Efforts Channeled By" and "Responsibility Of" rows](images/bmm-vision-properties.png)
 
 **Column navigator — expanded Vision.** Each row in the accordion is a predicate. Outgoing predicates (`amplifiedBy`, `madeOperativeBy`) appear in regular type. Incoming predicates (`Efforts Channeled By`, `Responsibility Of`) appear italicized, mixed into the same list. Clicking either kind opens a new column of the related resources — outgoing clicks fetch targets; incoming clicks fetch sources. The user navigates transparently.
 
+![Column navigator showing the Vision accordion expanded with outgoing and italicized incoming predicates intermixed](images/bmm-column-navigation.png)
+
 **Explorer tab — radial graph.** The current resource at the center, every directly-related resource on the perimeter. Outgoing edges point outward with the forward predicate label. Incoming edges point outward too (using the inverse label) so the visual direction matches the conceptual direction, with the incoming portion of each edge label italicized via SVG `<tspan>`. A neighbor that is both a target and a source of relationships shows both labels on a single edge.
+
+![Explorer tab radial graph centered on the Vision with neighbors and italicized inverse-label edges](images/bmm-explorer-eu-rent.png)
 
 ### 4.4 The Instantiate payoff
 
@@ -238,7 +242,7 @@ To make this concrete, here is a representative result of running the first prom
 > - Goal: `http://localhost:3005/oslc/eu-rent/resources/<goal-customer-service-id>`
 > - Strategy: `http://localhost:3005/oslc/eu-rent/resources/<strategy-rewards-id>`
 
-*(Screenshot: `docs/images/bmm-gap-analysis-claude-desktop.png` — the Claude Desktop conversation showing the prompt, the MCP tool-call activity, and the assistant's answer table.)*
+![Claude Desktop conversation showing the gap-analysis prompt, MCP tool-call activity, and the assistant's answer identifying the customer-service Goal as missing implementing Tactics](images/bmm-gap-analysis-claude-desktop.png)
 
 **Why this matters for the framework.** The assistant didn't carry hardcoded BMM knowledge. It read the shapes to learn the chain shape, queried the populated data to find the actual instances, and joined them to find the missing edge. Replacing BMM with another domain vocabulary would let the same prompt archetype find analogous gaps without code changes.
 
