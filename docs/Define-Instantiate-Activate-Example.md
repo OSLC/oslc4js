@@ -142,7 +142,7 @@ Starting `bmm-server` yields, from the declarative Define inputs alone:
 - **Compact resource previews** at `/compact?uri=…` that return formatted summaries for hover tooltips.
 - **An OSLC browser** at `/` — the column-based navigator in `oslc-browser`, serving human-facing navigation, Properties tab, Explorer graph, and diagram views for every shape. Incoming links render with inverse labels automatically because the browser reflects off `oslc:inverseLabel` declarations in the shapes.
 - **An LDM `/discover-links` endpoint** — a per-server implementation of the standard OSLC Link Discovery Management protocol, answering reverse-link queries from the server's own storage.
-- **An embedded MCP endpoint** at `/mcp` — AI assistants get a resource list (`oslc://catalog`, `oslc://vocabulary`, `oslc://shapes`) plus the equivalent `read_catalog` / `read_vocabulary` / `read_shapes` tools for discovery, one tool per creation factory (`create_Vision`, `create_Goal`, …) for authoring, and a single `query_resources` tool for retrieval (filter by type via `oslc.where=rdf:type=<...>`).
+- **An embedded MCP endpoint** at `/mcp` — AI assistants discover the server through the OSLC catalog: a top-level `oslc://catalog` MCP resource and equivalent `read_catalog` tool list every ServiceProvider with its `oslc:domain` vocabulary URIs, creation factories' `oslc:resourceShape` URIs, and query capabilities. Per-class shape and vocabulary content is fetched with `get_resource` on those URIs. Authoring uses one tool per creation factory (`create_Vision`, `create_Goal`, …); retrieval uses a single `query_resources` tool with `oslc.where=rdf:type=<...>` filters.
 
 ### 3.5 The Define payoff
 
@@ -208,15 +208,16 @@ To make this concrete, here is a representative result of running the first prom
 
 **Prompt (paraphrased from `docs/prompts/03-analyze-bmm-model.md`):**
 
-> Read `oslc://catalog`, `oslc://vocabulary`, and `oslc://shapes` first so you understand this server. Then identify Goals in the EU-Rent ServiceProvider that have no realizing Tactic chain — the expected chain is `Goal ← Strategy (channelsEffortsToward / enablesEnd) ← Tactic (implements)`. For each gap, list the Goal's title and URI, the nearest existing coverage, and what kind of Tactic would close the gap. Don't create anything — just report.
+> Call `read_catalog` first so you can see the EU-Rent ServiceProvider's vocabularies, creation factories (with their shape URIs), and query capability. Use `get_resource` on the shape URIs you need to read the per-class definitions. Then identify Goals in the EU-Rent ServiceProvider that have no realizing Tactic chain — the expected chain is `Goal ← Strategy (channelsEffortsToward / enablesEnd) ← Tactic (implements)`. For each gap, list the Goal's title and URI, the nearest existing coverage, and what kind of Tactic would close the gap. Don't create anything — just report.
 
 **What the assistant does (visible via MCP tool calls):**
 
-1. Reads `oslc://shapes` → learns that `Strategy.channelsEffortsToward` and `CourseOfAction.enablesEnd` both target Ends, and that `Tactic.implements` targets Strategy.
-2. `query_resources` (against EU-Rent's `queryBase`, filter `rdf:type=<bmm:Goal>`) → 4 Goals with URIs and titles.
-3. `query_resources` filtered to `bmm:Strategy` → 3 Strategies; for each, fetches `channelsEffortsToward` and `enablesEnd` targets.
-4. `query_resources` filtered to `bmm:Tactic` → 5 Tactics; for each, fetches `implements` target.
-5. Joins the three layers in memory.
+1. `read_catalog` → discovers the EU-Rent SP, its `queryBase`, and the resourceShape URIs for Goal, Strategy, Tactic.
+2. `get_resource` on the StrategyShape URI → learns that `Strategy.channelsEffortsToward` and `CourseOfAction.enablesEnd` both target Ends, and that `Tactic.implements` targets Strategy.
+3. `query_resources` (against EU-Rent's `queryBase`, filter `rdf:type=<bmm:Goal>`) → 4 Goals with URIs and titles.
+4. `query_resources` filtered to `bmm:Strategy` → 3 Strategies; for each, fetches `channelsEffortsToward` and `enablesEnd` targets.
+5. `query_resources` filtered to `bmm:Tactic` → 5 Tactics; for each, fetches `implements` target.
+6. Joins the three layers in memory.
 
 **Representative answer:**
 

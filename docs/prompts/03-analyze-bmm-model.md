@@ -12,9 +12,9 @@ All prompts assume:
 
 Every analysis prompt should start with this preamble so the assistant grounds its answer in the server's live state rather than hallucinating BMM knowledge:
 
-> Before answering, call the `read_catalog`, `read_vocabulary`, and `read_shapes` tools so you understand what's on this server and what relationships are meaningful. Use the `query_resources` tool against the ServiceProvider's `queryBase` to fetch instance data — pass `oslc.where=rdf:type=<...>` to narrow by type. Use `get_resource` to fetch a specific resource by URI. Cite specific resource URIs in your answer so a human can verify every claim against the server.
+> Before answering, call `read_catalog` so you can see the ServiceProviders on this server, their creation factories (each declaring an `oslc:resourceShape` URI), their vocabularies (each SP declares `oslc:domain` namespace URIs), and their query capabilities. Then for the relationships you need to reason about, call `get_resource` on the relevant shape URIs and vocabulary URIs to read their definitions. Use `query_resources` against the ServiceProvider's `queryBase` to fetch instance data — pass `oslc.where=rdf:type=<...>` to narrow by type. Cite specific resource URIs in your answer so a human can verify every claim against the server.
 
-(Notes: `read_catalog` / `read_vocabulary` / `read_shapes` are MCP **tools** that return the same content as the MCP **resources** at `oslc://catalog` / `oslc://vocabulary` / `oslc://shapes`; the tool form is portable across MCP host transports. The vocabulary and shapes returns merge every RDF vocabulary and shape file in `config/domain/` — a server can host multiple vocabularies and shape sets, and one read of each tool returns the union.)
+(Discovery follows OSLC Core: vocabularies and shapes are referenced from each ServiceProvider, not aggregated server-wide. A server can host multiple ServiceProviders, each with its own set of vocabularies and shapes; the catalog tells you which apply where. `read_catalog` mirrors the `oslc://catalog` MCP resource; either form works.)
 
 ## Prompt A — Coverage gaps
 
