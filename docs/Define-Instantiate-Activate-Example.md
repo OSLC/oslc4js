@@ -216,35 +216,33 @@ To make this concrete, here is a representative result of running the first prom
 
 **What the assistant does (visible via MCP tool calls):**
 
-1. `read_catalog` → discovers the EU-Rent SP, its `queryBase`, and the resourceShape URIs for Goal, Strategy, Tactic.
-2. `get_resource` on the StrategyShape URI → learns that `Strategy.channelsEffortsToward` and `CourseOfAction.enablesEnd` both target Ends, and that `Tactic.implements` targets Strategy.
+1. `read_catalog` → discovers the EU-Rent SP, its `queryBase`, the resourceShape URIs for each class, and the `oslc:domain` vocabulary URI (BMM).
+2. `get_resource` on the relevant shape and vocabulary URIs → today this returns the document but does not extract per-fragment shape definitions on its own; the assistant falls back to BMM 1.3 spec knowledge for the chain definition (`Goal ← channelsEffortsToward — Strategy ← implements — Tactic`). Improving fragment-aware resolution is a known follow-up.
 3. `query_resources` (against EU-Rent's `queryBase`, filter `rdf:type=<bmm:Goal>`) → 4 Goals with URIs and titles.
 4. `query_resources` filtered to `bmm:Strategy` → 3 Strategies; for each, fetches `channelsEffortsToward` and `enablesEnd` targets.
 5. `query_resources` filtered to `bmm:Tactic` → 5 Tactics; for each, fetches `implements` target.
 6. Joins the three layers in memory.
 
-**Representative answer:**
+**Actual answer (from a real Claude Desktop session against the populated server):**
 
-> Out of 4 Goals on the EU-Rent ServiceProvider, **3 have a realizing Tactic chain and 1 has a coverage gap.**
+> Out of 4 Goals on the EU-Rent ServiceProvider, **2 have a complete realizing Tactic chain and 2 have coverage gaps.**
 >
 > | Goal | Strategy(ies) channelling effort | Tactics implementing those Strategies | Coverage |
 > |---|---|---|---|
 > | Be a premium brand car rental company | Nationwide on-airport head-to-head competition | Encourage rental extensions | ✅ |
-> | Provide well-maintained cars | Car purchase and disposal | Outsource maintenance for small branches; Create standard specifications of car models; Equalize car usage; Comply with manufacturers' maintenance schedules | ✅ |
-> | Vehicles available when and where expected | Car purchase and disposal *(via `enablesEnd`)* | (same four Tactics as above) | ✅ |
-> | **Provide industry-leading customer service** | **Rewards scheme** *(targets this Goal)* | **— none — no Tactic `implements` the Rewards Strategy** | ❌ |
+> | Provide well-maintained cars | Manage car purchase and disposal at local area level | 4 Tactics (outsource maintenance, standard specs, equalize usage, manufacturer schedules) | ✅ |
+> | **Provide industry-leading customer service** | Outsource loyalty rewards to third-party scheme | **— none — no Tactic implements the rewards Strategy** | ❌ |
+> | **Vehicles available when and where expected** | **— none via `channelsEffortsToward`** *(only appears as an `enablesEnd` target on the car-purchase Strategy)* | n/a | ❌ |
 >
-> **The gap:** the *Provide industry-leading customer service* Goal has a Strategy aimed at it (the rewards scheme), but no Tactic operationalizes that Strategy. The chain stops at the Strategy level.
+> **Gap 1 — `Provide industry-leading customer service`** (URI `http://localhost:3005/oslc/eu-rent/resources/moeotwhsjkhe50`): has a Strategy aimed at it (`moeotyevqp2bsj` "Outsource loyalty rewards to third-party scheme") but no Tactic carries `bmm:implements` pointing at that Strategy. The chain stops at the Strategy level. Closing it would mean Tactics like *"Select and contract a third-party loyalty partner"*, *"Integrate the rewards-scheme API into the booking flow"*, *"Define service-recovery protocols for rental incidents"*, or *"Train front-desk staff on partner-scheme entitlements"*.
 >
-> **What would close the gap:** Tactics that implement the rewards scheme — for example, "Issue tiered loyalty cards at branch sign-up", "Apply automatic discount on the next rental after a 3-rental streak", or "Train branch staff to upsell loyalty enrolment at car return". Each of these would be a Tactic with `implements → <strategy/rewards-scheme>` and ideally `enablesEnd → <goal/customer-service>`.
+> **Gap 2 — `Vehicles available when and where expected`** (URI `http://localhost:3005/oslc/eu-rent/resources/moeotx1cig94wa`): the deeper gap. No Strategy channels efforts toward this Goal. The car-purchase Strategy `moeoty4q89f25p` references it via the broader `bmm:enablesEnd`, but the Goal-specific channeling relationship is absent — and this Goal also has no `quantifiedBy` Objective, making it the weakest-supported End in the model. The Strategy layer needs to be filled in first; a "Demand-driven fleet allocation across branches" or "Inter-branch vehicle repositioning" Strategy would naturally channel here, with Tactics for forecasting, transfer runs, one-way pricing, and high-variance-branch buffers.
 >
-> Resource URIs (so the gap is verifiable on the server):
-> - Goal: `http://localhost:3005/oslc/eu-rent/resources/<goal-customer-service-id>`
-> - Strategy: `http://localhost:3005/oslc/eu-rent/resources/<strategy-rewards-id>`
+> **Side observation (data-quality, not a gap).** Strategy `moeotxuue36wxj` ("Nationwide on-airport head-to-head competition") includes the Vision URI `moeotxkuarqxlw` in its `bmm:channelsEffortsToward`. Our shape's `oslc:range` for that property is `bmm:End`, which covers both Vision and Goal, so it's allowed by the contract — but BMM 1.3's narrative usage typically routes Vision-level alignment through `bmm:enablesEnd` and reserves `channelsEffortsToward` for Goals. Worth a stylistic cleanup, not a validation failure.
 
-![Claude Desktop conversation showing the gap-analysis prompt, MCP tool-call activity, and the assistant's answer identifying the customer-service Goal as missing implementing Tactics](images/bmm-gap-analysis-claude-desktop.png)
+![Claude Desktop conversation showing the gap-analysis prompt, MCP tool-call activity, and the assistant's answer identifying both the customer-service Goal (Strategy with no Tactic) and the availability Goal (no Strategy at all) as gaps](images/bmm-gap-analysis-claude-desktop.png)
 
-**Why this matters for the framework.** The assistant didn't carry hardcoded BMM knowledge. It read the shapes to learn the chain shape, queried the populated data to find the actual instances, and joined them to find the missing edge. Replacing BMM with another domain vocabulary would let the same prompt archetype find analogous gaps without code changes.
+**Why this matters for the framework.** The assistant didn't carry hardcoded BMM knowledge — it read the shapes to learn the chain definition, queried the populated data, and joined the layers to find missing edges. It found *two* gaps in this dataset, including one (the availability Goal having no `channelsEffortsToward` Strategy) that the prompt author hadn't anticipated when writing the example. Replacing BMM with another domain vocabulary would let the same prompt archetype find analogous gaps without code changes.
 
 ### 5.2 Programmatic OSLC consumers
 
