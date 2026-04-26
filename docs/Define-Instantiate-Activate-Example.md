@@ -142,7 +142,7 @@ Starting `bmm-server` yields, from the declarative Define inputs alone:
 - **Compact resource previews** at `/compact?uri=…` that return formatted summaries for hover tooltips.
 - **An OSLC browser** at `/` — the column-based navigator in `oslc-browser`, serving human-facing navigation, Properties tab, Explorer graph, and diagram views for every shape. Incoming links render with inverse labels automatically because the browser reflects off `oslc:inverseLabel` declarations in the shapes.
 - **An LDM `/discover-links` endpoint** — a per-server implementation of the standard OSLC Link Discovery Management protocol, answering reverse-link queries from the server's own storage.
-- **An embedded MCP endpoint** at `/mcp` — AI assistants get a resource list (`oslc://catalog`, `oslc://vocabulary`, `oslc://shapes`) for discovery and one tool per creation factory (`create_Vision`, `create_Goal`, …) and query capability (`query_Vision`, …) for content creation and use.
+- **An embedded MCP endpoint** at `/mcp` — AI assistants get a resource list (`oslc://catalog`, `oslc://vocabulary`, `oslc://shapes`) plus the equivalent `read_catalog` / `read_vocabulary` / `read_shapes` tools for discovery, one tool per creation factory (`create_Vision`, `create_Goal`, …) for authoring, and a single `query_resources` tool for retrieval (filter by type via `oslc.where=rdf:type=<...>`).
 
 ### 3.5 The Define payoff
 
@@ -213,9 +213,9 @@ To make this concrete, here is a representative result of running the first prom
 **What the assistant does (visible via MCP tool calls):**
 
 1. Reads `oslc://shapes` → learns that `Strategy.channelsEffortsToward` and `CourseOfAction.enablesEnd` both target Ends, and that `Tactic.implements` targets Strategy.
-2. `query_goals` → 4 Goals with URIs and titles.
-3. `query_strategies` → 3 Strategies; for each, fetches `channelsEffortsToward` and `enablesEnd` targets.
-4. `query_tactics` → 5 Tactics; for each, fetches `implements` target.
+2. `query_resources` (against EU-Rent's `queryBase`, filter `rdf:type=<bmm:Goal>`) → 4 Goals with URIs and titles.
+3. `query_resources` filtered to `bmm:Strategy` → 3 Strategies; for each, fetches `channelsEffortsToward` and `enablesEnd` targets.
+4. `query_resources` filtered to `bmm:Tactic` → 5 Tactics; for each, fetches `implements` target.
 5. Joins the three layers in memory.
 
 **Representative answer:**

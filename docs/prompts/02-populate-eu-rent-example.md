@@ -12,13 +12,13 @@ This is a canonicalized reference prompt for having an AI assistant read the OMG
 
 > You will populate an OMG Business Motivation Model (BMM) OSLC server with the EU-Rent example from BMM 1.3. EU-Rent is a fictitious European car rental company used as the running example throughout the specification.
 >
-> The server exposes an MCP endpoint at `http://localhost:3005/mcp`. Start by reading its MCP resources — they give you the full picture of what the server supports before you create anything:
+> The server exposes an MCP endpoint at `http://localhost:3005/mcp`. Start by calling these three tools — they give you the full picture of what the server supports before you create anything:
 >
-> 1. `oslc://catalog` — lists all ServiceProviders on the server and their creation factories and query capabilities. You will create a new ServiceProvider for EU-Rent if one doesn't exist.
-> 2. `oslc://vocabulary` — the BMM RDF vocabulary (classes, properties, ranges). Use this to understand what types of resources you can create and what links between them are meaningful.
-> 3. `oslc://shapes` — the OSLC ResourceShapes. For each BMM class, this tells you which fields are required, which are optional, their types, cardinalities, and — critically — the *inverse metadata* on link properties so you know which side of a bidirectional relationship owns the triple.
+> 1. `read_catalog` — lists all ServiceProviders on the server and their creation factories and query capabilities. You will create a new ServiceProvider for EU-Rent if one doesn't exist.
+> 2. `read_vocabulary` — the merged RDF vocabulary across every vocabulary file in `config/domain/` (classes, properties, ranges). Use this to understand what types of resources you can create and what links between them are meaningful.
+> 3. `read_shapes` — the merged OSLC ResourceShapes across every shape file in `config/domain/`. For each class, this tells you which fields are required, which are optional, their types, cardinalities, and — critically — the *inverse metadata* on link properties so you know which side of a bidirectional relationship owns the triple.
 >
-> Read all three before creating resources.
+> Call all three before creating resources. (These tools mirror the MCP resources at `oslc://catalog`, `oslc://vocabulary`, and `oslc://shapes` for MCP host transports that surface tools but not generic resources to the assistant.)
 >
 > **What to create:**
 >
@@ -49,7 +49,7 @@ This is a canonicalized reference prompt for having an AI assistant read the OMG
 >
 > **How to link resources:**
 >
-> - Every link is owned by *one* side — the side whose shape declares the forward property. The MCP shapes resource (`oslc://shapes`) tells you which side owns each relationship via the `oslc:propertyDefinition` on the creation tool's input schema.
+> - Every link is owned by *one* side — the side whose shape declares the forward property. `read_shapes` (or the MCP `oslc://shapes` resource) tells you which side owns each relationship via the `oslc:propertyDefinition` on the creation tool's input schema.
 > - When you want to express "this Strategy channels efforts toward that Vision", create or update the Strategy, passing the Vision URI in `channelsEffortsToward`. Do not try to create an inverse link on the Vision — the triple is stored once, on the Strategy.
 > - To update an existing resource to add a link after both endpoints are created, use the `update_*` tool (one per creation factory).
 >
