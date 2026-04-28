@@ -28,7 +28,7 @@ These let a resource shape declare, for a forward link property such as `bmm:cha
 
 ## Motivation
 
-OSLC relationships are directional: a triple `<source> <predicate> <target> .` is stored on the source resource. When a client displays the *target* resource, it has no built-in way to name or render the relationship — the predicate's local name belongs to the source's domain (e.g., `channelsEffortsToward` is a Strategy concept, not a Vision concept).
+OSLC relationships are directional: a triple `<source> <predicate> <target> .` is stored on the source resource. When a client displays the *target* resource, it has no built-in way to name or render the relationship — the predicate's local name belongs to the source's domain (e.g., `channelsEffortsToward` is a Strategy concept, not a Vision concept). This could also be a way of formalizing the link ownership constraints in the linking profile specification. All the secondary links would be captured as oslc:inversePropertyDefinitions not actual resource properties. 
 
 Existing clients handle this in one of two ways, both unsatisfactory:
 
