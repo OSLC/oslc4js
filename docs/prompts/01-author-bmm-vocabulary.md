@@ -10,7 +10,7 @@ The real authoring sessions were conversational — with discovery, false starts
 - `oslc-service/README.md` — what the OSLC service layer expects from a domain vocabulary.
 - `storage-service/src/storage.ts` — the storage abstraction (informational, for sanity-checking that generated shapes are consistent with CRUD expectations).
 - The OASIS OSLC Core 3.0 specification (via web) for ResourceShape property semantics.
-- `docs/OSLC-Shape-Inverse-Extensions.md` — the two proposed extensions the generated shapes must use.
+- `docs/OSLC-Shape-Extensions.md` — the two proposed extensions the generated shapes must use.
 
 ## Prompt
 
@@ -62,7 +62,7 @@ The real authoring sessions were conversational — with discovery, false starts
 > - `oslc:inversePropertyDefinition` — the URI identifier for the reverse direction, in the `bmm:` namespace. Use a short verb phrase (e.g., for `bmm:amplifiedBy`, the inverse is `bmm:amplifies`).
 > - `oslc:inverseLabel` — the human-readable label for the reverse direction, in title case (e.g., `"Amplifies"`, `"Efforts Channeled By"`, `"Responsibility Of"`).
 >
-> These two properties come from `docs/OSLC-Shape-Inverse-Extensions.md` in this repository. Read that doc before generating shapes — it explains the contract and the constraint that inverse URIs must NOT be asserted as `rdf:Property` in `BMM.ttl`.
+> These two properties come from `docs/OSLC-Shape-Extensions.md` in this repository. Read that doc before generating shapes — it explains the contract and the constraint that inverse URIs must NOT be asserted as `rdf:Property` in `BMM.ttl`.
 >
 > Example for a Strategy's `channelsEffortsToward` property, declared on `StrategyShape`:
 >

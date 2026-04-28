@@ -143,7 +143,7 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 >
 > **Naming rule:** short, domain-agnostic predicates. `amplifiedBy`, not `amplifiedByMission`. `quantifies`, not `quantifiesGoal`.
 >
-> **Inverse metadata rule:** every link property declares `oslc:inversePropertyDefinition` (URI for reverse direction) and `oslc:inverseLabel` (human-readable inverse wording). *See `docs/OSLC-Shape-Inverse-Extensions.md`.*
+> **Inverse metadata rule:** every link property declares `oslc:inversePropertyDefinition` (URI for reverse direction) and `oslc:inverseLabel` (human-readable inverse wording). *See `docs/OSLC-Shape-Extensions.md`.*
 
 Full prompt: `docs/prompts/01-author-bmm-vocabulary.md`
 
@@ -483,7 +483,7 @@ Full V-model scenario is beyond this walkthrough — a natural extension of the 
 
 - **`docs/Define-Instantiate-Activate-Example.md`** — **companion document** for this deck: every shape fragment, prompt, and MCP-response example shown here, with the full reproduction steps
 - **`docs/Define-Instantiate-Activate.md`** — the abstract Define-Instantiate-Activate framework that this worked example demonstrates
-- **`docs/OSLC-Shape-Inverse-Extensions.md`** — proposed OSLC-OP property definitions (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`)
+- **`docs/OSLC-Shape-Extensions.md`** — proposed OSLC-OP property definitions (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`)
 - **`docs/prompts/`** — canonicalized reference prompts for vocabulary authoring, EU-Rent population, and analysis
 - **`bmm-server/README.md`** — server setup and EU-Rent population script
 - **`oslc-browser/README.md`** — incoming-link rendering pipeline
@@ -499,7 +499,7 @@ Full V-model scenario is beyond this walkthrough — a natural extension of the 
 ## Questions, suggestions, and OSLC-OP submissions welcome.
 
 - **Repository:** `github.com/OSLC/oslc4js`
-- **Proposed extensions:** `docs/OSLC-Shape-Inverse-Extensions.md`
+- **Proposed extensions:** `docs/OSLC-Shape-Extensions.md`
 - **Reproduce the walkthrough:** start `bmm-server`, run `testing/populate-eurent.sh`, open `http://localhost:3005/`
 
 *The deeper claim: OSLC has evolved from lifecycle tool integration to knowledge integration. BMM makes that visible. The pattern applies wherever structured meaning meets AI assistants.*

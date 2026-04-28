@@ -54,7 +54,7 @@ The BMM vocabulary in `bmm-server/config/domain/BMM.ttl`, the shapes in `BMM-Sha
 
 **Inverse URIs are identifiers, not redundant triples.** The `bmm:amplifies` URI referenced by `<#p-amplifiedBy>`'s `oslc:inversePropertyDefinition` is *not* declared as an `rdf:Property` in the vocabulary. The triple `<goal> bmm:amplifiedBy <vision> .` is stored exactly once, on the Goal. The inverse URI exists as a naming handle clients use when displaying the Vision side of that relationship. Asserting both directions would double storage and create two sources of truth that can drift.
 
-**Sidebar: our proposed OSLC shape extensions.** The full rationale, property definitions, and contrast with hardcoded inverse-type tables (as used in IBM DOORS Next and `oslc-client`'s `LDMClient`) are in `docs/OSLC-Shape-Inverse-Extensions.md`. Short version: making the shape the single source of truth for inverse labels lets clients reflect off the vocabulary at runtime rather than carrying a static inverse-type map that must be updated whenever a new domain is introduced.
+**Sidebar: our proposed OSLC shape extensions.** The full rationale, property definitions, and contrast with hardcoded inverse-type tables (as used in IBM DOORS Next and `oslc-client`'s `LDMClient`) are in `docs/OSLC-Shape-Extensions.md`. Short version: making the shape the single source of truth for inverse labels lets clients reflect off the vocabulary at runtime rather than carrying a static inverse-type map that must be updated whenever a new domain is introduced.
 
 **What the AI produced — a fragment for the Goal class.** To make the output of this Define step concrete, here is the small slice of the generated artifacts that defines `bmm:Goal` and its relationships.
 
@@ -364,7 +364,7 @@ These screenshots should be captured against a live `bmm-server` running on `htt
 
 - `bmm-server/README.md` — server-level overview, setup, and the EU-Rent population script.
 - `oslc-browser/README.md` — the "Incoming Links" section documents the rendering pipeline for italicized inverse labels.
-- `docs/OSLC-Shape-Inverse-Extensions.md` — proposed `oslc:inversePropertyDefinition` and `oslc:inverseLabel` property definitions, intended for OSLC-OP submission.
+- `docs/OSLC-Shape-Extensions.md` — proposed `oslc:inversePropertyDefinition` and `oslc:inverseLabel` property definitions, intended for OSLC-OP submission.
 - `docs/prompts/01-author-bmm-vocabulary.md` — canonicalized reference prompt for vocabulary + shapes authoring.
 - `docs/prompts/02-populate-eu-rent-example.md` — canonicalized reference prompt for EU-Rent population.
 - `docs/prompts/03-analyze-bmm-model.md` — analysis prompt archetypes (gap analysis, structural summarization, multi-hop traversal, Observe-Propose-Execute, compliance validation).

@@ -17,7 +17,7 @@
 | Scope of "Activate" section | Small (query examples only), medium (analysis prompts + dependency graph), or large (full V-model / change-impact scenario from existing doc) | **Medium** for the new narrative focusing on the relationship between business motivation and traditional application or product lifecycle management; mention SSE and summarize the way business motivation and the knowledge integration concepts demonstrated could also apply to the V model, but keep the V-model scenario as a *later* chapter or appendix so the core walkthrough stays linear. |
 | How to present the Claude prompts | Exact verbatim transcripts; canonicalized reference prompts; or both | **Canonicalized reference prompts** with a note that real prompts may often be more conversational. Verbatim transcripts are long, include false starts, and don't reproduce deterministically. The prompts should produce the expected results. |
 | Screenshot strategy | Re-capture everything post-italics-fix; or reuse existing | **Re-capture** — the browser UI changed materially (italic incoming links, Explorer arrows, merged Links table). Old screenshots would mislead. |
-| Formalize the OSLC shape extensions | Inline in the walkthrough; separate spec doc | **Separate spec doc** (`docs/OSLC-Shape-Inverse-Extensions.md`). The walkthrough references it in one paragraph. This also becomes the draft we'd submit to OSLC-OP. |
+| Formalize the OSLC shape extensions | Inline in the walkthrough; separate spec doc | **Separate spec doc** (`docs/OSLC-Shape-Extensions.md`). The walkthrough references it in one paragraph. This also becomes the draft we'd submit to OSLC-OP. |
 
 ---
 
@@ -25,7 +25,7 @@
 
 1. **`docs/Define-Instantiate-Activate-Example.md`** (extends `Define-Instantiate-Activate.md` with worked example)
 2. **`docs/Define-Instantiate-Activate-Presentation-Example.md`** (extends `Define-Instantiate-Activate-Presentation.md` with a worked example) — Marp source, continues PNG-based image strategy for PDF export compatibility
-3. **`docs/OSLC-Shape-Inverse-Extensions.md`** (new) — standalone reference for `oslc:inversePropertyDefinition` and `oslc:inverseLabel`, written as a proto-OSLC-OP proposal
+3. **`docs/OSLC-Shape-Extensions.md`** (new) — standalone reference for `oslc:inversePropertyDefinition` and `oslc:inverseLabel`, written as a proto-OSLC-OP proposal
 4. **`docs/prompts/`** (new directory) — canonicalized reference prompts, one per significant AI step:
    - `01-author-bmm-vocabulary.md` — the vocabulary + shapes + HTML-rendering prompt
    - `02-populate-eu-rent-example.md` — the EU-Rent-population prompt
@@ -93,7 +93,7 @@ Material to **remove** from the existing doc:
    3.3 Our OSLC ResourceShape extensions (sidebar, links to spec doc)
        - What problem inverse metadata solves (link ownership
          transparency; no hardcoded inverse-type table)
-       - Forward reference to OSLC-Shape-Inverse-Extensions.md
+       - Forward reference to OSLC-Shape-Extensions.md
    3.4 Generating the server
        - create-oslc-server.ts reads config/domain/ and produces a
          working bmm-server
@@ -247,7 +247,7 @@ Optional appendix (slides 35–42)
 | `docs/prompts/01-author-bmm-vocabulary.md` | ~100 lines | Canonicalize from what we actually used; include the naming + inverse-metadata guidance explicitly |
 | `docs/prompts/02-populate-eu-rent-example.md` | ~80 lines | "Read BMM 1.3 Annex C, use the MCP endpoint at …, create all EU-Rent resources with proper links" |
 | `docs/prompts/03-analyze-bmm-model.md` | ~40 lines | A handful of reusable analysis prompts |
-| `docs/OSLC-Shape-Inverse-Extensions.md` | ~150 lines | Proto-OSLC-OP proposal: motivation, property definitions, usage examples (from BMM-Shapes.ttl), contrast with hardcoded inverse tables |
+| `docs/OSLC-Shape-Extensions.md` | ~150 lines | Proto-OSLC-OP proposal: motivation, property definitions, usage examples (from BMM-Shapes.ttl), contrast with hardcoded inverse tables |
 | `docs/images/bmm-vision-properties.png` | screenshot | Vision selected in browser, Properties tab showing italic incoming links |
 | `docs/images/bmm-column-navigation.png` | screenshot | Column view expanded with a navigation path |
 | `docs/images/bmm-explorer-eu-rent.png` | screenshot | Explorer tab showing Vision-centered graph |
@@ -259,7 +259,7 @@ Optional appendix (slides 35–42)
 
 ## Order of operations (when you're ready to execute)
 
-1. Write `docs/OSLC-Shape-Inverse-Extensions.md` first — it's the atomic reference the walkthrough cites.
+1. Write `docs/OSLC-Shape-Extensions.md` first — it's the atomic reference the walkthrough cites.
 2. Write the three prompt reference files.
 3. Capture the screenshots in a single browser session (all from the same EU-Rent dataset, so visuals match the narrative).
 4. Write `Define-Instantiate-Use-Example.md` section by section (top-down from the outline), referencing the existing framework material as needed.

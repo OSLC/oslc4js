@@ -734,6 +734,7 @@
 <#VisionShape>
   a oslc:ResourceShape ;
   dcterms:title "Vision" ;
+  oslc:icon </icons/vision.svg> ;
   oslc:describes bmm:Vision ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -750,6 +751,7 @@
 <#GoalShape>
   a oslc:ResourceShape ;
   dcterms:title "Goal" ;
+  oslc:icon </icons/goal.svg> ;
   oslc:describes bmm:Goal ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -766,6 +768,7 @@
 <#ObjectiveShape>
   a oslc:ResourceShape ;
   dcterms:title "Objective" ;
+  oslc:icon </icons/objective.svg> ;
   oslc:describes bmm:Objective ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -783,6 +786,7 @@
 <#MissionShape>
   a oslc:ResourceShape ;
   dcterms:title "Mission" ;
+  oslc:icon </icons/mission.svg> ;
   oslc:describes bmm:Mission ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -798,6 +802,7 @@
 <#StrategyShape>
   a oslc:ResourceShape ;
   dcterms:title "Strategy" ;
+  oslc:icon </icons/strategy.svg> ;
   oslc:describes bmm:Strategy ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -815,6 +820,7 @@
 <#TacticShape>
   a oslc:ResourceShape ;
   dcterms:title "Tactic" ;
+  oslc:icon </icons/tactic.svg> ;
   oslc:describes bmm:Tactic ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -833,6 +839,7 @@
 <#BusinessPolicyShape>
   a oslc:ResourceShape ;
   dcterms:title "Business Policy" ;
+  oslc:icon </icons/business_policy.svg> ;
   oslc:describes bmm:BusinessPolicy ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -849,6 +856,7 @@
 <#BusinessRuleShape>
   a oslc:ResourceShape ;
   dcterms:title "Business Rule" ;
+  oslc:icon </icons/business_rule.svg> ;
   oslc:describes bmm:BusinessRule ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -867,6 +875,7 @@
 <#InfluencerShape>
   a oslc:ResourceShape ;
   dcterms:title "Influencer" ;
+  oslc:icon </icons/influencer.svg> ;
   oslc:describes bmm:Influencer ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -883,6 +892,7 @@
 <#AssessmentShape>
   a oslc:ResourceShape ;
   dcterms:title "Assessment" ;
+  oslc:icon </icons/assessment.svg> ;
   oslc:describes bmm:Assessment ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -901,6 +911,7 @@
 <#PotentialImpactShape>
   a oslc:ResourceShape ;
   dcterms:title "Potential Impact" ;
+  oslc:icon </icons/potential_impact.svg> ;
   oslc:describes bmm:PotentialImpact ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -919,6 +930,7 @@
 <#OrganizationUnitShape>
   a oslc:ResourceShape ;
   dcterms:title "Organization Unit" ;
+  oslc:icon </icons/organization_unit.svg> ;
   oslc:describes bmm:OrganizationUnit ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -937,6 +949,7 @@
 <#BusinessProcessShape>
   a oslc:ResourceShape ;
   dcterms:title "Business Process" ;
+  oslc:icon </icons/business_process.svg> ;
   oslc:describes bmm:BusinessProcess ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,
@@ -953,6 +966,7 @@
 <#AssetShape>
   a oslc:ResourceShape ;
   dcterms:title "Asset" ;
+  oslc:icon </icons/asset.svg> ;
   oslc:describes bmm:Asset ;
   oslc:property <#p-title>, <#p-description>, <#p-identifier>,
     <#p-creator>, <#p-contributor>, <#p-created>, <#p-modified>,

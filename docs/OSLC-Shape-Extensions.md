@@ -1,9 +1,21 @@
-# OSLC Resource Shape Inverse Property Extensions
+# OSLC Resource Shape Extensions
 
-**Status:** Proposed extension to OSLC Core 3.0, implemented and in use in oslc4js.
+**Status:** Proposed extensions to OSLC Core 3.0, implemented and in use in oslc4js.
 **Target:** OASIS OSLC-OP (Open Services for Lifecycle Collaboration - Open Project).
 
+This document collects the OSLC ResourceShape extensions proposed by the oslc4js project. Each extension is independently submittable to OSLC-OP; they are described together here because they share the same audience and the same broader goal — letting the shape carry enough domain context that clients can render and navigate without hardcoded type knowledge.
+
 ## Summary
+
+| Property | Domain | Range | Purpose |
+|---|---|---|---|
+| `oslc:inversePropertyDefinition` | `oslc:Property` | URI | Identifier for the inverse direction of a directional link property. |
+| `oslc:inverseLabel` | `oslc:Property` | string | Human-readable label for the inverse direction. |
+| `oslc:icon` | `oslc:ResourceShape` | URI | Icon URL representing this resource type, for use in browsers, dialogs, diagrams, and Compact previews. |
+
+The first two enable transparent inverse-link rendering. The third lets a server give every resource type a glyph that clients can show next to the title — without each client carrying its own per-domain icon table.
+
+## Part 1 — Inverse property metadata
 
 Two new properties on `oslc:Property` nodes in an OSLC `ResourceShape`:
 
@@ -174,3 +186,98 @@ Servers that don't declare the extensions continue to work with shape-aware clie
 3. Is there value in a companion property that identifies the *forward* property on the target side (i.e., when the target explicitly wants to enumerate its expected incoming predicates) — or is that information already derivable from shape crawling?
 
 Current oslc4js implementations take the simplest answer (plain `xsd:string`, no description, no forward enumeration) to keep the minimum viable extension small. These questions can be revisited during OSLC-OP review.
+
+---
+
+## Part 2 — Type icons on resource shapes
+
+A new property on `oslc:ResourceShape`:
+
+| Property | Range | Purpose |
+|---|---|---|
+| `oslc:icon` | URI | URL of an icon (typically SVG) representing this resource type. |
+
+This lets a `ResourceShape` advertise an icon glyph alongside its `dcterms:title` so clients can show a consistent visual cue for each resource type — in column browsers, creation dialogs, dependency diagrams, hover previews, anywhere a resource type appears.
+
+### Property definition
+
+```turtle
+@prefix oslc: <http://open-services.net/ns/core#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+oslc:icon a rdf:Property ;
+  rdfs:label "icon" ;
+  rdfs:comment "URL of an icon resource (typically SVG) representing this resource type. When declared on an oslc:ResourceShape, the icon represents the type the shape describes; servers MAY include this URL in the oslc:Compact representation of any resource whose oslc:instanceShape references the shape." ;
+  rdfs:domain oslc:ResourceShape ;
+  rdfs:range rdfs:Resource .
+```
+
+`oslc:icon` is optional and has cardinality `zero-or-one` per ResourceShape.
+
+### Note on the existing `oslc:icon` on Compact
+
+OSLC Core already defines `oslc:icon` on `oslc:Compact` (the resource preview representation). That occurrence is *per resource* and was historically populated either by the server hand-coding logic or left empty. This extension proposes the **same property name** on `oslc:ResourceShape` — making the type-level icon declaration first-class, and giving Compact a deterministic source: read it from the resource's `oslc:instanceShape`. The property URI is identical; the domain is widened to include `oslc:ResourceShape`.
+
+### Motivation
+
+Today, clients that want type icons (e.g., DOORS Next showing a Requirement glyph, ETM showing a Test Case glyph) hardcode them in their UI code, keyed by resource type URI. That's the same coordination problem that `oslc:inverseLabel` addresses for relationship names: every new domain requires a client change, and a shared client across multiple servers needs runtime icon-table merging.
+
+Letting the shape declare the icon URL inverts the coupling: the server (or the domain vocabulary author) chooses the icon, the client reads it via the standard ResourceShape contract.
+
+### Usage example
+
+The BMM Vision shape:
+
+```turtle
+@prefix oslc: <http://open-services.net/ns/core#> .
+@prefix bmm: <http://www.omg.org/spec/BMM#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+<#VisionShape>
+  a oslc:ResourceShape ;
+  oslc:describes bmm:Vision ;
+  dcterms:title "Vision" ;
+  oslc:icon </icons/vision.svg> ;
+  oslc:property <#p-amplifiedBy> , <#p-madeOperativeBy> .
+```
+
+The icon URL is resolved against the shape document's base URI per RDF rules, so a relative `</icons/vision.svg>` resolves to `http://server/icons/vision.svg` when the shape document is served from that server. Absolute URIs are equally valid for cases where the icon library lives elsewhere.
+
+### Server behavior
+
+A server SHOULD include the icon URL in any `oslc:Compact` representation it generates for a resource whose `oslc:instanceShape` references a shape declaring `oslc:icon`. The Compact's existing `oslc:icon` triple — historically rare in practice — gains a deterministic source.
+
+Pseudocode:
+
+```
+when generating Compact for resource R:
+  let shapeURI = R[oslc:instanceShape]
+  if shapeURI:
+    let icon = fetch(shapeURI)[oslc:icon]
+    if icon: emit  R oslc:icon <icon>  in the Compact
+```
+
+This is what `oslc-service`'s Compact handler does (see `compact.ts`). The shape lookup is cached so the cost is one fetch per shape per server lifetime.
+
+### Client behavior
+
+A client receiving an `oslc:Compact` with `oslc:icon` MAY render the icon next to the resource's title, in dialogs, in diagram nodes, etc. A client that wants to show icons for resource types it has never seen before fetches the type's `ResourceShape` (from the catalog, via `oslc:resourceShape` on a creation factory) and reads `oslc:icon` directly.
+
+### Format guidance
+
+The URI's referent SHOULD be a small, square, monochrome-friendly image. SVG is preferred (scales for retina, recolorable via CSS `currentColor`). The size hint is 24×24, matching most icon libraries' native size.
+
+oslc4js bundles 14 Material Design Icons (outlined variant) under `bmm-server/public/icons/`, one per BMM class with a creation factory.
+
+### Forward compatibility
+
+Clients that don't understand `oslc:icon` on the shape ignore the triple — it's an extra property on the shape node. The shape remains a conformant OSLC ResourceShape 3.0 resource. Servers that don't declare it produce Compact representations without the per-resource icon, which is the existing behavior.
+
+### Open questions for OSLC-OP
+
+1. Should there be `oslc:smallIcon` and `oslc:largeIcon` for size variants, paralleling `oslc:smallPreview` / `oslc:largePreview`?
+2. Should `oslc:icon` accept multiple values for theming (light/dark, color variants)?
+3. Should the property also be allowed directly on `oslc:CreationFactory` so creation dialogs can show the icon without first resolving the shape?
+
+The minimum viable extension is a single optional URL on the shape, mirroring existing patterns. Variants and overrides can be layered later without breaking conformance.
