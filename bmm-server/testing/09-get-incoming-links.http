@@ -1,0 +1,95 @@
+###############################################################################
+# 09-get-incoming-links.http — Discover incoming links via OSLC LDM
+#
+# POST /discover-links is the OSLC Link Discovery Management endpoint.
+# It returns triples whose object is one of the supplied target URIs —
+# i.e. links INTO the targets — from this server's storage. Same-server
+# scope only; cross-server incoming links are the domain of a separate
+# LDM provider / LQE, and oslc-browser merges both sources client-side.
+#
+# Body forms accepted:
+#   1. application/json (or application/x-www-form-urlencoded):
+#        objectResources         | objectConceptResources : URI[]
+#        predicateFilters                                  : URI[] (optional)
+#   2. text/turtle / application/rdf+xml:
+#        [] oslc_ldm:resources <t1>, <t2>, ... ;
+#           oslc_ldm:linkPredicates <p1>, <p2>, ... .   (linkPredicates optional)
+#
+# Response: text/turtle with the matched <source> <predicate> <target> triples.
+#
+# Targets below assume 03-07 ran against the solartech ServiceProvider
+# so resources like vision-market-leader and goal-market-share exist.
+###############################################################################
+
+@baseUrl = http://localhost:3005
+@sp = solartech
+
+### ── JSON: incoming links into a Goal ────────────────────────────────
+# Returns triples like
+#   <vision-market-leader> bmm:amplifiedBy <goal-market-share>
+# (the forward link is stored on the Vision; the LDM endpoint surfaces
+# it as an incoming link from the Goal's perspective).
+POST {{baseUrl}}/discover-links
+Content-Type: application/json
+Accept: text/turtle
+
+{
+  "objectResources": [
+    "{{baseUrl}}/oslc/{{sp}}/resources/goal-market-share"
+  ]
+}
+
+### ── JSON: filter by a specific link predicate ───────────────────────
+# Restrict the result to incoming links whose predicate is bmm:amplifiedBy.
+POST {{baseUrl}}/discover-links
+Content-Type: application/json
+Accept: text/turtle
+
+{
+  "objectResources": [
+    "{{baseUrl}}/oslc/{{sp}}/resources/goal-market-share"
+  ],
+  "predicateFilters": [
+    "http://www.omg.org/spec/BMM#amplifiedBy"
+  ]
+}
+
+### ── JSON: incoming links into multiple targets in one request ───────
+# The Vision and Mission together — server returns all matching triples.
+POST {{baseUrl}}/discover-links
+Content-Type: application/json
+Accept: text/turtle
+
+{
+  "objectResources": [
+    "{{baseUrl}}/oslc/{{sp}}/resources/vision-market-leader",
+    "{{baseUrl}}/oslc/{{sp}}/resources/mission-deliver-solar-solutions"
+  ]
+}
+
+### ── JSON: legacy LDM alias objectConceptResources ───────────────────
+# Same as objectResources; accepted for compatibility with older LDM clients.
+POST {{baseUrl}}/discover-links
+Content-Type: application/json
+Accept: text/turtle
+
+{
+  "objectConceptResources": [
+    "{{baseUrl}}/oslc/{{sp}}/resources/objective-revenue-growth"
+  ]
+}
+
+### ── Turtle: OSLC-conformant body shape ──────────────────────────────
+# RDF body using the oslc_ldm: vocabulary. linkPredicates is optional.
+POST {{baseUrl}}/discover-links
+Content-Type: text/turtle
+Accept: text/turtle
+
+@prefix oslc_ldm: <http://open-services.net/ns/ldm#> .
+
+[] oslc_ldm:resources
+     <{{baseUrl}}/oslc/{{sp}}/resources/goal-market-share> ,
+     <{{baseUrl}}/oslc/{{sp}}/resources/goal-customer-satisfaction> ;
+   oslc_ldm:linkPredicates
+     <http://www.omg.org/spec/BMM#amplifiedBy> ,
+     <http://www.omg.org/spec/BMM#includesGoal> .

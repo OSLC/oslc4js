@@ -1,8 +1,10 @@
-# Define — Instantiate — Activate: A BMM Worked Example
+# AAKI: A BMM Worked Example
 
-## End-to-end walkthrough of AI-assisted OSLC using the OMG Business Motivation Model
+## End-to-end walkthrough of AI Assisted Knowledge Integration using the OMG Business Motivation Model
 
-**Companion to [`Define-Instantiate-Activate.md`](Define-Instantiate-Activate.md).** That document lays out the abstract framework — why a semantic value chain needs Define / Instantiate / Activate, why AI and governed knowledge graphs are complementary, and how the pattern applies to the SSE V-model. This document grounds every claim of the framework in a concrete, reproducible walkthrough: build an OSLC server for BMM, populate it with the EU-Rent example from the spec, and activate it for AI-assisted analysis. Every step can be replayed against the `bmm-server` in this repository.
+> **AI Assisted Knowledge Integration (AAKI)** is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI authoring and analysis, and linked-data infrastructure. AAKI is realized in three stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions) — over OSLC linked data and AI-addressable knowledge stores via MCP.
+
+**Companion to [`AAKI.md`](AAKI.md).** That document lays out the abstract framework for AAKI — why the Define / Instantiate / Activate stages need each other, why AI and governed knowledge graphs are complementary, why RDF/Turtle is a deliberate fit with AI authoring, and how the pattern applies to the SSE V-model. This document grounds every claim of the framework in a concrete, reproducible walkthrough: build an OSLC server for BMM, populate it with the EU-Rent example from the spec, and activate it for AI-assisted analysis. Every step can be replayed against the `bmm-server` in this repository.
 
 ---
 
@@ -22,13 +24,13 @@ The goal of having a BMM OSLC server is not academic. The goal is that a Strateg
 
 ---
 
-## 2. The three-layer framework (summary)
+## 2. The three AAKI stages (summary)
 
-The three layers — Define (schema / vocabulary), Instantiate (instance authoring), Activate (outcomes and value) — are defined in detail in the companion [`Define-Instantiate-Activate.md`](Define-Instantiate-Activate.md). The short version: without Define, instances are semantically incoherent across tools; without Instantiate governance, Activate cannot answer versioned questions; without Activate, the governed graph is beautiful and unused.
+The three stages — Define (schema / vocabulary), Instantiate (instance authoring), Activate (outcomes and value) — are defined in detail in the companion [`AAKI.md`](AAKI.md). The short version: without Define, instances are semantically incoherent across tools; without Instantiate governance, Activate cannot answer versioned questions; without Activate, the governed graph is beautiful and unused.
 
-![Define-Instantiate-Activate summary](image.png)
+![AAKI summary — Define, Instantiate, Activate stages over OSLC](DIA-Stages.png)
 
-Historically, Layer 2 was the slow bottleneck — subject matter experts captured knowledge in documents, integrators translated documents into OSLC instances. AI assistants change this. They participate as first-class actors in all three layers. The rest of this document shows how, using BMM as the worked example.
+Historically, Stage 2 was the slow bottleneck — subject matter experts captured knowledge in documents, integrators translated documents into OSLC instances. AI assistants change this. They participate as first-class actors in all three stages, and they're particularly fluent in RDF/Turtle — the format AAKI uses to capture meaning rather than just data structure. The rest of this document shows how, using BMM as the worked example.
 
 ---
 
@@ -54,7 +56,10 @@ The BMM vocabulary in `bmm-server/config/domain/BMM.ttl`, the shapes in `BMM-Sha
 
 **Inverse URIs are identifiers, not redundant triples.** The `bmm:amplifies` URI referenced by `<#p-amplifiedBy>`'s `oslc:inversePropertyDefinition` is *not* declared as an `rdf:Property` in the vocabulary. The triple `<goal> bmm:amplifiedBy <vision> .` is stored exactly once, on the Goal. The inverse URI exists as a naming handle clients use when displaying the Vision side of that relationship. Asserting both directions would double storage and create two sources of truth that can drift.
 
-**Sidebar: our proposed OSLC shape extensions.** The full rationale, property definitions, and contrast with hardcoded inverse-type tables (as used in IBM DOORS Next and `oslc-client`'s `LDMClient`) are in `docs/OSLC-Shape-Extensions.md`. Short version: making the shape the single source of truth for inverse labels lets clients reflect off the vocabulary at runtime rather than carrying a static inverse-type map that must be updated whenever a new domain is introduced.
+**Sidebar: our proposed OSLC shape extensions.** The full rationale, property definitions, and contrast with hardcoded inverse-type tables (as used in IBM DOORS Next and `oslc-client`'s `LDMClient`) are in `docs/OSLC-Shape-Extensions.md`. Short version: making the shape the single source of truth for inverse labels lets clients reflect off the vocabulary at runtime rather than carrying a static inverse-type map that must be updated whenever a new domain is introduced. This extension also allows clients to discover the proper lables to use for
+incoming links accessed through and OSLC Link Discovery Management (LDM) server.
+
+**RDF as the AI's native authoring format.** This is also where AAKI's choice of RDF/Turtle pays off concretely — the AI produces Turtle as fluently as prose because Turtle captures meaning, not just structure. The vocabulary fragments below were generated, reviewed, and revised entirely in Turtle; no intermediate JSON or DSL was needed.
 
 **What the AI produced — a fragment for the Goal class.** To make the output of this Define step concrete, here is the small slice of the generated artifacts that defines `bmm:Goal` and its relationships.
 
@@ -64,7 +69,7 @@ From `BMM.ttl` (the vocabulary):
 bmm:Goal
   a rdfs:Class ;
   rdfs:subClassOf bmm:DesiredResult ;
-  dc11:description "A statement about a state or condition of the enterprise to be brought about or sustained through appropriate Means. A Goal is a long-term, ongoing, qualitative statement of intent. A Goal amplifies a Vision — that is, it indicates what must be done to make the Vision a reality." .
+  dc11:description """A statement about a state or condition of the enterprise to be brought about or sustained through appropriate Means. A Goal is a long-term, ongoing, qualitative statement of intent. A Goal amplifies a Vision — that is, it indicates what must be done to make the Vision a reality.""" .
 
 # Goal → Objective
 bmm:quantifiedBy
@@ -115,7 +120,7 @@ For the full vocabulary and all 14 shapes — including their ranges, cardinalit
 
 ### 3.3 AI as server generator
 
-`bmm-server` itself was not hand-written. The `create-oslc-server.ts` script in the workspace root reads a vocabulary and a shapes file, synthesizes a `config/catalog-template.ttl` that describes one ServiceProvider creation template, one creation factory per shape, and one query capability per managed class, and emits a thin `src/app.ts` that mounts the `oslc-service` Express middleware against a Jena Fuseki backend via `jena-storage-service`. It also scaffolds a `ui/` directory wrapping the `oslc-browser` library, an `env.ts`, and a `package.json` with the right workspace dependencies.
+`bmm-server` itself was not hand-written. The `create-oslc-server.ts` script in the workspace root reads a vocabulary and a shapes file, synthesizes a `config/catalog-template.ttl` that describes one ServiceProvider creation template, one creation factory, selection dialog and creation dialog per managed class, one query capability for the domain, and emits a thin `src/app.ts` that mounts the `oslc-service` Express middleware against a Jena Fuseki backend via `jena-storage-service`. It also scaffolds a `ui/` directory wrapping the `oslc-browser` library, an `env.ts`, and a `package.json` with the right workspace dependencies.
 
 The actual command used to scaffold `bmm-server`, run from the `oslc4js` workspace root:
 
@@ -126,7 +131,7 @@ npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
   --managed Vision,Goal,Objective,Mission,Strategy,Tactic,BusinessPolicy,BusinessRule,Influencer,Assessment,PotentialImpact,OrganizationUnit,BusinessProcess,Asset
 ```
 
-The `--managed` list names the 14 instantiable BMM classes that get creation factories, query capabilities, and creation dialogs. Anything not in that list still has a vocabulary entry and a shape but doesn't get an OSLC service surface — useful for abstract classes (Means, End, Directive, CourseOfAction) that exist as supertypes but are never instantiated directly.
+The `--managed` list names the 14 instantiable BMM classes that get creation factories, query capabilities, and creation dialogs. **ResourceShapes are only authored for these concrete classes — not for the abstract supertypes** (`Means`, `End`, `Directive`, `CourseOfAction`, `DesiredResult`, `MotivationalElement`) that exist purely to give the type hierarchy structure and to give relationships polymorphic ranges (e.g., `Strategy.channelsEffortsToward → End`). Abstract supertypes appear in the vocabulary but have no shape, no factory, no creation dialog — they're never instantiated directly. A handful of specialized subtypes (`ExternalInfluencer`, `InternalInfluencer`, `InfluencingOrganization`, `Regulation`) are also un-shaped: they're handled as `Influencer` instances distinguished by a category property rather than separate creation paths. That accounts for the gap between the 25 classes in `BMM.ttl` and the 14 shapes in `BMM-Shapes.ttl`. This alos allows the generated OSLC server to support only a subset of the domain classes if that is all that is needed for some use case.
 
 After the command completes, `cd bmm-server && npm install && npm run build && npm start` brings up the running server. The entire authored surface area of `bmm-server` after that is its declarative `config/` content; no domain code was written.
 
@@ -137,12 +142,13 @@ Starting `bmm-server` yields, from the declarative Define inputs alone:
 - **A ServiceProvider catalog** at `/oslc` listing the factories, query capabilities, and shapes for each ServiceProvider on the server.
 - **A ServiceProvider creation template** — what ELM calls a project area — that instantiates a new scope and mounts per-scope factories/queries.
 - **Creation factories** for every BMM class, accepting `POST` requests with Turtle bodies and validating against the shape.
-- **Query capability** for every BMM class, accepting OSLC query URIs like `?oslc.where=rdf:type=<bmm:Vision>`.
-- **Creation dialogs** for every class, rendered from the shape's `oslc:hintWidth`/`oslc:hintHeight`/label metadata.
+- **Query capability** for for the server's supported domains, accepting OSLC query URIs like `?oslc.where=rdf:type=<bmm:Vision>`.
+- **Creation and Selection dialogs** for every class, rendered from the shape's `oslc:hintWidth`/`oslc:hintHeight`/label metadata.
 - **Compact resource previews** at `/compact?uri=…` that return formatted summaries for hover tooltips.
 - **An OSLC browser** at `/` — the column-based navigator in `oslc-browser`, serving human-facing navigation, Properties tab, Explorer graph, and diagram views for every shape. Incoming links render with inverse labels automatically because the browser reflects off `oslc:inverseLabel` declarations in the shapes.
 - **An LDM `/discover-links` endpoint** — a per-server implementation of the standard OSLC Link Discovery Management protocol, answering reverse-link queries from the server's own storage.
 - **An embedded MCP endpoint** at `/mcp` — AI assistants discover the server through the OSLC catalog: a top-level `oslc://catalog` MCP resource and equivalent `read_catalog` tool list every ServiceProvider with its `oslc:domain` vocabulary URIs, creation factories' `oslc:resourceShape` URIs, and query capabilities. Per-class shape and vocabulary content is fetched with `get_resource` on those URIs. Authoring uses one tool per creation factory (`create_Vision`, `create_Goal`, …); retrieval uses a single `query_resources` tool with `oslc.where=rdf:type=<...>` filters.
+- **The oslc-browser UI** a simple, easy to use UI to view and navigate resources managed by the server, including their properties and traceability graphic veiws. 
 
 ### 3.5 The Define payoff
 
@@ -261,7 +267,8 @@ A specialized consumer that only needs incoming links — `oslc-browser` is one,
 
 ### 5.4 Human users in the browser
 
-The same BMM server, the same vocabulary, the same shapes, the same data — rendered as column-based navigation, Properties panels, and dependency graphs for stakeholder walkthroughs. A product manager who does not know RDF exists can browse the EU-Rent Vision, follow `amplifiedBy` to its Goals, see the incoming "Efforts Channeled By" Strategies, and understand the realization structure without reading the spec.
+The same BMM server, the same vocabulary, the same shapes, the same data — rendered as column-based navigation, Properties panels, and dependency graphs for stakeholder walkthroughs. A product manager who does not know RDF exists can browse the EU-Rent Vision, follow `amplifiedBy` to its Goals, see the incoming "Efforts Channeled By" Strategies, and understand the realization structure without reading the spec. The same oslc-browser can view and
+navigate any OSLC resource, there is nothing in the browser that is hard-coded to a specific domain. 
 
 ### 5.5 The Activate payoff
 
@@ -273,7 +280,7 @@ The same OSLC service machinery that serves these consumers was itself *built* f
 
 ## 6. What the scenario demonstrates
 
-OSLC has historically been framed as "RDF + typed links + delegated dialogs for lifecycle tool integration." That framing is still accurate as far as it goes. But the BMM walkthrough demonstrates something larger: OSLC now supports **knowledge integration in collaboration with AI assistants**.
+OSLC has historically been framed as "RDF + typed links + delegated dialogs for lifecycle tool integration." That framing is still accurate as far as it goes. But the BMM walkthrough demonstrates something larger: OSLC is the substrate for **AI Assisted Knowledge Integration** — the practice of making domain knowledge actionable across an enterprise through governed ontologies, AI authoring and analysis, and linked-data infrastructure working together.
 
 Three extensions closed that loop in this project:
 
@@ -291,7 +298,7 @@ BMM is one domain. The pattern generalizes. Any ontology that can be captured as
 
 ## 7. Why structure still matters — demonstrated, not just asserted
 
-The [companion framework document](Define-Instantiate-Activate.md) argues that AI and structured knowledge infrastructure are complementary. The BMM walkthrough lets us ground that abstract claim in concrete examples. For each framework claim, here is what actually happened.
+The [companion framework document](AAKI.md) argues that AI and structured knowledge infrastructure are complementary. The BMM walkthrough lets us ground that abstract claim in concrete examples. For each framework claim, here is what actually happened.
 
 ### "AI needs structure to be reliable"
 
@@ -309,54 +316,32 @@ The [companion framework document](Define-Instantiate-Activate.md) argues that A
 
 **Framework claim:** AI collapses the authoring bottleneck and enables cross-graph analysis at a scale impractical by hand.
 
-**Demonstrated:** Manual authoring of 72 linked EU-Rent resources from the BMM PDF is a multi-day SME engagement — which is why this example wasn't routinely populated by hand in the first place. The AI completes it in a single session. On the analysis side, the prompts in `docs/prompts/03-analyze-bmm-model.md` show what becomes practical: gap analysis across Goals and Tactics, five-hop realization traversal, Observe-Propose-Execute authoring with human approval gates. These are queries over the live graph, not summaries over source documents.
+**Demonstrated:** Manual authoring of 72 linked EU-Rent resources from the BMM PDF is a multi-day SME engagement — which is why this example wasn't routinely populated by hand in the first place. The AI completes it in a single session. On the analysis side, the prompts in `docs/prompts/03-analyze-bmm-model.md` show what becomes practical: gap analysis across Goals and Tactics, five-hop realization traversal, Observe-Propose-Execute authoring with human approval gates. These are queries over the live graph, not summaries over source documents. And the analysis did 
+not require a expert to carefully craft a query and report from which a user would then have to manually draw conclusions. 
 
 ### "Integrated architecture, annotated with example content"
 
-**Framework claim:** The three layers form a feedback loop; AI creates in Layer 2, the server governs in Layer 1, AI analyzes in Layer 3, findings flow back into new Layer 2 resources.
+**Framework claim:** The three AAKI stages form a feedback loop; AI creates in Stage 2, the server governs in Stage 1, AI analyzes in Stage 3, findings flow back into new Stage 2 resources.
 
 **Demonstrated:** In the BMM walkthrough:
 
 ```
-Layer 1 (Define): BMM.ttl + BMM-Shapes.ttl authored by Claude from the spec
+Stage 1 (Define):      BMM.ttl + BMM-Shapes.ttl authored by Claude from the spec
                          ↓  (drives)
-Layer 2 (Instantiate): EU-Rent populated by Claude via MCP, 72 linked resources
+Stage 2 (Instantiate): EU-Rent populated by Claude via MCP, 72 linked resources
                          ↓  (feeds)
-Layer 3 (Activate):    Analysis prompts find a Goal with no realizing Tactic chain
+Stage 3 (Activate):    Analysis prompts find a Goal with no realizing Tactic chain
                          ↓  (proposes)
-Layer 2 (Instantiate): New Tactic drafted (Observe-Propose-Execute); human approves; created
+Stage 2 (Instantiate): New Tactic drafted (Observe-Propose-Execute); human approves; created
                          ↓  (verified against)
-Layer 1 (Define):      Shape validation confirms conformance; gap closed in Activate
+Stage 1 (Define):      Shape validation confirms conformance; gap closed in Activate
 ```
 
 Each arrow is a real MCP interaction against the running server. None of it is hypothetical.
 
 ### And the V-model — one paragraph
 
-The same three-layer loop applies upward to the SSE V-model: an AI assistant that queries LQE for structural gaps across requirements / design / test tools, proposes cross-tool action plans through OSLC integration endpoints, and executes authoring through tool-specific MCPs realizes a continuous, quantifiable governance loop. That full scenario is a natural extension of the BMM-anchored loop demonstrated here, applied upward along the traceability chain that BMM anchors. The framework document's "AI-Assisted V-Model" section walks it in more detail.
-
----
-
-## 8. Capturing the walkthrough screenshots
-
-These screenshots should be captured against a live `bmm-server` running on `http://localhost:3005/` with the EU-Rent example populated. Save them to `docs/images/` with the exact filenames below so the document's and presentation deck's image references resolve.
-
-**Required — referenced inline in the walkthrough:**
-
-| Filename | View to capture | Used in |
-|---|---|---|
-| `bmm-vision-properties.png` | Connect, navigate to a Vision (e.g., "Be the car rental brand of choice for business users"), select the row, switch to the **Properties tab**. Frame to show: title, description, outgoing **Links** rows (`amplifiedBy` → 4 Goals, `madeOperativeBy` → Mission), AND at least two italicized incoming rows (*"Efforts Channeled By"* from Strategies, *"Responsibility Of"* from an OrgUnit). | §4.3 + presentation slide |
-| `bmm-column-navigation.png` | Same Vision in the **Column view**: click the chevron to expand. Frame so you see outgoing predicates (regular: `amplifiedBy`, `madeOperativeBy`, etc.) and italicized incoming predicates (*Efforts Channeled By*, *Responsibility Of*) intermixed. Bonus if a second column is open from a predicate click. | §4.3 + presentation slide |
-| `bmm-explorer-eu-rent.png` | Same Vision selected, switch to the **Explorer tab**. Frame the radial graph so the center Vision and ~5–6 neighbors are legible, with at least one italicized inverse-label visible on an incoming edge. | §4.3 + presentation slide |
-| `bmm-gap-analysis-claude-desktop.png` | A Claude Desktop conversation pane showing the gap-analysis prompt being run against `bmm-server`'s MCP endpoint: the prompt, the assistant's tool-call activity (read shapes, query goals/strategies/tactics), and the resulting table that identifies the *Provide industry-leading customer service* Goal as having a Strategy but no implementing Tactics. | §5.1 |
-
-**Optional — pure visual reinforcement:**
-
-| Filename | View to capture | Used in |
-|---|---|---|
-| `bmm-customer-service-goal-no-chain.png` | The *Provide industry-leading customer service* Goal opened in the column browser, expanded, with the lack of any incoming Tactic visible. Complements the Claude Desktop screenshot above with a "raw evidence" view of the same gap. | optional supplementary visual for §5.1 |
-| `bmm-mcp-population.png` | Terminal capture of `./testing/populate-eurent.sh` running, showing ~10 resource-creation log lines. Evidence of the scripted replay path. | §8 reference only |
-| `define-instantiate-activate-summary.svg` | A custom three-layer diagram with AI feedback arrow. PNG export for Marp inclusion. | §8 reference only — only worth doing if you want a custom summary diagram rather than reusing the existing `image.png` |
+The same AAKI loop applies upward to the SSE V-model: an AI assistant that queries LQE for structural gaps across requirements / design / test tools, proposes cross-tool action plans through OSLC integration endpoints, and executes authoring through tool-specific MCPs realizes a continuous, quantifiable governance loop. That full scenario is a natural extension of the BMM-anchored loop demonstrated here, applied upward along the traceability chain that BMM anchors. The framework document's "Applying AAKI to an AI-Assisted V-Model" section walks it in more detail.
 
 ---
 

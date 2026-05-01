@@ -2,11 +2,11 @@
 
 An [OSLC 3.0](https://docs.oasis-open-projects.org/oslc-op/core/v3.0/oslc-core.html) server for the [OMG Business Motivation Model (BMM) 1.3](https://www.omg.org/spec/BMM/1.3/) built with Node.js and Express. It uses the **oslc-service** Express middleware for OSLC operations, backed by **Apache Jena Fuseki** for RDF persistence.
 
-BMM provides a scheme for developing, communicating, and managing business plans in an organized manner. It captures the relationships between an enterprise's Ends (what it wants to achieve) and its Means (how it intends to achieve them), along with the Influencers and Assessments that shape business motivation.
+BMM provides a scheme for developing, communicating, and managing business plans in an organized manner. It captures the relationships between an enterprise's Ends (what it wants to achieve) and its Means (how it intends to achieve them), along with the Influencers and Assessments that shape business motivation. BMM provides the business motivation that can guide the ALM, PLM and SSE initiativities, activities and deliverables.
 
 This server manages the following BMM resource types: **Vision**, **Goal**, **Objective**, **Mission**, **Strategy**, **Tactic**, **Business Policy**, **Business Rule**, **Influencer**, **Assessment**, **Potential Impact**, **Organization Unit**, **Business Process**, **Asset**.
 
-This is a complete demonstration of the Define-Instantiate-Activate pattern from the architecture document (../docs/Define-Instantiate-Activate.md):
+This is a complete demonstration of **AI Assisted Knowledge Integration (AAKI)**, realized through its Define / Instantiate / Activate stages over OSLC linked data and AI-addressable knowledge stores via MCP — see the [AAKI framework](../docs/AAKI.md) and the [BMM-grounded walkthrough](../docs/AAKI-Example.md):
 
   **Define** — BMM.ttl vocabulary (25 classes, 49 properties), BMM-Shapes.ttl (14 ResourceShapes), and a catalog template — all declarative, no application code. Claude was used to create the BMM OSLC vocabulary and resource shapes directly from the OMG specification at: https://www.omg.org/spec/BMM/1.3/PDF. 
 
@@ -16,7 +16,7 @@ This is a complete demonstration of the Define-Instantiate-Activate pattern from
 
 And the bmm-server gets a generic, reusable OSLC browser that can be used to view and navigate those BMM sample resources:
 
-![alt text](image-3.png)
+![OSLC Browser Overview](readme-images/browser-overview.png)
 
 None of this is BMM-specific. The same toolchain works for any domain — swap the vocabulary and shapes, run the scaffolding script, and you have a working OSLC server with
 an AI-accessible MCP endpoint and a generic, usable and consistent UI. The barrier between domain knowledge and a working, AI-integrated tool is now just three Turtle files that can often be generated from your existing documentation.
@@ -109,7 +109,7 @@ The spec PDF is included at `docs/BMM-formal-15-05-19.pdf`.
 
 There are two equivalent paths. Both exercise the same MCP create/query tools that an AI assistant uses — one interactively, one scripted.
 
-*Path A — AI-driven (demonstrates the Define-Instantiate-Activate vision):*
+*Path A — AI-driven (demonstrates the AAKI vision):*
 
 1. Start bmm-server and Fuseki as described above.
 2. Connect an AI assistant (e.g., Claude Desktop) to the MCP endpoint at `http://localhost:3005/mcp`.

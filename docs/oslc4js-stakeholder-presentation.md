@@ -77,47 +77,47 @@ The people who **can build ontologies** don't have the domain expertise.
 
 <!-- _class: lead -->
 
-# The Semantic Value Chain
+# AI Assisted Knowledge Integration
 
 ## Define — Instantiate — Activate
 
 ---
 
-# Three Layers of Shared Meaning
+# Three Stages of Shared Meaning
 
-To make domain knowledge actionable across an enterprise, three layers must work together:
+To make domain knowledge actionable across an enterprise, **AI Assisted Knowledge Integration (AAKI)** proposes three realization stages:
 
-| Layer | Question it answers | Character |
+| Stage | Question it answers | Character |
 |---|---|---|
 | **1. Define** | What kinds of things exist? What properties and relationships do they have? | Schema / vocabulary governance |
 | **2. Instantiate** | What are the actual artifacts — requirements, services, processes — their content, links, and governance state? | Instance creation and management |
 | **3. Activate** | What decisions, compliance evidence, analyses, and actions can we derive from the governed data? | Value delivery and outcomes |
 
-This maps onto the classic *schema / instance / use* distinction from information architecture — applied to the OSLC linked data ecosystem.
+This maps onto the classic *schema / instance / use* distinction from information architecture — applied to **AAKI: realized over OSLC linked data and AI-addressable knowledge stores via MCP.**
 
 ---
 
 # Where Deployments Fail
 
-Most OSLC deployments invest heavily in Layer 2 (tools, adapters, data migration) without adequate investment in the other layers:
+Most OSLC deployments invest heavily in Stage 2 (tools, adapters, data migration) without adequate investment in the other stages:
 
-- **Without Layer 1** (Define) — Layer 2 produces a connected but *semantically incoherent* graph. Links exist but mean different things in different tools.
+- **Without Stage 1** (Define) — Stage 2 produces a connected but *semantically incoherent* graph. Links exist but mean different things in different tools.
 
-- **Without Layer 2 governance** (versioning, configuration management) — Layer 3 can't answer versioned questions. All you get is a snapshot of today's state.
+- **Without Stage 2 governance** (versioning, configuration management) — Stage 3 can't answer versioned questions. All you get is a snapshot of today's state.
 
-- **Without Layer 3** (Activate) — Layers 1 and 2 produce a beautifully governed but *unused* knowledge graph. The classic ontology project failure mode.
+- **Without Stage 3** (Activate) — Stages 1 and 2 produce a beautifully governed but *unused* knowledge graph. The classic ontology project failure mode.
 
-> The three barriers that follow are concrete manifestations of gaps in these layers.
+> The three barriers that follow are concrete manifestations of gaps in these stages.
 
 ---
 
-# How oslc4js Addresses Each Layer
+# How oslc4js Addresses Each Stage
 
-**Layer 1 — Define:** Declarative vocabularies and OSLC ResourceShapes formalize domain knowledge as REST API contracts. Vocabulary governance tools (e.g., TopBraid EDG) manage the ontology lifecycle.
+**Stage 1 — Define:** Declarative vocabularies and OSLC ResourceShapes formalize domain knowledge as REST API contracts. Vocabulary governance tools (e.g., TopBraid EDG) manage the ontology lifecycle. Authored in RDF/Turtle — the format AI assistants produce and consume most fluently.
 
-**Layer 2 — Instantiate:** The OSLC server hosts governed instances. AI via MCP acts as a first-class participant — creating, linking, and validating resources directly. Configuration management (GCM) adds the temporal dimension.
+**Stage 2 — Instantiate:** The OSLC server hosts governed instances. AI via MCP acts as a first-class participant — creating, linking, and validating resources directly. Configuration management (GCM) adds the temporal dimension.
 
-**Layer 3 — Activate:** Three mechanisms deliver value:
+**Stage 3 — Activate:** Three mechanisms deliver value:
 - *Analytical* — SPARQL/LQE queries for traceability, compliance, coverage
 - *Agentic* — MCP endpoint lets AI reason over live data and propose actions
 - *Operational* — Tool integrations surface linked data inline in native environments

@@ -49,13 +49,13 @@ style: |
   }
 ---
 
-# Define — Instantiate — Activate: A BMM Worked Example
+# AAKI: A BMM Worked Example
 
-## AI-Assisted OSLC, Walked End-to-End
+## AI Assisted Knowledge Integration, Walked End-to-End
 
-### Companion to the Define-Instantiate-Activate framework deck
+### Companion to the AAKI framework deck
 
-The detailed worked example for this deck — every shape fragment, prompt, and MCP response shown here, plus the full reproduction steps — lives in **`docs/Define-Instantiate-Activate-Example.md`**. This deck summarizes the journey; that document grounds it.
+The detailed worked example for this deck — every shape fragment, prompt, and MCP response shown here, plus the full reproduction steps — lives in **`docs/AAKI-Example.md`**. This deck summarizes the journey; that document grounds it.
 
 ---
 
@@ -65,7 +65,7 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 
 - The Problem BMM Lets Us Tell
 - Why BMM Is the Right Lens
-- The Three-Layer Framework
+- The Three AAKI Stages
 - Define — Authoring with AI
 - Define — Our Shape Extensions
 - Define — `create-oslc-server.ts`
@@ -108,15 +108,17 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 
 ---
 
-# The Three-Layer Framework
+# The Three AAKI Stages
 
-| Layer | Answers | What's new with AI |
+| Stage | Answers | What's new with AI |
 |---|---|---|
-| **Define** — schema | What kinds of things exist, how they relate, what UI metadata drives authoring | AI authors vocabulary + shapes from spec documents |
+| **Define** — schema | What kinds of things exist, how they relate, what UI metadata drives authoring | AI authors vocabulary + shapes (in Turtle, fluently) from spec documents |
 | **Instantiate** — artifacts | What are the actual Visions, Goals, Strategies in this organization | AI populates through MCP, translating SME intent into shape-conformant resources |
 | **Activate** — value | What decisions, reports, analyses, and agent actions the data enables | AI queries the governed graph for gaps, summaries, proposed actions — with humans in the governance loop |
 
-![h:260px](image.png)
+![h:200px](DIA-Stages.png)
+
+> *RDF/Turtle is unusually well-suited to AI workflows — it captures meaning, not structure. AI assistants produce and consume Turtle as fluently as prose.*
 
 ---
 
@@ -168,7 +170,7 @@ Two new properties on `oslc:Property`, proposed for OSLC-OP:
   oslc:inverseLabel "Efforts Channeled By" .
 ```
 
-**Why it matters:** the inverse URI is an *identifier*, not asserted as an `rdf:Property`. The triple is stored once. Clients render incoming links by reflecting off the shape — no hardcoded inverse-type tables like DOORS Next or `oslc-client.LDMClient.INVERSE_LINK_TYPES`.
+**Why it matters:** the inverse URI is an *identifier*, not asserted as an `rdf:Property`. The triple is stored once. Clients render incoming links by reflecting off the shape — no hardcoded inverse-type tables like DOORS Next or `oslc-client.LDMClient.INVERSE_LINK_TYPES`. Same benefit applies to OSLC **LDM** clients: incoming links discovered via `/discover-links`.
 
 ---
 
@@ -185,7 +187,8 @@ npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
             OrganizationUnit,BusinessProcess,Asset
 ```
 
-- Generates `config/catalog-template.ttl` — one ServiceProvider creation template, one creation factory per managed class, one query capability per managed class.
+- Generates `config/catalog-template.ttl` — one ServiceProvider creation template, one creation factory + creation/selection dialogs per managed class, one query capability for the domain.
+- `--managed` can be a **subset** of the domain's classes when only some need to be instantiated for the use case.
 - Emits a thin `src/app.ts` that mounts `oslc-service` against a Jena Fuseki backend via `jena-storage-service`.
 - Scaffolds a `ui/` directory wrapping the `oslc-browser` library.
 - Authored surface area: declarative `config/` content. **No domain code.**
@@ -198,7 +201,7 @@ Starting `bmm-server` yields, from the declarative inputs alone:
 
 - **Service Provider catalog** at `/oslc` — factories, queries, shapes per ServiceProvider
 - **Service Provider creation template** (what ELM calls a *project area*)
-- **Creation factories + creation dialogs + query capabilities** per BMM class
+- **Creation factories + creation/selection dialogs** per managed class; **one query capability for the domain**
 - **Compact resource previews** for hover tooltips
 - **OSLC browser** at `/` — column navigation, Properties, Explorer graph, diagrams
 - **LDM `/discover-links` endpoint** — standard OSLC Link Discovery Management, answered from this server's storage
@@ -247,7 +250,7 @@ The next question: what does populating this server look like?
 - ~20 Influencers, ~6 Assessments, ~5 Potential Impacts
 - ~4 Business Processes, ~4 Assets, ~4 Organization Units
 
-**4. Link.** Every BMM relationship type (`channelsEffortsToward`, `amplifiedBy`, `quantifiedBy`, `assesses`, `enablesEnd`, …) exercised at least once.
+**4. Link.** Every BMM relationship type.
 
 **5. Report.** Query each class, spot-check link graphs, summarize counts.
 
@@ -261,7 +264,7 @@ Full prompt: `docs/prompts/02-populate-eu-rent-example.md`
 
 **Scripted:** `bmm-server/testing/populate-eurent.sh` does the same work non-interactively in ~60 seconds for fast dev-loop replays.
 
-**Either path produces the same populated graph.** The interactive path is the authoritative Define-Instantiate-Activate demonstration; the script is a time-saver.
+**Either path produces the same populated graph.** The interactive path is the authoritative AAKI demonstration; the script is a time-saver.
 
 ---
 
@@ -323,7 +326,7 @@ The AI is not replacing subject-matter expertise. It removes the translation-int
 
 ## One contract, four kinds of consumer
 
-The same Define-Instantiate deliverables serve four consumer archetypes without additional code:
+The same Define + Instantiate deliverables serve four consumer archetypes without additional code:
 
 1. **AI assistants** asking analytical questions
 2. **Programmatic OSLC consumers** running standard queries
@@ -377,13 +380,13 @@ Any OSLC-conformant client consumes this — existing ELM adapters, MID Connecto
 
 A **federating consumer** (an LQE or dedicated LDM provider) could aggregate BMM resources alongside requirements, test cases, and change requests from ELM via TRS feeds. Answers cross-domain questions: *"which test cases verify requirements realizing Goals that amplify the EU-Rent Vision?"*
 
-TRS feeds in `oslc-service` are a future extension; the `/discover-links` endpoint we built today covers same-server reverse queries in the meantime.
+TRS feeds in `oslc-service` are a future extension; the `/discover-links` endpoint covers same-server incoming link queries.
 
 ---
 
 # Activate — LDM and Human Users
 
-**LDM `/discover-links`** — a specialized client posts a target URI, gets back the reverse triples. Labels resolved client-side from the shape cache via `oslc:inverseLabel`. Same wire format as a dedicated LDM/LQE provider, so clients work interchangeably.
+**LDM `/discover-links`** — a specialized client posts a target URI, gets back the incoming links (reverse triples). Labels resolved client-side from the shape cache via `oslc:inverseLabel`. Same wire format as a dedicated LDM/LQE provider, so clients work interchangeably.
 
 **Human users** — the same BMM server, same vocabulary, same shapes, same data, rendered as a column browser, Properties panels, and dependency graphs for stakeholder walkthroughs.
 
@@ -399,7 +402,7 @@ A product manager who doesn't know RDF exists browses the EU-Rent Vision, follow
 - Adding a new consumer kind — GraphQL gateway, SHACL validator, natural-language translator — costs **shape reads**, not a new inverse-type table or a domain-specific adapter.
 - The server **exploits OSLC templates and OSLC discovery** to build its own services declaratively from `config/domain/`. OSLC is both the contract the server implements and the pattern by which the server is defined.
 
-Replacing BMM with a new domain vocabulary costs a new `config/domain/`, not a rewrite.
+Replacing or extending BMM with a new domain vocabulary costs a new `config/domain/`, not a rewrite.
 
 ---
 
@@ -413,20 +416,20 @@ Still accurate. Still valuable.
 
 **New framing demonstrated by this walkthrough:**
 
-> "OSLC now supports **knowledge integration in collaboration with AI assistants**."
+> "OSLC is the substrate for **AI Assisted Knowledge Integration (AAKI)**."
 
-The RDF, the links, and the delegated dialogs are still there. But the server has become an **AI-addressable structured knowledge store**, not just a human-facing web application.
+The RDF, the links, and the delegated dialogs are still there. But the server has become an **AI-addressable knowledge store**, not just a human-facing web application — and RDF/Turtle, far from being legacy baggage, turns out to be the ideal exchange format between AI authoring and the governed system of record.
 
 ---
 
-# The Three Extensions That Closed the Loop
+# The Three Extensions That Closed the AAKI Loop
 
 None of these changed OSLC Core or the RDF model. Each earns its place by removing a specific point of coordination that used to block AI-assisted workflows.
 
 | Extension | Removes |
 |---|---|
 | **Embedded MCP endpoint** in `oslc-service` | The gap between OSLC servers and AI assistants — no separate MCP bridge to build or run. |
-| **LDM `/discover-links`** per server | The need for a dedicated LDM provider before incoming-link discovery is usable. |
+| **LDM `/discover-links`** per server | The need for a dedicated LDM provider for efficient access to locally accessible incoming links. |
 | **Shape inverse metadata** (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`) | Hardcoded client-side inverse-type tables. Vocabulary governance replaces client-rebuild cycles. |
 
 ---
@@ -435,7 +438,7 @@ None of these changed OSLC Core or the RDF model. Each earns its place by removi
 
 **AI alone:** ephemeral. No auditability, no persistence, no interoperability, no governance. A conversation produces text, not artifacts.
 
-**Ontology + OSLC alone:** governed but under-populated. The authoring bottleneck kept these systems from accumulating the instance data that makes them valuable.
+**Ontology + OSLC alone:** governed but under-populated and hard to use. The authoring bottleneck kept these systems from accumulating the instance data that makes them valuable.
 
 **Together:** the AI is the most capable authoring and analysis tool a governed knowledge graph has ever had. The governed knowledge graph is the persistent, auditable, queryable substrate the AI needs to produce decisions rather than conversations.
 
@@ -443,15 +446,15 @@ None of these changed OSLC Core or the RDF model. Each earns its place by removi
 
 ---
 
-# Define → Instantiate → Activate — BMM Annotated
+# AAKI Stages — BMM Annotated
 
-![h:340px](image.png)
+![h:240px](DIA-Stages.png)
 
 - **Define** — Claude authored `BMM.ttl` (25 classes, 49 properties), `BMM-Shapes.ttl` (14 shapes, 38 link properties with inverse metadata), `BMM-Shapes.html` — from the OMG spec. Zero domain code.
 - **Instantiate** — Claude populated **72 linked EU-Rent resources** via MCP in a single session: 1 Vision, 4 Goals, 1 Mission, 3 Strategies, 5 Tactics, 5 Policies, 6 Rules, 20 Influencers, 6 Assessments, …
 - **Activate** — gap analysis ("unrealized Goals"), structural summary ("Influence landscape"), Observe-Propose-Execute authoring — all over the same declarative contract. Human browser + LDM clients + OSLC queries + AI analysts served by one shape set.
 
-Feedback flows back from Activate into new Instantiate actions, which the governed Define layer keeps semantically coherent.
+Feedback flows back from Activate into new Instantiate actions, the governed Define stage keeps coherent.
 
 ---
 
@@ -471,9 +474,9 @@ Full V-model scenario is beyond this walkthrough — a natural extension of the 
 
 # Key Takeaways
 
-1. **The shape is the contract.** Define it with AI help. Every operational surface — REST, UI, LDM, MCP — follows.
-2. **AI participates in all three layers.** Authoring (Define), population (Instantiate), analysis (Activate). Humans stay in the governance loop where it matters.
-3. **Small extensions, large consequences.** Embedded MCP + LDM `/discover-links` + shape inverse metadata together make OSLC an AI-addressable knowledge integration substrate.
+1. **The shape is the constraining contract.** Define it with AI help. Every operational surface — REST, UI, LDM, MCP — follows.
+2. **AI participates in all three AAKI stages.** Authoring (Define), population (Instantiate), analysis (Activate). Humans stay in the governance loop where it matters.
+3. **Small extensions, large consequences.** Embedded MCP + LDM `/discover-links` + shape inverse metadata together make OSLC an AI-addressable knowledge integration substrate — the technical realization of AAKI.
 4. **Structure and AI are complementary.** The system of record supplies auditability, persistence, interoperability, governance. The AI supplies authoring speed and analytical depth.
 5. **BMM is the demo; the pattern generalizes.** Any ontology expressible as RDF + shapes works the same way.
 
@@ -481,14 +484,14 @@ Full V-model scenario is beyond this walkthrough — a natural extension of the 
 
 # References
 
-- **`docs/Define-Instantiate-Activate-Example.md`** — **companion document** for this deck: every shape fragment, prompt, and MCP-response example shown here, with the full reproduction steps
-- **`docs/Define-Instantiate-Activate.md`** — the abstract Define-Instantiate-Activate framework that this worked example demonstrates
-- **`docs/OSLC-Shape-Extensions.md`** — proposed OSLC-OP property definitions (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`)
-- **`docs/prompts/`** — canonicalized reference prompts for vocabulary authoring, EU-Rent population, and analysis
-- **`bmm-server/README.md`** — server setup and EU-Rent population script
-- **`oslc-browser/README.md`** — incoming-link rendering pipeline
-- **OMG Business Motivation Model 1.3** — `bmm-server/docs/BMM-formal-15-05-19.pdf`
-- **OASIS OSLC Core 3.0** — the baseline this work extends
+- [**`docs/AAKI-Example.md`**](https://github.com/OSLC/oslc4js/blob/master/docs/AAKI-Example.md) — **companion document** for this deck: every shape fragment, prompt, and MCP-response example shown here, with the full reproduction steps
+- [**`docs/AAKI.md`**](https://github.com/OSLC/oslc4js/blob/master/docs/AAKI.md) — the abstract AAKI framework that this worked example demonstrates
+- [**`docs/OSLC-Shape-Extensions.md`**](https://github.com/OSLC/oslc4js/blob/master/docs/OSLC-Shape-Extensions.md) — proposed OSLC-OP property definitions (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`)
+- [**`docs/prompts/`**](https://github.com/OSLC/oslc4js/tree/master/docs/prompts) — canonicalized reference prompts for vocabulary authoring, EU-Rent population, and analysis
+- [**`bmm-server/README.md`**](https://github.com/OSLC/oslc4js/blob/master/bmm-server/README.md) — server setup and EU-Rent population script
+- [**`oslc-browser/README.md`**](https://github.com/OSLC/oslc4js/blob/master/oslc-browser/README.md) — incoming-link rendering pipeline
+- [**OMG Business Motivation Model 1.3**](https://www.omg.org/spec/BMM/1.3) — local PDF: [`bmm-server/docs/BMM-formal-15-05-19.pdf`](https://github.com/OSLC/oslc4js/blob/master/bmm-server/docs/BMM-formal-15-05-19.pdf)
+- [**OASIS OSLC Core 3.0**](https://docs.oasis-open-projects.org/oslc-op/core/v3.0/oslc-core.html) — the baseline this work extends
 
 ---
 
@@ -498,8 +501,8 @@ Full V-model scenario is beyond this walkthrough — a natural extension of the 
 
 ## Questions, suggestions, and OSLC-OP submissions welcome.
 
-- **Repository:** `github.com/OSLC/oslc4js`
-- **Proposed extensions:** `docs/OSLC-Shape-Extensions.md`
-- **Reproduce the walkthrough:** start `bmm-server`, run `testing/populate-eurent.sh`, open `http://localhost:3005/`
+- **Repository:** [github.com/OSLC/oslc4js](https://github.com/OSLC/oslc4js)
+- **Proposed extensions:** [docs/OSLC-Shape-Extensions.md](https://github.com/OSLC/oslc4js/blob/master/docs/OSLC-Shape-Extensions.md)
+- **Reproduce the walkthrough:** start `bmm-server`, run [`testing/populate-eurent.sh`](https://github.com/OSLC/oslc4js/blob/master/bmm-server/testing/populate-eurent.sh), open [http://localhost:3005/](http://localhost:3005/)
 
 *The deeper claim: OSLC has evolved from lifecycle tool integration to knowledge integration. BMM makes that visible. The pattern applies wherever structured meaning meets AI assistants.*

@@ -1,6 +1,6 @@
 # Reference Prompts: Analyze a Populated BMM Model
 
-This file collects canonicalized analysis prompts for the Activate phase of the Define-Instantiate-Activate story. Each prompt demonstrates a different kind of value that AI assistants can extract from a populated BMM OSLC server, using only the MCP endpoint and the server's declarative schema.
+This file collects canonicalized analysis prompts for the Activate stage of AAKI (AI Assisted Knowledge Integration). Each prompt demonstrates a different kind of value that AI assistants can extract from a populated BMM OSLC server, using only the MCP endpoint and the server's declarative schema.
 
 All prompts assume:
 
@@ -60,7 +60,7 @@ This prompt demonstrates *multi-hop traversal*: the assistant builds a picture a
 >
 > Do not create the Rule yet — this is a review step. If I approve, I will ask you to create it via the `create_BusinessRule` MCP tool.
 
-This prompt demonstrates the *Observe-Propose-Execute* governance pattern from the Define-Instantiate-Activate framework: the assistant has `create_*` tools available but stops short of using them, drafting a proposal for human review. Only after approval would the user authorize creation.
+This prompt demonstrates the *Observe-Propose-Execute* governance pattern from the AAKI framework: the assistant has `create_*` tools available but stops short of using them, drafting a proposal for human review. Only after approval would the user authorize creation.
 
 ## Prompt E — Compliance check
 

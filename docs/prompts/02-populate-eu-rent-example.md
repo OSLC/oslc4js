@@ -90,4 +90,4 @@ Total runtime in a single Claude Desktop session: roughly 15–25 minutes depend
 
 ## Alternative: scripted replay
 
-For faster development cycles, the same resources can be created via `bmm-server/testing/populate-eurent.sh`, which talks to the MCP endpoint non-interactively and produces an equivalent dataset in ~60 seconds. The AI-driven path is the authoritative demonstration of the Define-Instantiate-Activate story; the script is a time-saver for engineers iterating on the server.
+For faster development cycles, the same resources can be created via `bmm-server/testing/populate-eurent.sh`, which talks to the MCP endpoint non-interactively and produces an equivalent dataset in ~60 seconds. The AI-driven path is the authoritative demonstration of AAKI; the script is a time-saver for engineers iterating on the server.

@@ -67,8 +67,8 @@ const WELL_KNOWN_NAMESPACES = new Set([
 interface CliArgs {
   name: string;
   port: number;
-  vocab?: string;
-  shapes?: string;
+  vocab: string[];
+  shapes: string[];
   managed?: string[];
 }
 
@@ -76,8 +76,12 @@ function parseArgs(argv: string[]): CliArgs {
   const args = argv.slice(2);
   let name = '';
   let port = 3001;
-  let vocab: string | undefined;
-  let shapes: string | undefined;
+  // --vocab and --shapes are repeatable so a single server can be
+  // scaffolded over multiple domain vocabularies (e.g., a server that
+  // serves both BMM and a complementary domain), or over a single
+  // domain whose shapes have been refactored into independent files.
+  const vocab: string[] = [];
+  const shapes: string[] = [];
   let managed: string[] | undefined;
 
   for (let i = 0; i < args.length; i++) {
@@ -89,10 +93,10 @@ function parseArgs(argv: string[]): CliArgs {
         port = Number(args[++i]);
         break;
       case '--vocab':
-        vocab = args[++i];
+        vocab.push(args[++i]);
         break;
       case '--shapes':
-        shapes = args[++i];
+        shapes.push(args[++i]);
         break;
       case '--managed':
         managed = args[++i].split(',').map((s) => s.trim());
@@ -109,33 +113,51 @@ function parseArgs(argv: string[]): CliArgs {
 Options:
   --name <name>          Server project name (required, e.g. bmm-server)
   --port <number>        Port number (default: 3001)
-  --vocab <file>         RDF vocabulary file to copy into config/domain/
-  --shapes <file>        RDF shapes file to copy into config/domain/
+  --vocab <file>         RDF vocabulary file to copy into config/domain/.
+                         Repeatable — pass once per domain or per refactored
+                         vocabulary section.
+  --shapes <file>        RDF shapes file to copy into config/domain/.
+                         Repeatable — pass once per shapes file. Managed
+                         classes are resolved across the union of all shapes;
+                         each managed class's catalog reference points at
+                         the shapes file that actually defines it.
   --managed <classes>    Comma-separated class names for OSLC services
-                         (requires --shapes; e.g. Means,End,Strategy)
+                         (requires at least one --shapes; e.g. Means,End,Strategy)
 
 Examples:
+  # Sample server with TODO placeholders
   npx tsx create-oslc-server.ts --name bmm-server --port 3003
 
+  # Single domain
   npx tsx create-oslc-server.ts --name bmm-server --port 3003 \\
     --vocab BMM.ttl --shapes BMM-Shapes.ttl \\
-    --managed Means,End,Strategy,Objective`);
+    --managed Vision,Goal,Strategy,Objective
+
+  # Multiple domains in one server
+  npx tsx create-oslc-server.ts --name lifecycle-server --port 3010 \\
+    --vocab BMM.ttl    --shapes BMM-Shapes.ttl \\
+    --vocab MRM.ttl    --shapes MRM-Shapes.ttl \\
+    --managed Vision,Goal,Program,Service`);
     process.exit(1);
   }
 
-  if (managed && !shapes) {
-    console.error('Error: --managed requires --shapes');
+  if (managed && shapes.length === 0) {
+    console.error('Error: --managed requires at least one --shapes');
     process.exit(1);
   }
 
-  if (vocab && !existsSync(resolve(vocab))) {
-    console.error(`Error: Vocabulary file not found: ${vocab}`);
-    process.exit(1);
+  for (const v of vocab) {
+    if (!existsSync(resolve(v))) {
+      console.error(`Error: Vocabulary file not found: ${v}`);
+      process.exit(1);
+    }
   }
 
-  if (shapes && !existsSync(resolve(shapes))) {
-    console.error(`Error: Shapes file not found: ${shapes}`);
-    process.exit(1);
+  for (const s of shapes) {
+    if (!existsSync(resolve(s))) {
+      console.error(`Error: Shapes file not found: ${s}`);
+      process.exit(1);
+    }
   }
 
   if (isNaN(port) || port < 1 || port > 65535) {
@@ -220,16 +242,21 @@ function findDomainNamespace(store: rdflib.IndexedFormula): DomainInfo | undefin
 
 interface ShapeInfo {
   shapeNode: rdflib.NamedNode;
-  fragmentId: string;    // e.g. "MeansShape"
-  classURI: string;      // e.g. "http://www.omg.org/spec/BMM#Means"
-  className: string;     // e.g. "Means" (local name)
-  shapeTitle: string;    // e.g. "Means" (from dcterms:title)
+  fragmentId: string;          // e.g. "MeansShape"
+  classURI: string;            // e.g. "http://www.omg.org/spec/BMM#Means"
+  className: string;           // e.g. "Means" (local name)
+  shapeTitle: string;          // e.g. "Means" (from dcterms:title)
+  shapesFileBaseName: string;  // basename without extension, e.g. "BMM-Shapes"
 }
 
 /**
  * Extract all ResourceShape definitions from a parsed shapes graph.
+ * `shapesFileBaseName` is stamped onto each result so that later, when we
+ * generate the catalog template, each managed class's `oslc:resourceShape`
+ * reference points at the actual shapes document that defines it — important
+ * when a server is scaffolded over multiple shapes files.
  */
-function extractShapes(store: rdflib.IndexedFormula): ShapeInfo[] {
+function extractShapes(store: rdflib.IndexedFormula, shapesFileBaseName: string): ShapeInfo[] {
   const shapes: ShapeInfo[] = [];
 
   // Find all subjects that are oslc:ResourceShape
@@ -265,6 +292,7 @@ function extractShapes(store: rdflib.IndexedFormula): ShapeInfo[] {
       classURI,
       className,
       shapeTitle: shapeTitle || className,
+      shapesFileBaseName,
     });
   }
 
@@ -278,6 +306,7 @@ interface ManagedClass {
   classURI: string;
   shapeFragmentId: string;
   displayTitle: string;
+  shapesFileBaseName: string;
 }
 
 function pluralize(word: string): string {
@@ -293,14 +322,10 @@ function pluralize(word: string): string {
 function generateCatalogTemplate(
   serverName: string,
   title: string,
-  domain: DomainInfo,
+  domains: DomainInfo[],
   managedClasses: ManagedClass[],
-  shapesBaseName: string,
 ): string {
   const store = rdflib.graph();
-
-  // Define namespace helpers
-  const DOMAIN = rdflib.Namespace(domain.namespace);
 
   // Catalog template URIs
   const catalogNode = rdflib.sym('urn:oslc:template/catalog');
@@ -322,14 +347,22 @@ function generateCatalogTemplate(
   store.add(spNode, OSLC('service'), serviceNode);
 
   // --- Service ---
+  // One oslc:domain per detected vocabulary namespace — a multi-domain
+  // server lists every domain it serves so MCP/LDM clients can discover
+  // the full vocabulary surface.
   store.add(serviceNode, RDF('type'), OSLC('Service'));
-  store.add(serviceNode, OSLC('domain'), rdflib.sym(domain.namespace.replace(/#$/, '')));
+  for (const domain of domains) {
+    store.add(serviceNode, OSLC('domain'), rdflib.sym(domain.namespace.replace(/#$/, '')));
+  }
 
   for (const mc of managedClasses) {
     const classNode = rdflib.sym(mc.classURI);
     // Use an absolute URI with the catalog base so rdflib serializes it as
     // a relative reference (e.g. <domain/MRMS-Shapes#ProgramShape>).
-    const shapeRef = rdflib.sym(`urn:oslc:template/domain/${shapesBaseName}#${mc.shapeFragmentId}`);
+    // Each managed class points at its own shapes file — different managed
+    // classes may live in different shapes files when scaffolding a
+    // multi-domain server.
+    const shapeRef = rdflib.sym(`urn:oslc:template/domain/${mc.shapesFileBaseName}#${mc.shapeFragmentId}`);
 
     // Creation Factory
     const factoryNode = rdflib.blankNode();
@@ -418,74 +451,103 @@ if (existsSync(projectDir)) {
 
 // ── Parse vocab and shapes if provided ────────────────────────────
 
-let domainInfo: DomainInfo | undefined;
-let allShapes: ShapeInfo[] = [];
-let managedClasses: ManagedClass[] = [];
-let vocabFileName: string | undefined;
-let shapesFileName: string | undefined;
-let shapesBaseName: string | undefined;
+const domainInfos: DomainInfo[] = [];
+const allShapes: ShapeInfo[] = [];
+const managedClasses: ManagedClass[] = [];
+const vocabFileNames: string[] = [];
+const shapesFileNames: string[] = [];
 
-if (cli.vocab) {
-  const vocabStore = parseRdfFile(cli.vocab);
-  domainInfo = findDomainNamespace(vocabStore);
-  vocabFileName = basename(cli.vocab);
+// Multiple vocab/shapes files may resolve to the same domain (for
+// example, a vocab refactored across a few files); only emit each
+// namespace once on the ServiceProvider as oslc:domain.
+const seenNamespaces = new Set<string>();
+const addDomainInfo = (info: DomainInfo | undefined): void => {
+  if (info && !seenNamespaces.has(info.namespace)) {
+    seenNamespaces.add(info.namespace);
+    domainInfos.push(info);
+  }
+};
+
+for (const v of cli.vocab) {
+  const store = parseRdfFile(v);
+  addDomainInfo(findDomainNamespace(store));
+  vocabFileNames.push(basename(v));
 }
 
-if (cli.shapes) {
-  const shapesStore = parseRdfFile(cli.shapes);
-  allShapes = extractShapes(shapesStore);
-  shapesFileName = basename(cli.shapes);
-  shapesBaseName = shapesFileName.replace(/\.\w+$/i, '');
-
-  // If vocab didn't yield a domain, try the shapes file
-  if (!domainInfo) {
-    domainInfo = findDomainNamespace(shapesStore);
-  }
-
-  if (allShapes.length === 0) {
-    console.error('Error: No ResourceShape definitions found in the shapes file.');
+for (const s of cli.shapes) {
+  const store = parseRdfFile(s);
+  const fileName = basename(s);
+  const baseName = fileName.replace(/\.\w+$/i, '');
+  const shapesFromFile = extractShapes(store, baseName);
+  if (shapesFromFile.length === 0) {
+    console.error(`Error: No ResourceShape definitions found in ${fileName}.`);
     console.error('Expected oslc:ResourceShape instances with oslc:describes properties.');
     process.exit(1);
   }
+  allShapes.push(...shapesFromFile);
+  shapesFileNames.push(fileName);
+  // Shapes files often declare their domain too; pick up any new
+  // namespace they reveal that the vocab files didn't.
+  addDomainInfo(findDomainNamespace(store));
 }
 
-if (domainInfo && vocabFileName) {
-  console.log(`  Vocabulary: ${vocabFileName} (prefix: ${domainInfo.prefix}: <${domainInfo.namespace}>)`);
-} else if (vocabFileName) {
-  console.log(`  Vocabulary: ${vocabFileName}`);
+for (const fileName of vocabFileNames) {
+  console.log(`  Vocabulary: ${fileName}`);
 }
-if (shapesFileName) {
-  console.log(`  Shapes:     ${shapesFileName} (${allShapes.length} resource shapes found)`);
+for (const fileName of shapesFileNames) {
+  console.log(`  Shapes:     ${fileName}`);
+}
+for (const d of domainInfos) {
+  console.log(`  Domain:     ${d.prefix}: <${d.namespace}>`);
+}
+if (allShapes.length > 0) {
+  console.log(`  Resource shapes found: ${allShapes.length}`);
 }
 
-if (cli.managed && cli.shapes && shapesBaseName) {
-  if (!domainInfo) {
+if (cli.managed && cli.shapes.length > 0) {
+  if (domainInfos.length === 0) {
     console.error('Error: Could not detect a domain namespace from --vocab or --shapes files.');
     console.error('Ensure at least one file defines classes in a non-standard namespace.');
     process.exit(1);
   }
 
-  // Resolve each managed class name to its shape
+  // Resolve each managed class name across the union of all shapes
+  // files. Each managed class records the shapes file basename that
+  // actually defines it, so the catalog template can reference it
+  // correctly when the server is scaffolded over multiple shapes files.
   for (const className of cli.managed) {
-    const shape = allShapes.find((s) => s.className === className);
-    if (!shape) {
+    const matches = allShapes.filter((s) => s.className === className);
+    if (matches.length === 0) {
       const available = allShapes.map((s) => s.className).join(', ');
       console.error(`Error: No shape found for managed class '${className}'.`);
-      console.error(`Available classes in shapes file: ${available}`);
+      console.error(`Available classes across all shapes files: ${available}`);
       process.exit(1);
     }
+    if (matches.length > 1) {
+      const sources = matches.map((m) => m.shapesFileBaseName).join(', ');
+      console.error(`Error: Class '${className}' is defined in multiple shapes files (${sources}).`);
+      console.error('Managed class names must be unique across the supplied --shapes files.');
+      process.exit(1);
+    }
+    const shape = matches[0];
     managedClasses.push({
       className,
       classURI: shape.classURI,
       shapeFragmentId: shape.fragmentId,
       displayTitle: shape.shapeTitle,
+      shapesFileBaseName: shape.shapesFileBaseName,
     });
   }
 
-  console.log(`  Managed:    ${managedClasses.map((mc) => `${domainInfo!.prefix}:${mc.className}`).join(', ')}`);
+  // Use the first detected domain prefix for the summary line. The
+  // catalog template emits one oslc:domain per detected vocabulary;
+  // managed classes resolve through their shape's URI, which is
+  // already qualified.
+  const primaryDomain = domainInfos[0];
+  console.log(`  Managed:    ${managedClasses.map((mc) => `${primaryDomain.prefix}:${mc.className}`).join(', ')}`);
 }
 
-const useDomainConfig = managedClasses.length > 0 && domainInfo !== undefined;
+const useDomainConfig = managedClasses.length > 0 && domainInfos.length > 0;
 
 console.log(`\nCreating OSLC server project: ${serverName}`);
 console.log(`  Title:   ${title}`);
@@ -497,8 +559,7 @@ console.log('');
 // ── Create directory structure ────────────────────────────────────
 
 mkdirs(
-  join(projectDir, 'config', 'shapes'),
-  join(projectDir, 'config', 'vocab'),
+  join(projectDir, 'config', 'domain'),
   join(projectDir, 'dialog'),
   join(projectDir, 'src'),
   join(projectDir, 'ui', 'src'),
@@ -770,7 +831,7 @@ export const env: AppEnv = {
 
 if (useDomainConfig) {
   writeFile('config/catalog-template.ttl',
-    generateCatalogTemplate(serverName, title, domainInfo!, managedClasses, shapesBaseName!));
+    generateCatalogTemplate(serverName, title, domainInfos, managedClasses));
 } else {
   // Default sample catalog with TODOs
   writeFile('config/catalog-template.ttl', `\
@@ -854,10 +915,12 @@ if (useDomainConfig) {
 `);
 }
 
-// ── config/domain/ ───────────────────────────────────────────────
+// ── config/domain/ — shapes files ────────────────────────────────
 
-if (cli.shapes) {
-  copyFileSync(resolve(cli.shapes), join(projectDir, 'config', 'shapes', shapesFileName!));
+if (cli.shapes.length > 0) {
+  for (let i = 0; i < cli.shapes.length; i++) {
+    copyFileSync(resolve(cli.shapes[i]), join(projectDir, 'config', 'domain', shapesFileNames[i]));
+  }
 } else {
   writeFile('config/domain/ChangeRequest.ttl', `\
 @prefix dcterms: <http://purl.org/dc/terms/> .
@@ -966,10 +1029,12 @@ if (cli.shapes) {
 `);
 }
 
-// ── config/domain/ ────────────────────────────────────────────────
+// ── config/domain/ — vocabulary files ────────────────────────────
 
-if (cli.vocab) {
-  copyFileSync(resolve(cli.vocab), join(projectDir, 'config', 'vocab', vocabFileName!));
+if (cli.vocab.length > 0) {
+  for (let i = 0; i < cli.vocab.length; i++) {
+    copyFileSync(resolve(cli.vocab[i]), join(projectDir, 'config', 'domain', vocabFileNames[i]));
+  }
 } else {
   copyFromOslcServer('config/domain/DD.ttl');
   copyFromOslcServer('config/domain/DD-Shapes.ttl');
@@ -1122,7 +1187,7 @@ Accept: text/turtle
 // ── README.md ─────────────────────────────────────────────────────
 
 const managedSection = useDomainConfig
-  ? `This server manages the following ${domainInfo!.prefix}: resource types: ${managedClasses.map((mc) => `**${mc.displayTitle}**`).join(', ')}.`
+  ? `This server manages the following resource types: ${managedClasses.map((mc) => `**${mc.displayTitle}** (\`${domainInfos.find(d => mc.classURI.startsWith(d.namespace))?.prefix ?? domainInfos[0].prefix}:${mc.className}\`)`).join(', ')}.`
   : 'The sample vocabularies, shapes, and catalog template should be replaced or extended with your domain-specific resources.';
 
 writeFile('README.md', `\

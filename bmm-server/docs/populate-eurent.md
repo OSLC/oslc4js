@@ -21,7 +21,7 @@ and Annex C (EU-Rent background):
 
 ## 1. AI-driven via Claude Desktop
 
-This path demonstrates the Define-Instantiate-Activate vision directly — an
+This path demonstrates AAKI directly — an
 AI assistant reads a source document (the BMM 1.3 specification PDF) and
 translates the prose examples into governed, linked RDF resources through
 MCP tool calls, without any domain-specific code.

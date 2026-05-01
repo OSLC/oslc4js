@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title>AAKI — Define, Instantiate, Activate</title>
+  <desc>The three AAKI realization stages over OSLC linked-data infrastructure: Stage 1 Define (vocabulary/shapes/domain vocabs), Stage 2 Instantiate (OSLC server, AI+MCP authoring, configuration management), Stage 3 Activate (LQE analytics, MCP endpoint, tool integrations), with OSLC as the cross-cutting integration layer spanning all three.</desc>
+
+  <rect width="800" height="900" fill="#0e0d10"/>
+
+  <!-- ── Stage 1 — Define ─────────────────────────────────────── -->
+  <rect x="20" y="20" width="760" height="200" rx="14" fill="#332758"/>
+  <text x="40" y="55" fill="#ffffff" font-size="24" font-weight="700">Stage 1 — define domains</text>
+  <text x="40" y="80" fill="#bcb6cf" font-size="14">Ontologies, vocabularies, constraints, reference data</text>
+
+  <g transform="translate(40, 105)">
+    <rect width="230" height="100" rx="8" fill="#43356d"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">TopBraid EDG</text>
+    <text x="16" y="58" fill="#d2cfe3" font-size="13">OWL, SHACL, SKOS</text>
+  </g>
+  <g transform="translate(285, 105)">
+    <rect width="230" height="100" rx="8" fill="#43356d"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">OSLC ResourceShapes</text>
+    <text x="16" y="58" fill="#d2cfe3" font-size="13">Service contracts, UI meta</text>
+  </g>
+  <g transform="translate(530, 105)">
+    <rect width="230" height="100" rx="8" fill="#43356d"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">Domain vocabs</text>
+    <text x="16" y="58" fill="#d2cfe3" font-size="13">OSLC-RM, SysML, BMM</text>
+  </g>
+
+  <!-- populates → -->
+  <text x="400" y="245" fill="#888" font-size="14" text-anchor="middle" font-style="italic">populates</text>
+  <path d="M 400 252 L 400 272" stroke="#888" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 392 264 L 400 274 L 408 264" stroke="#888" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ── Stage 2 — Instantiate ────────────────────────────────── -->
+  <rect x="20" y="285" width="760" height="200" rx="14" fill="#1c4a3a"/>
+  <text x="40" y="320" fill="#ffffff" font-size="24" font-weight="700">Stage 2 — create instances</text>
+  <text x="40" y="345" fill="#b6cfc4" font-size="14">Artifacts authored, linked, versioned, and governed</text>
+
+  <g transform="translate(40, 370)">
+    <rect width="230" height="100" rx="8" fill="#26604c"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">OSLC server</text>
+    <text x="16" y="58" fill="#cfe5d9" font-size="13">bmm-server, Eclipse Lyo</text>
+  </g>
+  <g transform="translate(285, 370)">
+    <rect width="230" height="100" rx="8" fill="#26604c"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">AI + MCP authoring</text>
+    <text x="16" y="58" fill="#cfe5d9" font-size="13">Create, link, validate</text>
+  </g>
+  <g transform="translate(530, 370)">
+    <rect width="230" height="100" rx="8" fill="#26604c"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">Config management</text>
+    <text x="16" y="58" fill="#cfe5d9" font-size="13">GCM, streams, baselines</text>
+  </g>
+
+  <!-- feeds → -->
+  <text x="400" y="510" fill="#888" font-size="14" text-anchor="middle" font-style="italic">feeds</text>
+  <path d="M 400 517 L 400 537" stroke="#888" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 392 529 L 400 539 L 408 529" stroke="#888" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ── Stage 3 — Activate ───────────────────────────────────── -->
+  <rect x="20" y="550" width="760" height="200" rx="14" fill="#4d2c1f"/>
+  <text x="40" y="585" fill="#ffffff" font-size="24" font-weight="700">Stage 3 — achieve outcomes</text>
+  <text x="40" y="610" fill="#cfb6ac" font-size="14">Reporting, tool integration, business value</text>
+
+  <g transform="translate(40, 635)">
+    <rect width="230" height="100" rx="8" fill="#653a29"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">LQE / LQE rs</text>
+    <text x="16" y="58" fill="#e6cdc0" font-size="13">Cross-domain reporting</text>
+  </g>
+  <g transform="translate(285, 635)">
+    <rect width="230" height="100" rx="8" fill="#653a29"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">MCP endpoint</text>
+    <text x="16" y="58" fill="#e6cdc0" font-size="13">AI consumes live data</text>
+  </g>
+  <g transform="translate(530, 635)">
+    <rect width="230" height="100" rx="8" fill="#653a29"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">Tool integrations</text>
+    <text x="16" y="58" fill="#e6cdc0" font-size="13">ELM, Polarion, Rhapsody</text>
+  </g>
+
+  <!-- ── Bottom strip — OSLC integration layer ────────────────── -->
+  <rect x="20" y="780" width="760" height="100" rx="14" fill="#171419" stroke="#272328" stroke-width="1.5"/>
+  <text x="400" y="820" fill="#ffffff" font-size="18" font-weight="700" text-anchor="middle">OSLC — the integration layer spanning all three</text>
+  <text x="400" y="850" fill="#9a9a9a" font-size="14" text-anchor="middle">LDP · ResourceShapes · TRS · Config · Link Discovery · SPARQL</text>
+</svg>

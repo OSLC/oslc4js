@@ -2,6 +2,8 @@
 
 An OSLC 3.0 server for the MISA Municipal Reference Model (MRM). It exposes MRM domain resources -- Programs, Services, Processes, Resources, Outcomes, Organization Units, Target Groups, and Needs -- as linked data through standard OSLC and LDP interfaces. The server is built on the `oslc-service` Express middleware with Apache Jena Fuseki as the triple store backend.
 
+mrm-server is an **AI Assisted Knowledge Integration (AAKI)** deployment for the MRM domain — Define stage authored as MRM vocabulary + shapes, Instantiate via MCP, Activate via OSLC + browser + AI. See the [AAKI framework](../docs/AAKI.md) for the architectural context.
+
 ## Prerequisites
 
 - **Node.js** v22.11.0 or later
