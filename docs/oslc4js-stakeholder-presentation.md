@@ -79,13 +79,7 @@ The people who **can build ontologies** don't have the domain expertise.
 
 # AI Assisted Knowledge Integration
 
-## Define — Instantiate — Activate
-
----
-
-# Three Stages of Shared Meaning
-
-To make domain knowledge actionable across an enterprise, **AI Assisted Knowledge Integration (AAKI)** proposes three realization stages:
+AI Assisted Knowledge Integration (AAKI) is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI assisted authoring and analysis, and linked-data infrastructure. AAKI is realized in three stages over OSLC linked data and AI-addressable knowledge stores via MCP.
 
 | Stage | Question it answers | Character |
 |---|---|---|
@@ -118,7 +112,7 @@ Most OSLC deployments invest heavily in Stage 2 (tools, adapters, data migration
 **Stage 2 — Instantiate:** The OSLC server hosts governed instances. AI via MCP acts as a first-class participant — creating, linking, and validating resources directly. Configuration management (GCM) adds the temporal dimension.
 
 **Stage 3 — Activate:** Three mechanisms deliver value:
-- *Analytical* — SPARQL/LQE queries for traceability, compliance, coverage
+- *Analytical* — SPARQL/LQE queries and reports for traceability, compliance, coverage
 - *Agentic* — MCP endpoint lets AI reason over live data and propose actions
 - *Operational* — Tool integrations surface linked data inline in native environments
 
@@ -146,15 +140,11 @@ This requires a **rare combination** of ontology expertise + full-stack developm
 
 ---
 
-# MRM: The Challenge
+# BMM: The Challenge
 
-MISA defined **8 primary resource types** for municipal service management:
+OMG defined the Business Motivation Model:
 
-| | | |
-|---|---|---|
-| Program | Service | Process |
-| Resource | Outcome | OrganizationUnit |
-| TargetGroup | Need | |
+![BMM Overview w:400 h:350](BMM-overview.png)
 
 with rich relationships between them. But building a **tool** to manage them? That was a separate, expensive project.
 
@@ -187,6 +177,8 @@ You provide **three declarative artifacts**:
 - **Bulk import** — load existing RDF datasets
 - **Pluggable storage** — Jena/Fuseki, filesystem, MongoDB — or implement the simple StorageService interface on your existing tools and repositories to adapt them for OSLC
 - **oslc-browser** — column-based navigation, property views, link traversal, diagrams — a working UI from day one, with custom UX layered on later as needed
+- **Incoming Link Discovery** - an OSLC LDM endpoint for discovering incoming links managed by this server.
+- **MCP Endpoing** - allows AI assistants to introspect the vocabularies, shapes and services to participate in creating and analyzing goverened content.
 
 ---
 
@@ -206,10 +198,11 @@ npm start
 # Value Delivered
 
 - **Weeks** of custom development replaced by **declarative configuration**
-- Existing tools can be OSLC-enabled by implementing a **simple storage a service dapter**
+- Existing tools can be OSLC-enabled by implementing a **simple storage service dapter**
 - Domain experts focus on **vocabulary and shapes** (what they know), not software (what they don't)
 - Users get a **working browser UI from day one** — no UX project required to start getting value
 - Any new domain follows the **same pattern** — the investment is reusable
+- The new domain is already supports collaborating with AI assistants
 
 ---
 
@@ -276,8 +269,6 @@ A "Water Treatment" Service links to:
 # Barrier 3
 
 ## "Creating and consuming models requires specialized skills"
-
----
 
 # Two Sides of the Same Problem
 

@@ -63,6 +63,7 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 
 # Contents
 
+- AAKI at a glance
 - The Problem BMM Lets Us Tell
 - Why BMM Is the Right Lens
 - The Three AAKI Stages
@@ -81,6 +82,12 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 - Why Structure + AI > Either Alone
 - The AI-Assisted V-Model (pointer)
 - Thank You
+
+---
+
+# AAKI at a glance
+
+![h:580](AAKI-Overview.png)
 
 ---
 

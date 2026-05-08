@@ -279,5 +279,6 @@ Clients that don't understand `oslc:icon` on the shape ignore the triple — it'
 1. Should there be `oslc:smallIcon` and `oslc:largeIcon` for size variants, paralleling `oslc:smallPreview` / `oslc:largePreview`?
 2. Should `oslc:icon` accept multiple values for theming (light/dark, color variants)?
 3. Should the property also be allowed directly on `oslc:CreationFactory` so creation dialogs can show the icon without first resolving the shape?
+4. Should oslc:icon also ne a property of oslc:Property to have icons for link types?
 
 The minimum viable extension is a single optional URL on the shape, mirroring existing patterns. Variants and overrides can be layered later without breaking conformance.

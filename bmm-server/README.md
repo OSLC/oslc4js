@@ -157,7 +157,7 @@ bmm-server includes a built-in MCP endpoint at `/mcp` using the [Streamable HTTP
 
 **Tools exposed (33 total):**
 - 14 `create_*` tools — one per BMM resource type (create_visions, create_goals, create_strategies, etc.)
-- 14 `query_*` tools — one per BMM resource type
+- 1 query capability to access any BMM resource type
 - 5 generic tools — get_resource, update_resource, delete_resource, list_resource_types, query_resources
 
 **To connect an AI assistant (e.g., Claude Desktop):**
@@ -195,7 +195,7 @@ These resources return human-readable markdown descriptions of the server's doma
 
 **5. Verify and report.** The agent queries the created resources to confirm they are linked correctly and reports a summary.
 
-**Why this is generic.** The agent never uses BMM-specific code. It learns the domain at runtime from the MCP resources the server provides. The same agent, connected to an mrm-server instead, would create Municipal Reference Model resources — Programs, Services, Processes — using the same pattern. Any OSLC server with a vocabulary, shapes, and catalog can be populated this way.
+**Why this is generic.** The agent never uses BMM-specific code. It learns the domain at runtime from the MCP resources the server providers. The same agent, connected to an mrm-server instead, would create Municipal Reference Model resources — Programs, Services, Processes — using the same pattern. Any OSLC server with a vocabulary, shapes, and catalog can be populated this way.
 
 ### Example Prompts
 

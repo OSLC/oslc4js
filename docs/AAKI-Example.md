@@ -2,15 +2,16 @@
 
 ## End-to-end walkthrough of AI Assisted Knowledge Integration using the OMG Business Motivation Model
 
-> **AI Assisted Knowledge Integration (AAKI)** is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI authoring and analysis, and linked-data infrastructure. AAKI is realized in three stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions) — over OSLC linked data and AI-addressable knowledge stores via MCP.
-
 **Companion to [`AAKI.md`](AAKI.md).** That document lays out the abstract framework for AAKI — why the Define / Instantiate / Activate stages need each other, why AI and governed knowledge graphs are complementary, why RDF/Turtle is a deliberate fit with AI authoring, and how the pattern applies to the SSE V-model. This document grounds every claim of the framework in a concrete, reproducible walkthrough: build an OSLC server for BMM, populate it with the EU-Rent example from the spec, and activate it for AI-assisted analysis. Every step can be replayed against the `bmm-server` in this repository.
+
+![AAKI OverviewC](AAKI-Overview.png)
+
 
 ---
 
 ## 1. Why BMM is the right lens
 
-Business motivation — the Visions, Goals, Missions, Strategies, Tactics, Policies, and Rules that define *why* an organization does what it does — is the context that makes every downstream lifecycle artifact meaningful. A requirement only matters because it realizes some Goal. A test case only matters because it verifies a requirement that traces to a Vision. Application lifecycle management (ALM), product lifecycle management (PLM), and the SSE V-model they embody all have no anchor without motivation above them.
+Business motivation — the Visions, Goals, Missions, Strategies, Tactics, Policies, and Rules that define *why* an organization does what it does — is the context that makes every downstream lifecycle artifact meaningful. A requirement only matters because it realizes some Goal. A test case only matters because it verifies a requirement that traces to a Vision. Application lifecycle management (ALM), product lifecycle management (PLM), and the SSE V-model they embody should all be anchored to motivation above them.
 
 The OMG Business Motivation Model (BMM) is a mature, well-specified way to capture that motivation. It has 25 classes, ~49 properties, and covers the Ends an organization pursues, the Means it uses to pursue them, the Influencers that shape its choices, the Assessments of those influencers, the Directives that govern action, the Business Processes that realize tactics, and the Organization Units that take responsibility. It is small enough to internalize in a week and real enough that the spec spends an Annex working a running example (EU-Rent) with 72 linked artifacts across every class.
 
@@ -20,7 +21,7 @@ We chose BMM for this walkthrough for three reasons:
 2. **It's genuinely useful.** BMM models, once populated, answer real portfolio-alignment questions ("which Goals have no realizing Tactics?", "which Influencers lack an Assessment?").
 3. **It has no widely-deployed OSLC server today.** That gap is exactly the kind of lifecycle-integration gap the oslc4js project exists to close — connecting BMM's motivation layer to the IBM ELM requirements/models/tests and MID OSLC Connectors that realize it.
 
-The goal of having a BMM OSLC server is not academic. The goal is that a Strategy in a BMM server can link to a set of requirements in DOORS Next, which link to a model in Rhapsody or Rhapsody Model Manager, which link to test cases in ELM Test Management — and an AI assistant, or a human, can traverse that chain end to end.
+The goal of having a BMM OSLC server is not academic. The goal is that a Strategy in a BMM server can link to a set of requirements in DOORS Next, which link to a realizing model in Rhapsody or Rhapsody Model Manager, which link to test cases in ELM Test Management — and an AI assistant, or a human, can traverse that chain end to end.
 
 ---
 
@@ -118,7 +119,7 @@ The shape declaratively pulls in shared OSLC AM properties (`<#p-title>`, `<#p-c
 
 For the full vocabulary and all 14 shapes — including their ranges, cardinalities, descriptions, and inverse metadata — see the AI-generated browsable reference at `bmm-server/config/domain/BMM-Shapes.html`.
 
-### 3.3 AI as server generator
+### 3.3 Creating an OSLC Server from a Template
 
 `bmm-server` itself was not hand-written. The `create-oslc-server.ts` script in the workspace root reads a vocabulary and a shapes file, synthesizes a `config/catalog-template.ttl` that describes one ServiceProvider creation template, one creation factory, selection dialog and creation dialog per managed class, one query capability for the domain, and emits a thin `src/app.ts` that mounts the `oslc-service` Express middleware against a Jena Fuseki backend via `jena-storage-service`. It also scaffolds a `ui/` directory wrapping the `oslc-browser` library, an `env.ts`, and a `package.json` with the right workspace dependencies.
 
@@ -131,7 +132,7 @@ npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
   --managed Vision,Goal,Objective,Mission,Strategy,Tactic,BusinessPolicy,BusinessRule,Influencer,Assessment,PotentialImpact,OrganizationUnit,BusinessProcess,Asset
 ```
 
-The `--managed` list names the 14 instantiable BMM classes that get creation factories, query capabilities, and creation dialogs. **ResourceShapes are only authored for these concrete classes — not for the abstract supertypes** (`Means`, `End`, `Directive`, `CourseOfAction`, `DesiredResult`, `MotivationalElement`) that exist purely to give the type hierarchy structure and to give relationships polymorphic ranges (e.g., `Strategy.channelsEffortsToward → End`). Abstract supertypes appear in the vocabulary but have no shape, no factory, no creation dialog — they're never instantiated directly. A handful of specialized subtypes (`ExternalInfluencer`, `InternalInfluencer`, `InfluencingOrganization`, `Regulation`) are also un-shaped: they're handled as `Influencer` instances distinguished by a category property rather than separate creation paths. That accounts for the gap between the 25 classes in `BMM.ttl` and the 14 shapes in `BMM-Shapes.ttl`. This alos allows the generated OSLC server to support only a subset of the domain classes if that is all that is needed for some use case.
+The `--managed` list names the 14 instantiable BMM classes that get creation factories, query capabilities, and creation dialogs. **ResourceShapes are only authored for these concrete classes — not for the abstract supertypes** (`Means`, `End`, `Directive`, `CourseOfAction`, `DesiredResult`, `MotivationalElement`) that exist purely to give the type hierarchy structure and to give relationships polymorphic ranges (e.g., `Strategy.channelsEffortsToward → End`). Abstract supertypes appear in the vocabulary but have no shape, no factory, no creation dialog — they're never instantiated directly. A handful of specialized subtypes (`ExternalInfluencer`, `InternalInfluencer`, `InfluencingOrganization`, `Regulation`) are also un-shaped: they're handled as `Influencer` instances distinguished by a category property rather than separate creation paths. That accounts for the gap between the 25 classes in `BMM.ttl` and the 14 shapes in `BMM-Shapes.ttl`. This also allows the generated OSLC server to support only a subset of the domain classes if that is all that is needed for some use case.
 
 After the command completes, `cd bmm-server && npm install && npm run build && npm start` brings up the running server. The entire authored surface area of `bmm-server` after that is its declarative `config/` content; no domain code was written.
 
@@ -144,15 +145,14 @@ Starting `bmm-server` yields, from the declarative Define inputs alone:
 - **Creation factories** for every BMM class, accepting `POST` requests with Turtle bodies and validating against the shape.
 - **Query capability** for for the server's supported domains, accepting OSLC query URIs like `?oslc.where=rdf:type=<bmm:Vision>`.
 - **Creation and Selection dialogs** for every class, rendered from the shape's `oslc:hintWidth`/`oslc:hintHeight`/label metadata.
-- **Compact resource previews** at `/compact?uri=…` that return formatted summaries for hover tooltips.
+- **Compact resource previews** that return formatted summaries for hover tooltips.
 - **An OSLC browser** at `/` — the column-based navigator in `oslc-browser`, serving human-facing navigation, Properties tab, Explorer graph, and diagram views for every shape. Incoming links render with inverse labels automatically because the browser reflects off `oslc:inverseLabel` declarations in the shapes.
 - **An LDM `/discover-links` endpoint** — a per-server implementation of the standard OSLC Link Discovery Management protocol, answering reverse-link queries from the server's own storage.
 - **An embedded MCP endpoint** at `/mcp` — AI assistants discover the server through the OSLC catalog: a top-level `oslc://catalog` MCP resource and equivalent `read_catalog` tool list every ServiceProvider with its `oslc:domain` vocabulary URIs, creation factories' `oslc:resourceShape` URIs, and query capabilities. Per-class shape and vocabulary content is fetched with `get_resource` on those URIs. Authoring uses one tool per creation factory (`create_Vision`, `create_Goal`, …); retrieval uses a single `query_resources` tool with `oslc.where=rdf:type=<...>` filters.
-- **The oslc-browser UI** a simple, easy to use UI to view and navigate resources managed by the server, including their properties and traceability graphic veiws. 
 
 ### 3.5 The Define payoff
 
-From a spec PDF to a running OSLC service for a non-trivial domain, with zero domain-specific application code written by humans and an AI-assisted authoring loop for the vocabulary. That's the Define payoff: the shape *is* the contract, and the contract drives every operational surface — the REST API, the browser UI, the LDM endpoint, the MCP tool schemas — without additional wiring.
+From a spec PDF to a running OSLC service for a non-trivial domain, with zero domain-specific application code written by humans and an AI-assisted authoring loop for the vocabulary. That's the Define payoff: the shape *is* the contract, and the contract drives every operational surface — the REST API, the browser UI, the LDM endpoint, the MCP tool schemas — without additional wiring. And this new bmm-server can integrate with any other OSLC server by leveraging and implementing the OSLC standards. 
 
 ---
 
@@ -163,6 +163,10 @@ From a spec PDF to a running OSLC service for a non-trivial domain, with zero do
 BMM 1.3 Annex C develops EU-Rent, a fictitious European car rental company, as the running example. Using it (rather than something we invented) means a reader can check every Goal, Strategy, and Tactic in the populated server against the published specification. EU-Rent is large enough to exercise every BMM class and relationship (~72 resources in a canonical population) and small enough to render as a single dependency graph.
 
 ### 4.2 AI as example populator
+
+A business analysis stakeholder can use an AI assistant to help populate instance data in the newly created bmm-server. This example starts by using the AI assistant to create an EU-Rent service provider: http://localhost:3005/oslc/eu-rent. Then we ca use a prompt to ask our AI assistant to populate that service provider with data extracted from available documents:
+
+> Read the https://www.omg.org/spec/BMM/1.3/PDF BMM specification, extract the EU-Rent example and use the bmm-server MCP tool to create that example instance using the EU-Rent service provider to populate the database with the example data. 
 
 The canonicalized population prompt is `docs/prompts/02-populate-eu-rent-example.md`. Its essential shape:
 

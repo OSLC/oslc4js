@@ -6,6 +6,8 @@ oslc4js is a concrete implementation of **AI Assisted Knowledge Integration (AAK
 
 ## AI Assisted Knowledge Integration (AAKI)
 
+**AI Assisted Knowledge Integration (AAKI)** is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI assisted authoring and analysis, and linked-data infrastructure. AAKI is realized in three stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions) — over OSLC linked data and AI-addressable knowledge stores via MCP.
+
 ### The customer challenge
 
 Organizations that depend on shared domain knowledge — across engineering, regulation, planning, and operations — face three persistent gaps:
@@ -19,6 +21,8 @@ Organizations that depend on shared domain knowledge — across engineering, reg
 ### The proposed solution
 
 **AAKI** is the strategic framework that addresses these three gaps together. It is realized in three stages — **Define** (governed vocabulary and shapes), **Instantiate** (governed artifacts and links, populated by SMEs and AI assistants), **Activate** (decisions, queries, traceability, and agent actions over the governed graph) — over linked-data infrastructure. AI assistants participate as first-class collaborators at every stage: drafting vocabulary and shapes from source documents, translating SME intent into shape-conformant resources, and analyzing the populated graph to surface gaps and propose actions. The OSLC server is the system of record that makes this auditable, versionable, and interoperable; the AI is the most capable authoring and analysis tool that system of record has ever had.
+
+![AAKI OverviewC](docs/AAKI-Overview.png)
 
 **oslc4js** is a concrete reference implementation of AAKI. The [`bmm-server`](bmm-server/) (OMG Business Motivation Model) and [`mrm-server`](mrm-server/) (MISA Municipal Reference Model) demonstrate every AAKI stage end-to-end against real domain ontologies.
 

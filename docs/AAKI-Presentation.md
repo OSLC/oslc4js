@@ -58,6 +58,7 @@ style: |
   - [The Customer Challenge](#the-customer-challenge)
   - [The AAKI Solution](#the-aaki-solution)
   - [The Business Value](#the-business-value)
+  - [AAKI at a glance](#aaki-at-a-glance)
 - [The Define, Instantiate and Activate Strategic Framework](#the-define-instantiate-and-activate-strategic-framework)
 - [Why RDF, Why Turtle](#why-rdf-why-turtle)
 - [Stage 1 — Define](#stage-1--define)
@@ -130,6 +131,12 @@ When integration is framed as AAKI, the conversation moves **up the abstraction 
 | Engineers wiring up tools | SMEs and stakeholders working in their own domain language |
 
 The result: **less effort** to Define, Instantiate, and Activate domain knowledge — and a **much wider set of stakeholders** able to use that knowledge to drive effective, timely action.
+
+---
+
+# AAKI at a glance
+
+![h:580](AAKI-Overview.png)
 
 ---
 

@@ -1,6 +1,13 @@
 # AI Assisted Knowledge Integration: Define, Instantiate, Activate
 
+**AI Assisted Knowledge Integration (AAKI)** is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI assisted authoring and analysis, and linked-data infrastructure. AAKI is realized in three stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions) — over OSLC linked data and AI-addressable knowledge stores via MCP.
+
 ## Challenge Brief
+
+The following sections summarize challenges around establishing and using shared information, how AAKI addresses these challenges, and what value users could expect to achieve using AAKI.
+
+For additional information on how oslc4js helps address the three ontology barriers (creating ontology-based models, connecting domains, and creating/consuming model data) — see [`oslc4js-stakeholder-presentation.md`](oslc4js-stakeholder-presentation.md). The [`AAKI-Example.md`](AAKI-Example.md) companion grounds the framework in a concrete walkthrough using the OMG Business Motivation Model (BMM).
+
 
 ### The customer challenge
 
@@ -16,17 +23,14 @@ Organizations that depend on shared domain knowledge — across engineering, reg
 
 **AI Assisted Knowledge Integration (AAKI)** is the strategic framework that addresses these three gaps together. It is realized in three stages — **Define** (governed vocabulary and shapes), **Instantiate** (governed artifacts and links, populated by SMEs and AI assistants), **Activate** (decisions, queries, traceability, and agent actions over the governed graph) — over linked-data infrastructure. AI assistants participate as first-class collaborators at every stage: drafting vocabulary and shapes from source documents, translating SME intent into shape-conformant resources, and analyzing the populated graph to surface gaps and propose actions. The OSLC server is the system of record that makes this auditable, versionable, and interoperable; the AI is the most capable authoring and analysis tool that system of record has ever had.
 
+![AAKI OverviewC](AAKI-Overview.png)
+
 **oslc4js** is a concrete reference implementation of AAKI. The `bmm-server` (OMG Business Motivation Model) and `mrm-server` (MISA Municipal Reference Model) demonstrate every AAKI stage end-to-end against real domain ontologies — proving the framework works in practice.
 
 ### The business value
 
 When integration is framed as AAKI, the conversation moves up the abstraction stack. We are no longer focused on the low-level topics — tool adaptors, selection dialogs, link creation, RDF resource representations — that have historically dominated lifecycle-tool integration. Instead the discussion is about producers and consumers of formalized shared concept spaces: ontologies and shapes serving as the contract; AI and humans authoring, integrating, and analyzing information in those spaces; the governed graph providing versioning, traceability, and provenance as architectural side effects. This reduces the effort required to Define, Instantiate, and Activate domain knowledge — and, more importantly, it lets a much wider set of stakeholders use that knowledge to drive effective, timely action.
 
----
-
-> **Short form (one-paragraph version):** AAKI is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI authoring and analysis, and linked-data infrastructure. AAKI is realized in three stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions) — over OSLC linked data and AI-addressable knowledge stores via MCP.
-
-> For the higher-level stakeholder framing — the three ontology barriers (creating ontology-based models, connecting domains, and creating/consuming model data) and how oslc4js addresses each — see [`oslc4js-stakeholder-presentation.md`](oslc4js-stakeholder-presentation.md). The [`AAKI-Example.md`](AAKI-Example.md) companion grounds the framework in a concrete BMM walkthrough.
 
 ## The Define, Instantiate and Activate Strategic Framework
 

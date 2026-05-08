@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title>AAKI: AI Assisted Knowledge Integration across existing and new OSLC domains</title>
+  <desc>One-page summary of the AAKI Define / Instantiate / Activate stages, showing how an AI assistant connects via MCP and OSLC discovery to existing OSLC servers (Architecture Management, Requirements Management, Quality Management, Change Management) and new domains (BMM), and what the AI contributes at each stage.</desc>
+
+  <defs>
+    <marker id="dot" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6">
+      <circle cx="4" cy="4" r="3" fill="#7a90b3"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="1000" fill="#0e0d10"/>
+
+  <!-- ── Header ───────────────────────────────────────────────── -->
+  <text x="700" y="50" fill="#ffffff" font-size="32" font-weight="700" text-anchor="middle">AI Assisted Knowledge Integration (AAKI)</text>
+  <text x="700" y="82" fill="#bcb6cf" font-size="17" text-anchor="middle">Define. Instantiate. Activate. Across every OSLC domain — existing and new.</text>
+
+  <!-- ── Domain row ───────────────────────────────────────────── -->
+  <!-- 5 domains: BMM (new), AM, RM, QM, CM -->
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+
+    <!-- BMM -->
+    <g transform="translate(80, 130)">
+      <rect width="200" height="100" rx="12" fill="#6d4f9a"/>
+      <rect x="148" y="-12" width="60" height="22" rx="11" fill="#f4d35e"/>
+      <text x="178" y="3" fill="#1a1a1a" font-size="11" font-weight="700" text-anchor="middle">NEW</text>
+      <text x="100" y="35" fill="#ffffff" font-size="22" font-weight="700" text-anchor="middle">BMM</text>
+      <text x="100" y="60" fill="#dcd0e9" font-size="13" text-anchor="middle">bmm-server</text>
+      <text x="100" y="80" fill="#bca6d8" font-size="11" text-anchor="middle">Business Motivation</text>
+    </g>
+
+    <!-- AM -->
+    <g transform="translate(320, 130)">
+      <rect width="200" height="100" rx="12" fill="#16a085"/>
+      <text x="100" y="35" fill="#ffffff" font-size="22" font-weight="700" text-anchor="middle">AM</text>
+      <text x="100" y="60" fill="#cfe7e0" font-size="13" text-anchor="middle">Rhapsody, RMM</text>
+      <text x="100" y="80" fill="#a3d1c7" font-size="11" text-anchor="middle">Architecture Management</text>
+    </g>
+
+    <!-- RM -->
+    <g transform="translate(560, 130)">
+      <rect width="200" height="100" rx="12" fill="#e67e22"/>
+      <text x="100" y="35" fill="#ffffff" font-size="22" font-weight="700" text-anchor="middle">RM</text>
+      <text x="100" y="60" fill="#f6dac4" font-size="13" text-anchor="middle">DOORS Next</text>
+      <text x="100" y="80" fill="#f1c498" font-size="11" text-anchor="middle">Requirements Management</text>
+    </g>
+
+    <!-- QM -->
+    <g transform="translate(800, 130)">
+      <rect width="200" height="100" rx="12" fill="#27ae60"/>
+      <text x="100" y="35" fill="#ffffff" font-size="22" font-weight="700" text-anchor="middle">QM</text>
+      <text x="100" y="60" fill="#ccebd6" font-size="13" text-anchor="middle">ELM Test Management (ETM)</text>
+      <text x="100" y="80" fill="#a0d6b3" font-size="11" text-anchor="middle">Quality / Test Management</text>
+    </g>
+
+    <!-- CM -->
+    <g transform="translate(1040, 130)">
+      <rect width="200" height="100" rx="12" fill="#c0392b"/>
+      <text x="100" y="35" fill="#ffffff" font-size="22" font-weight="700" text-anchor="middle">CM</text>
+      <text x="100" y="60" fill="#f6cdc7" font-size="13" text-anchor="middle">EWM</text>
+      <text x="100" y="80" fill="#f1a59b" font-size="11" text-anchor="middle">Change Management</text>
+    </g>
+
+    <!-- + others / MID OSLC connectors -->
+    <g transform="translate(1260, 145)">
+      <rect width="100" height="70" rx="10" fill="#2a2730" stroke="#5a5266" stroke-dasharray="4,3"/>
+      <text x="50" y="28" fill="#cfc5db" font-size="14" font-weight="700" text-anchor="middle">+ more</text>
+      <text x="50" y="48" fill="#a094b3" font-size="10" text-anchor="middle">MID genOSLC,</text>
+      <text x="50" y="62" fill="#a094b3" font-size="10" text-anchor="middle">SBVR, custom…</text>
+    </g>
+  </g>
+
+  <!-- Connection lines from each domain (bottom center) to AI hub (top center, 700, 295) -->
+  <g stroke="#7a90b3" stroke-width="1.5" fill="none" opacity="0.7">
+    <line x1="180" y1="230" x2="700" y2="295" stroke-dasharray="6,4"/>
+    <line x1="420" y1="230" x2="700" y2="295" stroke-dasharray="6,4"/>
+    <line x1="660" y1="230" x2="700" y2="295" stroke-dasharray="6,4"/>
+    <line x1="900" y1="230" x2="700" y2="295" stroke-dasharray="6,4"/>
+    <line x1="1140" y1="230" x2="700" y2="295" stroke-dasharray="6,4"/>
+    <line x1="1310" y1="215" x2="700" y2="295" stroke-dasharray="6,4"/>
+  </g>
+
+  <!-- MCP label in middle of fan -->
+  <g transform="translate(700, 270)">
+    <rect x="-90" y="-14" width="180" height="22" rx="11" fill="#0e0d10" stroke="#5a6a85"/>
+    <text y="2" fill="#bcc8db" font-size="12" font-weight="600" text-anchor="middle">MCP · OSLC Discovery</text>
+  </g>
+
+  <!-- ── AI hub ───────────────────────────────────────────────── -->
+  <g transform="translate(450, 295)">
+    <rect width="500" height="90" rx="12" fill="#1a5276"/>
+    <text x="250" y="35" fill="#ffffff" font-size="24" font-weight="700" text-anchor="middle">AI Assistant</text>
+    <text x="250" y="62" fill="#bdd1e3" font-size="14" text-anchor="middle">Claude · GPT · or any MCP-speaking agent</text>
+    <text x="250" y="80" fill="#8cb0d2" font-size="12" text-anchor="middle">Discovers servers via OSLC catalogs · authors and queries via MCP tools</text>
+  </g>
+
+  <!-- ── Stage cards ──────────────────────────────────────────── -->
+
+  <!-- Stage 1 - Define (purple) -->
+  <g transform="translate(40, 420)">
+    <rect width="430" height="475" rx="14" fill="#332758"/>
+    <text x="24" y="40" fill="#ffffff" font-size="24" font-weight="700">Stage 1 — Define</text>
+    <text x="24" y="68" fill="#bcb6cf" font-size="14">Vocabulary, shapes, link types</text>
+
+    <rect x="24" y="90" width="382" height="145" rx="8" fill="#43356d"/>
+    <text x="40" y="118" fill="#ffffff" font-size="15" font-weight="700">What the AI does</text>
+    <text x="40" y="142" fill="#d2cfe3" font-size="13">• Reads spec PDFs (BMM 1.3, OSLC RM/QM/CM/AM)</text>
+    <text x="40" y="164" fill="#d2cfe3" font-size="13">• Authors RDF vocabularies in Turtle</text>
+    <text x="40" y="186" fill="#d2cfe3" font-size="13">• Drafts OSLC ResourceShapes — the REST</text>
+    <text x="40" y="204" fill="#d2cfe3" font-size="13">  service contract — with inverse metadata</text>
+    <text x="40" y="226" fill="#d2cfe3" font-size="13">• Reviews and revises vocabulary with humans</text>
+
+    <text x="24" y="270" fill="#ffffff" font-size="15" font-weight="700">Domains in scope</text>
+    <text x="24" y="295" fill="#d2cfe3" font-size="13">• <tspan font-weight="700">BMM</tspan> — new vocabulary authored from OMG spec</text>
+    <text x="24" y="317" fill="#d2cfe3" font-size="13">• <tspan font-weight="700">OSLC AM / RM / QM / CM</tspan> — existing standards</text>
+    <text x="24" y="339" fill="#d2cfe3" font-size="13">• <tspan font-weight="700">Local extensions</tspan> per organization</text>
+
+    <text x="24" y="383" fill="#ffffff" font-size="15" font-weight="700">Output</text>
+    <text x="24" y="408" fill="#d2cfe3" font-size="13">Governed vocabulary + shapes per domain.</text>
+    <text x="24" y="428" fill="#d2cfe3" font-size="13">The shape <tspan font-style="italic">is</tspan> the contract.</text>
+    <text x="24" y="455" fill="#a99fc4" font-size="12" font-style="italic">Same RDF/Turtle the AI also reads back at runtime.</text>
+  </g>
+
+  <!-- Stage 2 - Instantiate (green) -->
+  <g transform="translate(485, 420)">
+    <rect width="430" height="475" rx="14" fill="#1c4a3a"/>
+    <text x="24" y="40" fill="#ffffff" font-size="24" font-weight="700">Stage 2 — Instantiate</text>
+    <text x="24" y="68" fill="#b6cfc4" font-size="14">Artifacts, links, governance</text>
+
+    <rect x="24" y="90" width="382" height="145" rx="8" fill="#26604c"/>
+    <text x="40" y="118" fill="#ffffff" font-size="15" font-weight="700">What the AI does</text>
+    <text x="40" y="142" fill="#cfe5d9" font-size="13">• Reads source documents (specs, plans, policy)</text>
+    <text x="40" y="164" fill="#cfe5d9" font-size="13">• Calls MCP creation factories per shape</text>
+    <text x="40" y="186" fill="#cfe5d9" font-size="13">• Validates against ResourceShapes on the fly</text>
+    <text x="40" y="208" fill="#cfe5d9" font-size="13">• Establishes typed cross-tool links</text>
+    <text x="40" y="226" fill="#cfe5d9" font-size="13">• Observe → Propose → Execute (humans approve)</text>
+
+    <text x="24" y="270" fill="#ffffff" font-size="15" font-weight="700">Where the artifacts live</text>
+    <text x="24" y="295" fill="#cfe5d9" font-size="13">• <tspan font-weight="700">bmm-server</tspan> (BMM) — embedded MCP</text>
+    <text x="24" y="317" fill="#cfe5d9" font-size="13">• <tspan font-weight="700">DOORS Next, ETM, EWM</tspan> (RM, QM, CM)</text>
+    <text x="24" y="339" fill="#cfe5d9" font-size="13">• <tspan font-weight="700">Rhapsody, RMM</tspan> (AM)</text>
+    <text x="24" y="361" fill="#cfe5d9" font-size="13">• <tspan font-weight="700">MID genOSLC connectors</tspan> bridge the rest</text>
+
+    <text x="24" y="403" fill="#ffffff" font-size="15" font-weight="700">Output</text>
+    <text x="24" y="428" fill="#cfe5d9" font-size="13">Cross-tool linked-data graph.</text>
+    <text x="24" y="455" fill="#9bbfae" font-size="12" font-style="italic">Provenance, versioning, baselines preserved by the host tool.</text>
+  </g>
+
+  <!-- Stage 3 - Activate (brown) -->
+  <g transform="translate(930, 420)">
+    <rect width="430" height="475" rx="14" fill="#4d2c1f"/>
+    <text x="24" y="40" fill="#ffffff" font-size="24" font-weight="700">Stage 3 — Activate</text>
+    <text x="24" y="68" fill="#cfb6ac" font-size="14">Decisions, queries, agent actions</text>
+
+    <rect x="24" y="90" width="382" height="145" rx="8" fill="#653a29"/>
+    <text x="40" y="118" fill="#ffffff" font-size="15" font-weight="700">What the AI does</text>
+    <text x="40" y="142" fill="#e6cdc0" font-size="13">• Provides quality guidance on individual resources</text>
+    <text x="40" y="164" fill="#e6cdc0" font-size="13">• Creates and traverses cross tool/domain links</text>
+    <text x="40" y="186" fill="#e6cdc0" font-size="13">• Runs gap, impact, coverage analysis</text>
+    <text x="40" y="208" fill="#e6cdc0" font-size="13">• Validates against domain constraints</text>
+    <text x="40" y="226" fill="#e6cdc0" font-size="13">• Drafts proposed actions for human review and approval</text>
+
+    <text x="24" y="270" fill="#ffffff" font-size="15" font-weight="700">Questions it can answer</text>
+    <text x="24" y="295" fill="#e6cdc0" font-size="13">• "Which Goals lack realizing Tactics?" (BMM)</text>
+    <text x="24" y="317" fill="#e6cdc0" font-size="13">• "Impact of changing requirement X?" (RM→QM/AM)</text>
+    <text x="24" y="339" fill="#e6cdc0" font-size="13">• "Test coverage of safety hazards?" (RM↔QM)</text>
+    <text x="24" y="361" fill="#e6cdc0" font-size="13">• "V-model compliance gaps?" (RM↔QM↔CM↔AM)</text>
+
+    <text x="24" y="403" fill="#ffffff" font-size="15" font-weight="700">Output</text>
+    <text x="24" y="428" fill="#e6cdc0" font-size="13">Auditable decisions, drafted artifacts.</text>
+    <text x="24" y="455" fill="#bfa195" font-size="12" font-style="italic">Same OSLC links humans use; same governance trail.</text>
+  </g>
+
+  <!-- ── Bottom banner ────────────────────────────────────────── -->
+  <rect x="40" y="920" width="1320" height="60" rx="12" fill="#171419" stroke="#272328" stroke-width="1.5"/>
+  <text x="700" y="950" fill="#ffffff" font-size="17" font-weight="700" text-anchor="middle">From <tspan fill="#9d7ed8">tool integration</tspan> to <tspan fill="#f4d35e">knowledge integration</tspan> — same OSLC contract, same MCP integration, every domain.</text>
+  <text x="700" y="971" fill="#9a9a9a" font-size="13" text-anchor="middle" font-style="italic">Existing tools (ELM, MID's genOSLC connectors) and new domains (BMM) participate identically — no client-side per-domain adapters.</text>
+</svg>
