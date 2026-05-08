@@ -44,6 +44,18 @@ The architectural framework, walkthroughs, and presentations live in [`docs/`](d
 | [docs/OSLC-Shape-Extensions.md](docs/OSLC-Shape-Extensions.md) | Proposed OSLC-OP extensions: `oslc:inversePropertyDefinition`, `oslc:inverseLabel`, `oslc:icon` on `oslc:ResourceShape` |
 | [docs/prompts/](docs/prompts/) | Canonicalized reference prompts for vocabulary authoring, EU-Rent population, and analysis |
 
+## Authoring skills
+
+This workspace ships three Claude Code skills under [`.claude/skills/`](.claude/skills/) — one per AAKI stage — so AI assistants helping with this codebase use the same conventions consistently.
+
+| Skill | Use when... |
+|---|---|
+| [aaki-define](.claude/skills/aaki-define/SKILL.md) | creating or extending an OSLC domain (vocabulary + shapes + vocab/shapes HTML) |
+| [aaki-instantiate](.claude/skills/aaki-instantiate/SKILL.md) | populating an OSLC server with instances via MCP from a source document |
+| [aaki-activate](.claude/skills/aaki-activate/SKILL.md) | extracting value from a populated server (gap/impact/coverage analysis, Observe-Propose-Execute proposals) |
+
+Claude Code picks these up automatically when the description matches your request. To invoke one explicitly, say *"use the aaki-define / aaki-instantiate / aaki-activate skill"*.
+
 ## Modules
 
 The workspace is organized into layered modules that build on each other:

@@ -349,6 +349,20 @@ The same AAKI loop applies upward to the SSE V-model: an AI assistant that queri
 
 ---
 
+## 8. Reusing this for your domain — the Authoring Skills
+
+The walkthrough above is BMM-specific, but the conventions it follows generalize. This workspace ships three Claude Code skills under [`.claude/skills/`](../.claude/skills/) — one per AAKI stage — that capture those conventions as reusable prompt templates and quality checklists for any OSLC domain.
+
+| Skill | Use when... |
+|---|---|
+| [aaki-define](../.claude/skills/aaki-define/SKILL.md) | creating or extending an OSLC domain — vocabulary + shapes + HTML, including ShapeChecker validation and the OSLC-OP ReSpec convention |
+| [aaki-instantiate](../.claude/skills/aaki-instantiate/SKILL.md) | populating an OSLC server with instances via MCP from a source document |
+| [aaki-activate](../.claude/skills/aaki-activate/SKILL.md) | extracting value from a populated server — gap, impact, coverage, multi-hop, compliance, Observe-Propose-Execute |
+
+Claude Code picks these up automatically when the description matches your request; to invoke one explicitly, say *"use the aaki-define / aaki-instantiate / aaki-activate skill"*. Each skill is self-contained — the BMM walkthrough you just read is one realized example, not a dependency.
+
+---
+
 ## 9. References
 
 - `bmm-server/README.md` — server-level overview, setup, and the EU-Rent population script.

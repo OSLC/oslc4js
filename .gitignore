@@ -6,3 +6,7 @@ node_modules/
 
 # Fuseki runtime state (databases, logs, backups — local-only)
 /run/
+
+# Claude Code per-developer settings (skills under .claude/skills/ are tracked)
+.claude/settings.local.json
+.claude/settings.local.*

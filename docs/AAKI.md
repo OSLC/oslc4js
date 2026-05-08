@@ -141,6 +141,18 @@ HAL in the movie 2001 is a good cautionary tale: HAL was a participant on the mi
 
 AAKI positions ontologies and OSLC servers not as alternatives to AI, but as the infrastructure that makes AI-assisted work auditable, repeatable, and governable rather than just impressive in a demo. The OSLC server is the integrated system of record; the AI is the most capable authoring and analysis tool that system of record has ever had. The ontology is what makes their collaboration precise rather than statistically approximate. RDF is the lingua franca that lets the AI and the system of record exchange knowledge without translation loss.
 
+## Authoring skills for AAKI
+
+This workspace ships three Claude Code skills under [`.claude/skills/`](../.claude/skills/) — one per AAKI stage — so AI assistants helping with the codebase apply the same conventions consistently and respect the user's RACI position (credentials, working context, no delivery / merge / promote on the user's behalf).
+
+| Skill | Use when... |
+|---|---|
+| [aaki-define](../.claude/skills/aaki-define/SKILL.md) | creating or extending an OSLC domain — open RDF vocabulary, OSLC ResourceShapes, and matching vocab/shapes HTML, including ShapeChecker validation and the OSLC-OP ReSpec conventions |
+| [aaki-instantiate](../.claude/skills/aaki-instantiate/SKILL.md) | populating an OSLC server with instances via MCP from a source document — discover-first protocol, link ownership, Observe-Propose-Execute, working inside the user's chosen context |
+| [aaki-activate](../.claude/skills/aaki-activate/SKILL.md) | extracting value from a populated server — gap, impact, coverage, multi-hop, compliance, and AI-drafted proposals — with citation discipline and a paraphrase guard |
+
+Claude Code picks these up automatically when the description matches the user's request; to invoke explicitly, the user says *"use the aaki-define / aaki-instantiate / aaki-activate skill"*. Each skill is self-contained with reusable prompt templates that work for any OSLC domain — the BMM artifacts in this workspace are one realized example, not a dependency.
+
 ## Applying AAKI to an AI-Assisted V-Model
 
 AAKI applies not just to individual OSLC servers, but to the entire systems and software engineering lifecycle. When viewed through the lens of the V-model — the standard framework for systems engineering that traces requirements decomposition on the left side to verification activities on the right — AI assistants operating through MCP endpoints can transform how organizations manage traceability, impact analysis, and compliance across integrated tool chains.

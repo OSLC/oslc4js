@@ -489,6 +489,24 @@ Full V-model scenario is beyond this walkthrough — a natural extension of the 
 
 ---
 
+<!-- _class: small-text -->
+
+# Authoring skills — reuse this pattern for any domain
+
+The BMM walkthrough you just saw is one realized example. The conventions are captured as three Claude Code skills under `.claude/skills/`, one per AAKI stage, that work for any OSLC domain.
+
+| Skill | Use when... |
+|---|---|
+| **aaki-define** | creating or extending an OSLC domain — vocabulary + shapes + HTML, ShapeChecker, OSLC-OP ReSpec |
+| **aaki-instantiate** | populating an OSLC server via MCP from a source document |
+| **aaki-activate** | extracting value — gap / impact / coverage / Observe-Propose-Execute |
+
+Picked up **automatically** when the description matches the user's request. To invoke explicitly: *"use the aaki-define / aaki-instantiate / aaki-activate skill"*.
+
+> Each skill is self-contained: reusable prompt templates with `<placeholder>` slots for the domain name, namespace, and source document. Replace **BMM** with **ISO 9001**, **MRM**, **SBVR**, or anything else expressible as RDF + shapes — same pattern, new vocabulary.
+
+---
+
 # References
 
 - [**`docs/AAKI-Example.md`**](https://github.com/OSLC/oslc4js/blob/master/docs/AAKI-Example.md) — **companion document** for this deck: every shape fragment, prompt, and MCP-response example shown here, with the full reproduction steps

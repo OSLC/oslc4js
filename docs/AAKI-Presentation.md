@@ -435,6 +435,26 @@ npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
 
 ---
 
+<!-- _class: small-text -->
+
+# Authoring skills
+
+This workspace ships three Claude Code skills under `.claude/skills/` — one per AAKI stage — so AI assistants helping with the codebase apply the same conventions consistently.
+
+| Skill | Use when... |
+|---|---|
+| **aaki-define** | creating or extending an OSLC domain — vocabulary + shapes + HTML |
+| **aaki-instantiate** | populating an OSLC server via MCP from a source document |
+| **aaki-activate** | extracting value — gap / impact / coverage / Observe-Propose-Execute |
+
+Picked up **automatically** when the description matches the user's request.
+
+To invoke explicitly: *"use the aaki-define / aaki-instantiate / aaki-activate skill"*.
+
+> Each skill is self-contained with reusable prompt templates that work for any OSLC domain — and respects the user's RACI position (credentials, working context, no delivery / merge / promote on the user's behalf).
+
+---
+
 # Applying AAKI to an AI-Assisted V-Model
 
 AAKI applies not just to individual OSLC servers, but to the **entire systems engineering lifecycle**.
