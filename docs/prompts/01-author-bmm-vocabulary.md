@@ -55,14 +55,13 @@ The real authoring sessions were conversational — with discovery, false starts
 >   - `oslc:representation oslc:Reference` for link properties
 >   - `oslc:range` for link properties, naming the target BMM class
 >
-> **Inverse metadata — this is important:**
+> **Inverse-direction label — this is important:**
 >
 > For every property constraint whose `oslc:valueType` is `oslc:Resource` (i.e., every link property), add:
 >
-> - `oslc:inversePropertyDefinition` — the URI identifier for the reverse direction, in the `bmm:` namespace. Use a short verb phrase (e.g., for `bmm:amplifiedBy`, the inverse is `bmm:amplifies`).
-> - `oslc:inverseLabel` — the human-readable label for the reverse direction, in title case (e.g., `"Amplifies"`, `"Efforts Channeled By"`, `"Responsibility Of"`).
+> - `oslc:inversePropertyLabel` — the human-readable label for the reverse direction, in title case (e.g., `"Amplifies"`, `"Efforts Channeled By"`, `"Responsibility Of"`). The name mirrors `jrs:inversePropertyLabel` used by IBM Jazz Reporting Services.
 >
-> These two properties come from `docs/OSLC-Shape-Extensions.md` in this repository. Read that doc before generating shapes — it explains the contract and the constraint that inverse URIs must NOT be asserted as `rdf:Property` in `BMM.ttl`.
+> This property comes from `docs/OSLC-Shape-Extensions.md` in this repository. There is no separate inverse predicate to assert as a triple; the reverse direction is found by swapping subject and object on the same forward predicate. `oslc:inversePropertyLabel` carries only the *label* clients use when rendering the relationship on the target side.
 >
 > Example for a Strategy's `channelsEffortsToward` property, declared on `StrategyShape`:
 >
@@ -76,8 +75,7 @@ The real authoring sessions were conversational — with discovery, false starts
 >   oslc:valueType oslc:Resource ;
 >   oslc:representation oslc:Reference ;
 >   oslc:range bmm:End ;
->   oslc:inversePropertyDefinition bmm:effortsChanneledBy ;
->   oslc:inverseLabel "Efforts Channeled By" .
+>   oslc:inversePropertyLabel "Efforts Channeled By" .
 > ```
 >
 > **HTML rendering:**
@@ -87,11 +85,10 @@ The real authoring sessions were conversational — with discovery, false starts
 > **Quality checks before finishing:**
 >
 > 1. Every property URI used in a shape exists in the vocabulary.
-> 2. No inverse URI is declared as `rdf:Property` in the vocabulary (they're identifiers only).
-> 3. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
-> 4. Every link property has both `oslc:inversePropertyDefinition` and `oslc:inverseLabel`.
-> 5. Property names in shapes match the camelCase convention.
-> 6. The HTML renders without errors in a modern browser.
+> 2. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
+> 3. Every link property declares `oslc:inversePropertyLabel`.
+> 4. Property names in shapes match the camelCase convention.
+> 5. The HTML renders without errors in a modern browser.
 >
 > When you are done, summarize the vocabulary statistics (count of classes, link properties, literal properties, shapes) and list any BMM spec concepts you chose not to include, with a one-line rationale each.
 
@@ -102,7 +99,7 @@ For BMM 1.3, the outcome is approximately:
 - 25 `rdf:Class` definitions in `BMM.ttl`
 - 49 `rdf:Property` definitions in `BMM.ttl` (forward properties only)
 - 14 `oslc:ResourceShape` definitions in `BMM-Shapes.ttl`
-- 38 link properties across all shapes, each carrying `oslc:inversePropertyDefinition` + `oslc:inverseLabel` (76 inverse-metadata triples total)
+- 37 link properties across all shapes, each carrying `oslc:inversePropertyLabel` (37 inverse-direction-label triples total)
 - An HTML document of ~400 lines with a navigable table of contents
 
 Concepts deliberately omitted from the BMM 1.3 spec: the Fact/Term/FactType sub-metamodel (handled by SBVR, out of scope); abstract intermediate classes that are not separately instantiable (collapsed into their concrete subclasses).

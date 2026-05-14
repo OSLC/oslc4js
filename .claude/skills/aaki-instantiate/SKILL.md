@@ -88,7 +88,7 @@ When you want to express a relationship:
 1. Look at both candidate sides' shapes.
 2. Find the side whose shape declares the forward property (the property whose `oslc:propertyDefinition` names the predicate, with `oslc:valueType oslc:Resource`).
 3. Pass the target's URI as that property's value when you create or update the source.
-4. **Do not** try to create an inverse link on the target side. The inverse URI declared via `oslc:inversePropertyDefinition` exists for clients to render incoming links; it is not a triple to assert.
+4. **Do not** try to create an inverse link on the target side. There is only one triple; the source side owns it. The inverse direction is rendered by clients using the source-side shape's `oslc:inversePropertyLabel` — not by asserting any inverse triple.
 
 Example (correct):
 
@@ -96,7 +96,7 @@ Example (correct):
 
 Example (wrong):
 
-> Trying to add the inverse link on B that points back at A using the inverse URI declared by `<TypeA>Shape`'s `oslc:inversePropertyDefinition`. The vocabulary does not define that inverse URI as an `rdf:Property`; it is an identifier only. The server will reject the request and the round-trip is wasted.
+> Trying to add a reverse-direction link on B that points back at A. There is no separate inverse predicate to assert; the only triple is the one stored on A. Asking the server to assert anything in the reverse direction yields no progress.
 
 ## Use the right tools
 
@@ -146,7 +146,7 @@ Brief an AI assistant (or yourself) with a prompt of this shape, replacing the b
 >
 > **Step 1 — Discover.** Start with `read_catalog` to see every ServiceProvider on the server, the vocabularies it declares (`oslc:domain` URIs), the creation factories (each with an `oslc:resourceShape` URI), and the query capabilities (with `queryBase` URLs). If the catalog has many ServiceProviders, use `read_service_provider <url>` to drill into the relevant one without crawling all of them.
 >
-> **Step 2 — Read the shapes you need.** For each `oslc:resourceShape` URI you'll create resources against, call `get_resource <shape-URI>` to read required vs. optional fields, value types, cardinalities, and the **inverse metadata** (`oslc:inversePropertyDefinition` / `oslc:inverseLabel`) on link properties so you know which side of each bidirectional relationship owns the triple. If you need disambiguation between concepts, also call `get_resource` on the relevant `oslc:domain` URI for class-level vocabulary.
+> **Step 2 — Read the shapes you need.** For each `oslc:resourceShape` URI you'll create resources against, call `get_resource <shape-URI>` to read required vs. optional fields, value types, cardinalities, and the **inverse-direction metadata** (`oslc:inversePropertyLabel`) on link properties so you know which side of each bidirectional relationship owns the triple — the side whose shape declares the forward property + its inverse label is the side that owns the link. If you need disambiguation between concepts, also call `get_resource` on the relevant `oslc:domain` URI for class-level vocabulary.
 >
 > **Step 3 — Bootstrap the ServiceProvider.** If no ServiceProvider exists for the scope you're populating (e.g., the project, organization, or product), call `create_service_provider` to create one.
 >

@@ -41,7 +41,7 @@ The architectural framework, walkthroughs, and presentations live in [`docs/`](d
 | [docs/AAKI-Presentation.md](docs/AAKI-Presentation.md) | Marp slide deck of the AAKI framework |
 | [docs/AAKI-Presentation-Example.md](docs/AAKI-Presentation-Example.md) | Marp slide deck of the BMM walkthrough |
 | [docs/oslc4js-stakeholder-presentation.md](docs/oslc4js-stakeholder-presentation.md) | High-level stakeholder pitch — three barriers in ontology-based modeling and how oslc4js addresses each |
-| [docs/OSLC-Shape-Extensions.md](docs/OSLC-Shape-Extensions.md) | Proposed OSLC-OP extensions: `oslc:inversePropertyDefinition`, `oslc:inverseLabel`, `oslc:icon` on `oslc:ResourceShape` |
+| [docs/OSLC-Shape-Extensions.md](docs/OSLC-Shape-Extensions.md) | Proposed OSLC-OP extensions: `oslc:inversePropertyLabel`, `oslc:icon` on `oslc:ResourceShape` |
 | [docs/prompts/](docs/prompts/) | Canonicalized reference prompts for vocabulary authoring, EU-Rent population, and analysis |
 
 ## Authoring skills

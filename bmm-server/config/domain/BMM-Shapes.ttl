@@ -20,11 +20,12 @@
 # oslc:property list; this gives the appearance of inheritance while
 # remaining OSLC-conformant.
 #
-# Forward link properties carry oslc:inversePropertyDefinition and
-# oslc:inverseLabel metadata. The inverse URIs are identifiers only;
-# they are never asserted as triples. oslc-browser uses the inverse
-# URI + label to render incoming links (discovered via LDM) as if
-# they were outgoing, so link ownership is transparent to the user.
+# Forward link properties carry oslc:inversePropertyLabel — a human-readable
+# label for the reverse direction. oslc-browser uses that label to render
+# incoming links (discovered via LDM) as if they were outgoing, so link
+# ownership is transparent to the user. The triple itself is always stored
+# once, on the source side. See docs/OSLC-Shape-Extensions.md for the
+# proposed property definition.
 # ================================================================
 
 <>
@@ -181,8 +182,7 @@
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
-  oslc:inversePropertyDefinition jazz_am:derivedBy ;
-  oslc:inverseLabel "Derived By" .
+  oslc:inversePropertyLabel "Derived By" .
 
 <#p-elaborates>
   a oslc:Property ;
@@ -192,8 +192,7 @@
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
-  oslc:inversePropertyDefinition jazz_am:elaboratedBy ;
-  oslc:inverseLabel "Elaborated By" .
+  oslc:inversePropertyLabel "Elaborated By" .
 
 <#p-refine>
   a oslc:Property ;
@@ -203,8 +202,7 @@
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
-  oslc:inversePropertyDefinition jazz_am:refinedBy ;
-  oslc:inverseLabel "Refined By" .
+  oslc:inversePropertyLabel "Refined By" .
 
 <#p-external>
   a oslc:Property ;
@@ -223,8 +221,7 @@
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
-  oslc:inversePropertyDefinition jazz_am:satisfiedBy ;
-  oslc:inverseLabel "Satisfied By" .
+  oslc:inversePropertyLabel "Satisfied By" .
 
 <#p-trace>
   a oslc:Property ;
@@ -234,8 +231,7 @@
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
-  oslc:inversePropertyDefinition jazz_am:tracedBy ;
-  oslc:inverseLabel "Traced By" .
+  oslc:inversePropertyLabel "Traced By" .
 
 # ================================================================
 # SHARED PROPERTY DEFINITIONS — End/CourseOfAction relationship
@@ -250,8 +246,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:End ;
-  oslc:inversePropertyDefinition bmm:enabledBy ;
-  oslc:inverseLabel "Enabled By" .
+  oslc:inversePropertyLabel "Enabled By" .
 
 # ================================================================
 # SHARED PROPERTY DEFINITIONS — Assessment relationships
@@ -266,8 +261,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:End ;
-  oslc:inversePropertyDefinition bmm:achievementAffectedBy ;
-  oslc:inverseLabel "Achievement Affected By" .
+  oslc:inversePropertyLabel "Achievement Affected By" .
 
 <#p-affectsEmploymentOfMeans>
   a oslc:Property ;
@@ -278,8 +272,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Means ;
-  oslc:inversePropertyDefinition bmm:employmentAffectedBy ;
-  oslc:inverseLabel "Employment Affected By" .
+  oslc:inversePropertyLabel "Employment Affected By" .
 
 # ================================================================
 # SHARED PROPERTY DEFINITIONS — OrganizationUnit relationships
@@ -294,8 +287,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:End ;
-  oslc:inversePropertyDefinition bmm:responsibilityOf ;
-  oslc:inverseLabel "Responsibility Of" .
+  oslc:inversePropertyLabel "Responsibility Of" .
 
 <#p-establishes>
   a oslc:Property ;
@@ -306,8 +298,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Means ;
-  oslc:inversePropertyDefinition bmm:establishedBy ;
-  oslc:inverseLabel "Established By" .
+  oslc:inversePropertyLabel "Established By" .
 
 <#p-recognizes>
   a oslc:Property ;
@@ -318,8 +309,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Influencer ;
-  oslc:inversePropertyDefinition bmm:recognizedBy ;
-  oslc:inverseLabel "Recognized By" .
+  oslc:inversePropertyLabel "Recognized By" .
 
 <#p-makesAssessment>
   a oslc:Property ;
@@ -330,8 +320,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Assessment ;
-  oslc:inversePropertyDefinition bmm:madeBy ;
-  oslc:inverseLabel "Made By" .
+  oslc:inversePropertyLabel "Made By" .
 
 <#p-definedBy>
   a oslc:Property ;
@@ -342,8 +331,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:BusinessProcess ;
-  oslc:inversePropertyDefinition bmm:defines ;
-  oslc:inverseLabel "Defines" .
+  oslc:inversePropertyLabel "Defines" .
 
 <#p-subOrganizationUnits>
   a oslc:Property ;
@@ -354,8 +342,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:OrganizationUnit ;
-  oslc:inversePropertyDefinition bmm:parentOrganizationUnit ;
-  oslc:inverseLabel "Parent Organization Unit" .
+  oslc:inversePropertyLabel "Parent Organization Unit" .
 
 # ================================================================
 # Vision-specific properties
@@ -370,8 +357,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Goal ;
-  oslc:inversePropertyDefinition bmm:amplifies ;
-  oslc:inverseLabel "Amplifies" .
+  oslc:inversePropertyLabel "Amplifies" .
 
 <#p-madeOperativeBy>
   a oslc:Property ;
@@ -382,8 +368,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Mission ;
-  oslc:inversePropertyDefinition bmm:makesOperative ;
-  oslc:inverseLabel "Makes Operative" .
+  oslc:inversePropertyLabel "Makes Operative" .
 
 # ================================================================
 # Goal-specific properties
@@ -398,8 +383,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Objective ;
-  oslc:inversePropertyDefinition bmm:quantifies ;
-  oslc:inverseLabel "Quantifies" .
+  oslc:inversePropertyLabel "Quantifies" .
 
 <#p-includesGoal>
   a oslc:Property ;
@@ -410,8 +394,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Goal ;
-  oslc:inversePropertyDefinition bmm:includedInGoal ;
-  oslc:inverseLabel "Included In" .
+  oslc:inversePropertyLabel "Included In" .
 
 # ================================================================
 # Objective-specific properties
@@ -426,8 +409,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Objective ;
-  oslc:inversePropertyDefinition bmm:includedInObjective ;
-  oslc:inverseLabel "Included In" .
+  oslc:inversePropertyLabel "Included In" .
 
 <#p-targetDate>
   a oslc:Property ;
@@ -458,8 +440,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:End ;
-  oslc:inversePropertyDefinition bmm:effortsChanneledBy ;
-  oslc:inverseLabel "Efforts Channeled By" .
+  oslc:inversePropertyLabel "Efforts Channeled By" .
 
 <#p-includesStrategy>
   a oslc:Property ;
@@ -470,8 +451,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Strategy ;
-  oslc:inversePropertyDefinition bmm:includedInStrategy ;
-  oslc:inverseLabel "Included In" .
+  oslc:inversePropertyLabel "Included In" .
 
 # ================================================================
 # Tactic-specific properties
@@ -486,8 +466,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Strategy ;
-  oslc:inversePropertyDefinition bmm:implementedBy ;
-  oslc:inverseLabel "Implemented By" .
+  oslc:inversePropertyLabel "Implemented By" .
 
 <#p-includesTactic>
   a oslc:Property ;
@@ -498,8 +477,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Tactic ;
-  oslc:inversePropertyDefinition bmm:includedInTactic ;
-  oslc:inverseLabel "Included In" .
+  oslc:inversePropertyLabel "Included In" .
 
 <#p-effectsEnforcementOfBusinessRule>
   a oslc:Property ;
@@ -510,8 +488,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:BusinessRule ;
-  oslc:inversePropertyDefinition bmm:enforcementEffectedBy ;
-  oslc:inverseLabel "Enforcement Effected By" .
+  oslc:inversePropertyLabel "Enforcement Effected By" .
 
 # ================================================================
 # Directive-specific properties
@@ -526,8 +503,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:CourseOfAction ;
-  oslc:inversePropertyDefinition bmm:governedBy ;
-  oslc:inverseLabel "Governed By" .
+  oslc:inversePropertyLabel "Governed By" .
 
 # ================================================================
 # BusinessPolicy-specific properties
@@ -542,8 +518,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:BusinessProcess ;
-  oslc:inversePropertyDefinition bmm:processGovernedBy ;
-  oslc:inverseLabel "Process Governed By" .
+  oslc:inversePropertyLabel "Process Governed By" .
 
 # ================================================================
 # BusinessRule-specific properties
@@ -558,8 +533,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:BusinessPolicy ;
-  oslc:inversePropertyDefinition bmm:basisFor ;
-  oslc:inverseLabel "Basis For" .
+  oslc:inversePropertyLabel "Basis For" .
 
 <#p-enforcedByBusinessProcess>
   a oslc:Property ;
@@ -570,8 +544,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:BusinessProcess ;
-  oslc:inversePropertyDefinition bmm:enforces ;
-  oslc:inverseLabel "Enforces" .
+  oslc:inversePropertyLabel "Enforces" .
 
 <#p-enforcementLevel>
   a oslc:Property ;
@@ -606,8 +579,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Influencer ;
-  oslc:inversePropertyDefinition bmm:assessedBy ;
-  oslc:inverseLabel "Assessed By" .
+  oslc:inversePropertyLabel "Assessed By" .
 
 <#p-identifiesPotentialImpact>
   a oslc:Property ;
@@ -618,8 +590,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:PotentialImpact ;
-  oslc:inversePropertyDefinition bmm:identifiedBy ;
-  oslc:inverseLabel "Identified By" .
+  oslc:inversePropertyLabel "Identified By" .
 
 <#p-assessmentCategory>
   a oslc:Property ;
@@ -643,8 +614,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Directive ;
-  oslc:inversePropertyDefinition bmm:impelledBy ;
-  oslc:inverseLabel "Impelled By" .
+  oslc:inversePropertyLabel "Impelled By" .
 
 <#p-isRiskForEnd>
   a oslc:Property ;
@@ -655,8 +625,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:End ;
-  oslc:inversePropertyDefinition bmm:atRiskFrom ;
-  oslc:inverseLabel "At Risk From" .
+  oslc:inversePropertyLabel "At Risk From" .
 
 <#p-isRiskForMeans>
   a oslc:Property ;
@@ -667,8 +636,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Means ;
-  oslc:inversePropertyDefinition bmm:atRiskFrom ;
-  oslc:inverseLabel "At Risk From" .
+  oslc:inversePropertyLabel "At Risk From" .
 
 <#p-isRewardForEnd>
   a oslc:Property ;
@@ -679,8 +647,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:End ;
-  oslc:inversePropertyDefinition bmm:potentialRewardFrom ;
-  oslc:inverseLabel "Potential Reward From" .
+  oslc:inversePropertyLabel "Potential Reward From" .
 
 <#p-isRewardForMeans>
   a oslc:Property ;
@@ -691,8 +658,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Means ;
-  oslc:inversePropertyDefinition bmm:potentialRewardFrom ;
-  oslc:inverseLabel "Potential Reward From" .
+  oslc:inversePropertyLabel "Potential Reward From" .
 
 # ================================================================
 # BusinessProcess-specific properties
@@ -707,8 +673,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Tactic ;
-  oslc:inversePropertyDefinition bmm:realizedBy ;
-  oslc:inverseLabel "Realized By" .
+  oslc:inversePropertyLabel "Realized By" .
 
 <#p-governedByBusinessRule>
   a oslc:Property ;
@@ -719,8 +684,7 @@
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:BusinessRule ;
-  oslc:inversePropertyDefinition bmm:governsProcessVia ;
-  oslc:inverseLabel "Governs Process" .
+  oslc:inversePropertyLabel "Governs Process" .
 
 
 # ================================================================

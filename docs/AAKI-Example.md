@@ -53,9 +53,9 @@ The BMM vocabulary in `bmm-server/config/domain/BMM.ttl`, the shapes in `BMM-Sha
 
 **Short, domain-agnostic predicate names.** The BMM specification itself uses Java-style property names that fold the target type into the predicate (`amplifiedByMission`, `quantifiesGoal`, `enablesEndCourseOfAction`). Those work poorly as RDF predicates — the triple `<vision> bmm:amplifiedByMission <mission> .` reads awkwardly, and the predicate conflates relationship and range. The prompt instructed Claude to follow RDF best practice: short verb phrases, domain-agnostic (`amplifiedBy`, `quantifies`, `enablesEnd`), with the target type folded in only for disambiguation (`governsProcess` vs. `governs`).
 
-**Inverse metadata on every link property.** For every property constraint with `oslc:valueType oslc:Resource`, the prompt required two additional triples: `oslc:inversePropertyDefinition` naming the URI for the reverse direction, and `oslc:inverseLabel` giving the human-readable inverse wording in title case ("Amplifies", "Efforts Channeled By", "Responsibility Of"). These are proposed OSLC-OP extensions unique to oslc4js; see the sidebar below.
+**Inverse-direction label on every link property.** For every property constraint with `oslc:valueType oslc:Resource`, the prompt required one additional triple: `oslc:inversePropertyLabel` giving the human-readable inverse wording in title case ("Amplifies", "Efforts Channeled By", "Responsibility Of"). The name mirrors `jrs:inversePropertyLabel`, which IBM Jazz Reporting Services has used for the same purpose. This is a proposed OSLC-OP extension unique to oslc4js; see the sidebar below.
 
-**Inverse URIs are identifiers, not redundant triples.** The `bmm:amplifies` URI referenced by `<#p-amplifiedBy>`'s `oslc:inversePropertyDefinition` is *not* declared as an `rdf:Property` in the vocabulary. The triple `<goal> bmm:amplifiedBy <vision> .` is stored exactly once, on the Goal. The inverse URI exists as a naming handle clients use when displaying the Vision side of that relationship. Asserting both directions would double storage and create two sources of truth that can drift.
+**There is no separate inverse predicate to assert.** The triple `<goal> bmm:amplifiedBy <vision> .` is stored exactly once, on the Goal. To find it from the Vision's side, clients pattern-match the same forward predicate with subject and object swapped — they don't look up a separate "inverse URI". `oslc:inversePropertyLabel` carries only the *label* that clients use when rendering the relationship on the target side; the reverse direction is purely a presentational concern, not a stored fact.
 
 **Sidebar: our proposed OSLC shape extensions.** The full rationale, property definitions, and contrast with hardcoded inverse-type tables (as used in IBM DOORS Next and `oslc-client`'s `LDMClient`) are in `docs/OSLC-Shape-Extensions.md`. Short version: making the shape the single source of truth for inverse labels lets clients reflect off the vocabulary at runtime rather than carrying a static inverse-type map that must be updated whenever a new domain is introduced. This extension also allows clients to discover the proper lables to use for
 incoming links accessed through and OSLC Link Discovery Management (LDM) server.
@@ -99,8 +99,7 @@ From `BMM-Shapes.ttl` (the OSLC service contract):
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range bmm:Objective ;
-  oslc:inversePropertyDefinition bmm:quantifies ;
-  oslc:inverseLabel "Quantifies" .
+  oslc:inversePropertyLabel "Quantifies" .
 
 <#GoalShape>
   a oslc:ResourceShape ;
@@ -146,7 +145,7 @@ Starting `bmm-server` yields, from the declarative Define inputs alone:
 - **Query capability** for for the server's supported domains, accepting OSLC query URIs like `?oslc.where=rdf:type=<bmm:Vision>`.
 - **Creation and Selection dialogs** for every class, rendered from the shape's `oslc:hintWidth`/`oslc:hintHeight`/label metadata.
 - **Compact resource previews** that return formatted summaries for hover tooltips.
-- **An OSLC browser** at `/` — the column-based navigator in `oslc-browser`, serving human-facing navigation, Properties tab, Explorer graph, and diagram views for every shape. Incoming links render with inverse labels automatically because the browser reflects off `oslc:inverseLabel` declarations in the shapes.
+- **An OSLC browser** at `/` — the column-based navigator in `oslc-browser`, serving human-facing navigation, Properties tab, Explorer graph, and diagram views for every shape. Incoming links render with inverse labels automatically because the browser reflects off `oslc:inversePropertyLabel` declarations in the shapes.
 - **An LDM `/discover-links` endpoint** — a per-server implementation of the standard OSLC Link Discovery Management protocol, answering reverse-link queries from the server's own storage.
 - **An embedded MCP endpoint** at `/mcp` — AI assistants discover the server through the OSLC catalog: a top-level `oslc://catalog` MCP resource and equivalent `read_catalog` tool list every ServiceProvider with its `oslc:domain` vocabulary URIs, creation factories' `oslc:resourceShape` URIs, and query capabilities. Per-class shape and vocabulary content is fetched with `get_resource` on those URIs. Authoring uses one tool per creation factory (`create_Vision`, `create_Goal`, …); retrieval uses a single `query_resources` tool with `oslc.where=rdf:type=<...>` filters.
 
@@ -181,7 +180,7 @@ A single Claude Desktop session populates the entire example in 15–25 minutes.
 
 Once populated, the server holds a real BMM model. The browser at `http://localhost:3005/` surfaces it in three complementary views.
 
-**Properties tab — Vision selected.** Shows the Vision's literal properties and its outgoing links ("amplifiedBy" to Goals, "madeOperativeBy" to the Mission). Below them, incoming links render in the same table, italicized: "Efforts Channeled By" with the Strategies that target this Vision, "Responsibility Of" with the OrgUnits accountable for it. The inverse wording comes from the *source-side* shape's `oslc:inverseLabel` — for instance, Strategy's `channelsEffortsToward` property declares inverse label "Efforts Channeled By", and that's what the Vision sees. Italics signal that the underlying triple is stored on the source, not on the Vision, but the user navigates as if the relationship were bidirectional.
+**Properties tab — Vision selected.** Shows the Vision's literal properties and its outgoing links ("amplifiedBy" to Goals, "madeOperativeBy" to the Mission). Below them, incoming links render in the same table, italicized: "Efforts Channeled By" with the Strategies that target this Vision, "Responsibility Of" with the OrgUnits accountable for it. The inverse wording comes from the *source-side* shape's `oslc:inversePropertyLabel` — for instance, Strategy's `channelsEffortsToward` property declares inverse label "Efforts Channeled By", and that's what the Vision sees. Italics signal that the underlying triple is stored on the source, not on the Vision, but the user navigates as if the relationship were bidirectional.
 
 ![Vision Properties tab showing outgoing links to Goals and Mission, plus italicized incoming "Efforts Channeled By" and "Responsibility Of" rows](images/bmm-vision-properties.png)
 
@@ -267,7 +266,7 @@ returns the populated Visions. A federating consumer — an LQE instance aggrega
 
 ### 5.3 LDM `/discover-links` consumers
 
-A specialized consumer that only needs incoming links — `oslc-browser` is one, a DOORS-Next-style rich-client could be another — posts a resource URI to `/discover-links` and gets back the reverse triples. Labels are resolved client-side from the shape cache using `oslc:inverseLabel`. No client-side hardcoded tables.
+A specialized consumer that only needs incoming links — `oslc-browser` is one, a DOORS-Next-style rich-client could be another — posts a resource URI to `/discover-links` and gets back the reverse triples. Labels are resolved client-side from the shape cache using `oslc:inversePropertyLabel`. No client-side hardcoded tables.
 
 ### 5.4 Human users in the browser
 
@@ -290,7 +289,7 @@ Three extensions closed that loop in this project:
 
 1. **Embedded MCP endpoint in `oslc-service`.** The server exposes its catalog, vocabulary, shapes, and creation/query tools directly to any MCP-speaking AI assistant. This is what makes the AI a first-class participant in Instantiate and Activate.
 2. **LDM `/discover-links` endpoint per server.** Standard OSLC Link Discovery Management, implemented against the server's own storage. Same wire format as a dedicated LDM/LQE provider, so clients work interchangeably against either; a federated future is additive, not a rewrite.
-3. **Inverse metadata on shape properties.** `oslc:inversePropertyDefinition` and `oslc:inverseLabel` let clients render incoming links transparently without hardcoded inverse-type tables. The shape becomes the single source of truth; the vocabulary governance loop replaces the client-rebuild loop.
+3. **Inverse-direction label on shape properties.** `oslc:inversePropertyLabel` lets clients render incoming links transparently without hardcoded inverse-type tables. The shape becomes the single source of truth; the vocabulary governance loop replaces the client-rebuild loop.
 
 None of these required changing OSLC Core or the underlying RDF model. They're extensions layered on top, and each earns its place by removing a specific point of coordination that used to block AI-assisted workflows.
 
@@ -367,7 +366,7 @@ Claude Code picks these up automatically when the description matches your reque
 
 - `bmm-server/README.md` — server-level overview, setup, and the EU-Rent population script.
 - `oslc-browser/README.md` — the "Incoming Links" section documents the rendering pipeline for italicized inverse labels.
-- `docs/OSLC-Shape-Extensions.md` — proposed `oslc:inversePropertyDefinition` and `oslc:inverseLabel` property definitions, intended for OSLC-OP submission.
+- `docs/OSLC-Shape-Extensions.md` — proposed `oslc:inversePropertyLabel` (and `oslc:icon`) property definitions, intended for OSLC-OP submission.
 - `docs/prompts/01-author-bmm-vocabulary.md` — canonicalized reference prompt for vocabulary + shapes authoring.
 - `docs/prompts/02-populate-eu-rent-example.md` — canonicalized reference prompt for EU-Rent population.
 - `docs/prompts/03-analyze-bmm-model.md` — analysis prompt archetypes (gap analysis, structural summarization, multi-hop traversal, Observe-Propose-Execute, compliance validation).

@@ -57,8 +57,7 @@ What goes in the shape is the constraint for this server's API:
   oslc:valueType oslc:Resource ;
   oslc:representation oslc:Reference ;
   oslc:range <vocabularyNamespace#TargetType> ;
-  oslc:inversePropertyDefinition <vocabularyNamespace#inverseProperty> ;
-  oslc:inverseLabel "Inverse Wording" .
+  oslc:inversePropertyLabel "Inverse Wording" .
 ```
 
 This separation — open vocabulary, constraining shape — is the OSLC pattern. The skill name "Define" really means *define the vocabulary as identifiers and define the API contract as shapes*, not "define an ontology with reasoning."
@@ -85,16 +84,24 @@ The triple `<x> :amplifiedByMission <y>` reads worse than `<x> :amplifiedBy <y>`
 
 This rule reinforces the open-vocabulary principle: short verb-phrase names are reusable across contexts; type-folded names are coupled to one usage.
 
-## Link ownership and inverse metadata
+## Link ownership and inverse-direction labels
 
-OSLC link triples are stored on **one** side. Every link property in a shape **SHOULD** declare both:
+OSLC link triples are stored on **one** side. Every link property in a shape **SHOULD** declare:
 
-- `oslc:inversePropertyDefinition` — URI identifier for the reverse direction.
-- `oslc:inverseLabel` — human-readable label for the reverse direction (title case).
+- `oslc:inversePropertyLabel` — human-readable label for the reverse direction (title case). Mirrors `jrs:inversePropertyLabel` used by IBM Jazz Reporting Services.
 
-These two properties are **not strictly required** — a shape without them is still well-formed, and basic link creation works fine — but they are strongly recommended because they enable **discovery and labeling of incoming links** without hardcoded client-side tables. With them, an OSLC browser viewing the target side of a relationship can render the incoming link with a human-readable inverse label, and an OSLC LDM `/discover-links` service can label discovered reverse triples by reflecting off the source-side shape. Without them, clients fall back to displaying the raw predicate URI or omit the incoming-link rendering entirely.
+This property is **not strictly required** — a shape without it is still well-formed, and basic link creation works fine — but it is strongly recommended because it enables **discovery and labeling of incoming links** without hardcoded client-side tables. With it, an OSLC browser viewing the target side of a relationship renders the incoming link with a human-readable inverse label, and an OSLC LDM `/discover-links` service can label discovered reverse triples by reflecting off the source-side shape. Without it, clients fall back to the SPARQL-style `^<predicateName>` form (see "Fallback rendering" below).
 
-When the inverse metadata IS supplied, the inverse URI is an **identifier only** — it is NEVER asserted as an `rdf:Property` in the vocabulary. The triple is stored once, on the side whose shape declares the forward property. The full rationale and proto-spec for these two properties are in the References section below.
+The triple is always stored once, on the side whose shape declares the forward property. There is no separate inverse predicate to assert; the reverse direction is found by swapping subject and object on the same forward predicate. The full proto-spec, including the link-ownership convention for asymmetric pairs like `oslc_cm:implementsRequirement` / `oslc_rm:implementedBy`, is in `docs/OSLC-Shape-Extensions.md`.
+
+### Fallback rendering (informal recommendation)
+
+When a forward property has no `oslc:inversePropertyLabel`, clients rendering its inverse view should:
+
+1. Use a **visual direction cue** that does not depend on label text (italics, a back-arrow icon, a distinct color, or an "Incoming" section).
+2. For plain-text contexts (LDM JSON serializations, CSV exports, accessibility readers), use the SPARQL property-path convention: prefix the forward predicate's `oslc:name` with `^`, e.g., `^implementsRequirement`. This is the closest thing RDF has to a standard textual inverse marker and is unmistakable in plain text.
+
+This is guidance, not a requirement. The point is that absence-of-label should never silently look like a forward link.
 
 ## ResourceShape rules
 
@@ -160,12 +167,11 @@ In either style, the shapes HTML must:
 3. The vocabulary file opens with one `owl:Ontology` declaration carrying publication metadata.
 4. The vocabulary file declares classes and properties as plain identifiers — no `rdfs:domain` or `rdfs:range` (those would invite reasoning the rest of the OSLC stack does not perform).
 5. Every property URI used in a shape exists in the vocabulary.
-6. No inverse URI is declared as `rdf:Property` in the vocabulary (they are identifiers only).
-7. Every link property in a shape that should support incoming-link discovery has both `oslc:inversePropertyDefinition` and `oslc:inverseLabel` (strongly recommended; not strictly required for shape validity).
-8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
-9. Property names match camelCase; predicates are short verb phrases without target-type folding.
-10. The HTML renders without errors in a modern browser.
-11. Resource shape count matches the count of **instantiable** classes — supertypes and enums do not have shapes.
+6. Every link property in a shape that should support incoming-link discovery declares `oslc:inversePropertyLabel` (strongly recommended; not strictly required for shape validity).
+7. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
+8. Property names match camelCase; predicates are short verb phrases without target-type folding.
+9. The HTML renders without errors in a modern browser.
+10. Resource shape count matches the count of **instantiable** classes — supertypes and enums do not have shapes.
 
 When you finish, summarize: count of classes, link properties, literal properties, shapes, and any concepts you deliberately omitted (with a one-line rationale each).
 
@@ -217,9 +223,9 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 >
 > **Naming rules:** short, domain-agnostic verb-phrase predicates. Do not fold the target type into the predicate name unless required for disambiguation between two predicates that share the verb. Predicates read as verbs (`amplifiedBy`, `quantifies`, `channelsEffortsToward`), not as nouns or relationship-record names.
 >
-> **Resource shape rules:** every instantiable class gets one shape with `dcterms:title`, `dcterms:description`, and `oslc:describes`. For each property the class supports, add an `oslc:property` constraint with `oslc:name`, `oslc:propertyDefinition`, `dcterms:description`, `oslc:occurs`, `oslc:valueType`, plus (for link properties) `oslc:representation oslc:Reference`, `oslc:range`, `oslc:inversePropertyDefinition`, and `oslc:inverseLabel`.
+> **Resource shape rules:** every instantiable class gets one shape with `dcterms:title`, `dcterms:description`, and `oslc:describes`. For each property the class supports, add an `oslc:property` constraint with `oslc:name`, `oslc:propertyDefinition`, `dcterms:description`, `oslc:occurs`, `oslc:valueType`, plus (for link properties) `oslc:representation oslc:Reference`, `oslc:range`, and `oslc:inversePropertyLabel`.
 >
-> **Inverse metadata (SHOULD, not MUST):** for every property whose `oslc:valueType` is `oslc:Resource` and where incoming-link discovery and labeling matter, declare both `oslc:inversePropertyDefinition` (URI identifier for the reverse direction) and `oslc:inverseLabel` (human-readable inverse wording in title case). These are strongly recommended — they let OSLC browsers render incoming links with proper labels and let an OSLC LDM `/discover-links` service label discovered reverse triples without hardcoded client-side tables. They are not required for the shape to validate or for basic link creation to work; a shape with link properties but no inverse metadata is well-formed but loses discoverability of incoming links. When supplied, the inverse URI is an identifier only — it must NOT be declared as an `rdf:Property` in the vocabulary. The triple is stored exactly once, on the side whose shape declares the forward property.
+> **Inverse-direction label (SHOULD, not MUST):** for every property whose `oslc:valueType` is `oslc:Resource` and where incoming-link discovery and labeling matter, declare `oslc:inversePropertyLabel` with the human-readable inverse wording in title case. The name mirrors `jrs:inversePropertyLabel` used by IBM Jazz Reporting Services. Strongly recommended — it lets OSLC browsers render incoming links with proper labels and lets an OSLC LDM `/discover-links` service label discovered reverse triples without hardcoded client-side tables. Not strictly required for shape validity; clients fall back to the SPARQL-style `^<predicateName>` form for unlabeled inverses. The triple itself is stored exactly once, on the side whose shape declares the forward property. There is no separate inverse predicate to assert.
 >
 > **HTML rendering:** generate a self-contained, browsable document for both the vocabulary and the shapes. The shapes HTML must include a TOC and per-shape property tables with columns: Name, Type, Cardinality, Description, Inverse.
 >
@@ -230,12 +236,11 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 > 3. The vocabulary file opens with one `owl:Ontology` declaration carrying publication metadata (title, description, publisher, issue date, license, source, version, copyright).
 > 4. The vocabulary file declares classes and properties as plain identifiers — no `rdfs:domain`/`rdfs:range` on properties.
 > 5. Every property URI used in a shape exists in the vocabulary.
-> 6. No inverse URI is declared as `rdf:Property`.
-> 7. Every link property whose incoming side should be discoverable has both `oslc:inversePropertyDefinition` and `oslc:inverseLabel` (recommended; not strictly required).
-> 8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
-> 9. Property names match camelCase; predicates are short verb phrases without target-type folding.
-> 10. The HTML renders cleanly.
-> 11. Resource shape count equals the count of instantiable classes — supertypes and enums do not have shapes.
+> 6. Every link property whose incoming side should be discoverable declares `oslc:inversePropertyLabel` (recommended; not strictly required).
+> 7. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
+> 8. Property names match camelCase; predicates are short verb phrases without target-type folding.
+> 9. The HTML renders cleanly.
+> 10. Resource shape count equals the count of instantiable classes — supertypes and enums do not have shapes.
 >
 > When you finish, summarize: count of classes, link properties, literal properties, shapes, and any concepts you deliberately omitted (with a one-line rationale each).
 
@@ -247,7 +252,7 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 - **OSLC-OP ShapeChecker** (validation tool): https://github.com/oslc-op/oslc-specs/tree/master/tools/ShapeChecker — validates vocabulary + resource-shape Turtle files against OSLC Core. Run before declaring a domain done.
 - **Link guidance** (predicate naming, link-direction): https://github.com/oslc-op/oslc-specs/blob/master/notes/link-guidance.html
 - **IBM Jazz LinkedData best practices**: https://jazz.net/wiki/bin/view/LinkedData/BestPractices
-- **Proposed shape extensions used here** (in an oslc4js workspace if available): `docs/OSLC-Shape-Extensions.md` — formal definitions for `oslc:inversePropertyDefinition`, `oslc:inverseLabel`, and `oslc:icon` on `oslc:ResourceShape`.
+- **Proposed shape extensions used here** (in an oslc4js workspace if available): `docs/OSLC-Shape-Extensions.md` — formal definitions for `oslc:inversePropertyLabel` and `oslc:icon` on `oslc:ResourceShape`.
 - **Reference implementation** (in an oslc4js workspace if available): `bmm-server/config/domain/BMM.ttl`, `BMM-Shapes.ttl`, `BMM-Shapes.html` — a fully realized domain following this skill's pattern. Note: BMM inherited some `rdfs:domain`/`rdfs:range` declarations from its source spec; those are the artifact of the source, not OSLC convention, and should be omitted in new domains.
 
 ## Common mistakes
@@ -259,7 +264,7 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 | One shape per class (including abstract supertypes) | Shapes are only for instantiable classes. Supertypes structure the type hierarchy; they are never created directly. |
 | Java-style predicate naming | Drop the target-type suffix (`:amplifiedByMission` → `:amplifiedBy`). |
 | Asserting both directions of a link | The triple is stored once. The inverse URI is metadata, not a triple. |
-| Missing inverse metadata on a link property where incoming-link discovery matters | Add `oslc:inversePropertyDefinition` and `oslc:inverseLabel` so clients can label and discover the incoming side. The shape is still valid without them, but LDM-discovered incoming links and oslc-browser's incoming-link rendering fall back to the raw predicate URI or get omitted. |
+| Missing inverse-direction label on a link property where incoming-link discovery matters | Add `oslc:inversePropertyLabel` so clients can label incoming-link discovery results. The shape is still valid without it; clients fall back to rendering the SPARQL-style `^<predicateName>` form. |
 | Duplicating property constraints across shapes by copy-paste | Use named property nodes (`<#p-title>`) and reference them from each shape's `oslc:property` list. |
 | Designing for reasoning ("the system will infer that…") | OSLC servers don't reason. If a constraint matters at the API, encode it in the shape; if it matters as a runtime check, use SHACL alongside, but don't expect property-level inference. |
 | Vocabulary file with no `owl:Ontology` header | Add the ontology declaration block at the top with title, description, publisher, issue date, license, source, version, and copyright — match the OSLC-OP convention. It's metadata, not reasoning. |

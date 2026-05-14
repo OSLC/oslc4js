@@ -152,7 +152,7 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 >
 > **Naming rule:** short, domain-agnostic predicates. `amplifiedBy`, not `amplifiedByMission`. `quantifies`, not `quantifiesGoal`.
 >
-> **Inverse metadata rule:** every link property declares `oslc:inversePropertyDefinition` (URI for reverse direction) and `oslc:inverseLabel` (human-readable inverse wording). *See `docs/OSLC-Shape-Extensions.md`.*
+> **Inverse-direction label rule:** every link property declares `oslc:inversePropertyLabel` (human-readable inverse wording, mirroring `jrs:inversePropertyLabel`). *See `docs/OSLC-Shape-Extensions.md`.*
 
 Full prompt: `docs/prompts/01-author-bmm-vocabulary.md`
 
@@ -160,12 +160,11 @@ Full prompt: `docs/prompts/01-author-bmm-vocabulary.md`
 
 # Define — Our Shape Extensions
 
-Two new properties on `oslc:Property`, proposed for OSLC-OP:
+One new property on `oslc:Property`, proposed for OSLC-OP:
 
 | Property | Purpose |
 |---|---|
-| `oslc:inversePropertyDefinition` | URI identifier for the reverse direction of a link property. |
-| `oslc:inverseLabel` | Human-readable label for that reverse direction. |
+| `oslc:inversePropertyLabel` | Human-readable label for the reverse direction of a link property. Mirrors `jrs:inversePropertyLabel` from IBM Jazz Reporting Services. |
 
 ```turtle
 <#p-channelsEffortsToward>
@@ -173,11 +172,10 @@ Two new properties on `oslc:Property`, proposed for OSLC-OP:
   oslc:name "channelsEffortsToward" ;
   oslc:propertyDefinition bmm:channelsEffortsToward ;
   oslc:valueType oslc:Resource ;
-  oslc:inversePropertyDefinition bmm:effortsChanneledBy ;
-  oslc:inverseLabel "Efforts Channeled By" .
+  oslc:inversePropertyLabel "Efforts Channeled By" .
 ```
 
-**Why it matters:** the inverse URI is an *identifier*, not asserted as an `rdf:Property`. The triple is stored once. Clients render incoming links by reflecting off the shape — no hardcoded inverse-type tables like DOORS Next or `oslc-client.LDMClient.INVERSE_LINK_TYPES`. Same benefit applies to OSLC **LDM** clients: incoming links discovered via `/discover-links`.
+**Why it matters:** the triple is stored once; there is no separate inverse predicate to assert. Clients render incoming links by reflecting off the shape — no hardcoded inverse-type tables like DOORS Next or `oslc-client.LDMClient.INVERSE_LINK_TYPES`. Same benefit applies to OSLC **LDM** clients: incoming links discovered via `/discover-links`. When no `oslc:inversePropertyLabel` is declared, clients fall back to the SPARQL-style `^<predicateName>` form.
 
 ---
 
@@ -283,7 +281,7 @@ Full prompt: `docs/prompts/02-populate-eu-rent-example.md`
 
 - Outgoing links (`amplifiedBy`, `madeOperativeBy`) — regular type.
 - Incoming links (`Efforts Channeled By`, `Responsibility Of`) — italicized in the same Links table.
-- Labels come from `oslc:inverseLabel` on the source-side shape.
+- Labels come from `oslc:inversePropertyLabel` on the source-side shape.
 - Italics signal the triple is stored on the source; the user navigates transparently.
 
 ---
@@ -393,7 +391,7 @@ TRS feeds in `oslc-service` are a future extension; the `/discover-links` endpoi
 
 # Activate — LDM and Human Users
 
-**LDM `/discover-links`** — a specialized client posts a target URI, gets back the incoming links (reverse triples). Labels resolved client-side from the shape cache via `oslc:inverseLabel`. Same wire format as a dedicated LDM/LQE provider, so clients work interchangeably.
+**LDM `/discover-links`** — a specialized client posts a target URI, gets back the incoming links (reverse triples). Labels resolved client-side from the shape cache via `oslc:inversePropertyLabel`. Same wire format as a dedicated LDM/LQE provider, so clients work interchangeably.
 
 **Human users** — the same BMM server, same vocabulary, same shapes, same data, rendered as a column browser, Properties panels, and dependency graphs for stakeholder walkthroughs.
 
@@ -437,7 +435,7 @@ None of these changed OSLC Core or the RDF model. Each earns its place by removi
 |---|---|
 | **Embedded MCP endpoint** in `oslc-service` | The gap between OSLC servers and AI assistants — no separate MCP bridge to build or run. |
 | **LDM `/discover-links`** per server | The need for a dedicated LDM provider for efficient access to locally accessible incoming links. |
-| **Shape inverse metadata** (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`) | Hardcoded client-side inverse-type tables. Vocabulary governance replaces client-rebuild cycles. |
+| **Shape inverse-direction label** (`oslc:inversePropertyLabel`) | Hardcoded client-side inverse-type tables. Vocabulary governance replaces client-rebuild cycles. |
 
 ---
 
@@ -511,7 +509,7 @@ Picked up **automatically** when the description matches the user's request. To 
 
 - [**`docs/AAKI-Example.md`**](https://github.com/OSLC/oslc4js/blob/master/docs/AAKI-Example.md) — **companion document** for this deck: every shape fragment, prompt, and MCP-response example shown here, with the full reproduction steps
 - [**`docs/AAKI.md`**](https://github.com/OSLC/oslc4js/blob/master/docs/AAKI.md) — the abstract AAKI framework that this worked example demonstrates
-- [**`docs/OSLC-Shape-Extensions.md`**](https://github.com/OSLC/oslc4js/blob/master/docs/OSLC-Shape-Extensions.md) — proposed OSLC-OP property definitions (`oslc:inversePropertyDefinition`, `oslc:inverseLabel`)
+- [**`docs/OSLC-Shape-Extensions.md`**](https://github.com/OSLC/oslc4js/blob/master/docs/OSLC-Shape-Extensions.md) — proposed OSLC-OP property definitions (`oslc:inversePropertyLabel`, `oslc:icon`)
 - [**`docs/prompts/`**](https://github.com/OSLC/oslc4js/tree/master/docs/prompts) — canonicalized reference prompts for vocabulary authoring, EU-Rent population, and analysis
 - [**`bmm-server/README.md`**](https://github.com/OSLC/oslc4js/blob/master/bmm-server/README.md) — server setup and EU-Rent population script
 - [**`oslc-browser/README.md`**](https://github.com/OSLC/oslc4js/blob/master/oslc-browser/README.md) — incoming-link rendering pipeline
