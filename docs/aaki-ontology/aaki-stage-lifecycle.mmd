@@ -1,0 +1,85 @@
+---
+title: AAKI Stage Lifecycle — UML sequence diagram
+---
+sequenceDiagram
+    participant SME as anActor : Human
+    participant AI as anAIAssistant : AIAssistant
+    participant Server as anOSLCServer : OSLCServer
+    participant MCP as anMCPEndpoint : MCPEndpoint
+    participant LQE as aDatamart : Datamart
+
+    rect rgb(245, 248, 252)
+    Note over SME,LQE: Stage 1 — Define
+    SME->>+AI: shareSource(specDocument)
+    AI->>AI: draftVocabulary()
+    AI->>AI: draftResourceShapes()
+    Note right of AI: «Propose»<br/>governance pattern
+    AI-->>SME: proposedArtifacts(vocab.ttl, shapes.ttl)
+    deactivate AI
+    SME->>+AI: approve(proposedArtifacts)
+    AI->>+Server: publishVocabulary(vocab.ttl, shapes.ttl)
+    Server-->>-AI: vocabularyURI
+    AI-->>-SME: vocabularyPublished(vocabularyURI)
+    end
+
+    rect rgb(245, 248, 252)
+    Note over SME,LQE: Stage 2 — Instantiate
+    SME->>+AI: shareSource(exampleData)
+    AI->>+MCP: read_service_provider()
+    MCP-->>-AI: serviceProviderDescription
+    AI->>+MCP: read_resource_shape()
+    MCP-->>-AI: shapes, creationFactories, queryCapabilities
+    AI->>AI: planResources()
+    AI->>AI: planLinks()
+    Note right of AI: «Propose»<br/>governance pattern
+    AI-->>SME: proposedBatch(resources, links)
+    deactivate AI
+    SME->>+AI: approveInContext(workingConfiguration)
+    loop For each planned resource
+        AI->>+MCP: create_resource(shape, payload)
+        MCP->>+Server: POST shape-conformant resource
+        Server-->>-MCP: 201 Created
+        MCP-->>-AI: resourceURI, provenance
+    end
+    loop For each planned link
+        AI->>+MCP: create_link(source, predicate, target)
+        MCP->>+Server: PUT outgoing-link triples
+        Server-->>-MCP: 204 No Content
+        MCP-->>-AI: linkRecorded
+    end
+    AI-->>-SME: deliveryComplete(provenanceSummary)
+    end
+
+    rect rgb(245, 248, 252)
+    Note over SME,LQE: Stage 3 — Activate
+    SME->>+AI: askQuestion(naturalLanguageQuery)
+    Note right of AI: «Observe»<br/>governance pattern<br/>(read-only, no approval)
+    alt question requires aggregate analytics
+        AI->>+LQE: SPARQL(materializedQuery)
+        LQE-->>-AI: aggregateResults
+    end
+    alt question requires current linked state
+        AI->>+MCP: traverseLinks(seedResource)
+        MCP-->>-AI: linkedArtifacts
+    end
+    AI-->>-SME: answer(citations, impactSummary)
+
+    opt mechanical follow-up under pre-authorized policy
+        SME->>+AI: applyPolicy(linkingPolicy)
+        Note right of AI: «Execute»<br/>governance pattern<br/>(policy-authorized)
+        loop For each affected resource
+            AI->>+MCP: update_link(source, predicate, target)
+            MCP->>+Server: PUT link triples
+            Server-->>-MCP: 204 No Content
+            MCP-->>-AI: linkRecorded
+        end
+        AI-->>-SME: policyApplied(provenanceRecorded)
+    end
+    end
+
+    rect rgb(245, 248, 252)
+    Note over SME,LQE: Feedback loop — re-enters Stages 1 or 2 as gaps surface
+    AI->>+LQE: queryGapsAndCoverage()
+    LQE-->>-AI: updatedMetrics
+    AI-->>SME: newQuestions(stage2Input)
+    end

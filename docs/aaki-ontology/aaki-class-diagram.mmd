@@ -1,0 +1,99 @@
+---
+title: AAKI Class Diagram — Structural view of the AAKI vocabulary
+---
+classDiagram
+    note "All AAKI classes are rdfs:subClassOf oslc_am:Resource\nand inherit the common OSLC core properties\n(title, description, creator, created, modified,\nserviceProvider, instanceShape, plus six common link types)"
+
+    class Stage {
+        +produces
+        +consumes
+        +operatesOn
+        +hasFacet
+        +demonstratedBy
+    }
+    class Facet {
+        +scopedTo
+        +exposes
+    }
+    class GovernancePattern {
+        +governs
+    }
+
+    class Actor
+    class Human {
+        +owns
+    }
+    class AIAssistant {
+        +assists
+        +scopedTo
+    }
+
+    class Decision {
+        +decidedBy
+        +decidedAt
+        +basedOnEvidence
+        +inConfiguration
+        +effectsChange
+    }
+
+    class Capability {
+        +supports
+    }
+
+    class Artifact
+    class Vocabulary
+    class ResourceShape
+    class ResourceInstance
+    class Link
+    class Configuration {
+        +resolves
+    }
+    class Baseline
+    class ChangeSet
+
+    class System
+    class OSLCServer {
+        +exposes
+    }
+    class MCPEndpoint
+    class Datamart
+    class Tool
+
+    class Domain
+
+    class Realization {
+        +realizes
+        +hasDomain
+    }
+
+    Actor <|-- Human
+    Actor <|-- AIAssistant
+    Artifact <|-- Vocabulary
+    Artifact <|-- ResourceShape
+    Artifact <|-- ResourceInstance
+    Artifact <|-- Link
+    Artifact <|-- Configuration
+    Configuration <|-- Baseline
+    Artifact <|-- ChangeSet
+    System <|-- OSLCServer
+    System <|-- MCPEndpoint
+    System <|-- Datamart
+    System <|-- Tool
+
+    Stage "1" --> "1..*" Artifact : produces / consumes / operatesOn
+    Stage "1" --> "*" Facet : hasFacet
+    Stage "*" --> "*" Realization : demonstratedBy
+    Realization "*" --> "1..*" Stage : realizes
+    Realization "1" --> "1" Domain : hasDomain
+    AIAssistant "*" --> "1..*" Stage : assists
+    GovernancePattern "1" --> "*" AIAssistant : governs
+    Human "1" --> "*" Decision : owns
+    Decision "*" --> "1" Human : decidedBy
+    Decision "*" --> "*" Artifact : basedOnEvidence
+    Decision "*" --> "*" Artifact : effectsChange
+    Decision "*" --> "1" Configuration : inConfiguration
+    OSLCServer "1" --> "*" Capability : exposes
+    Capability "*" --> "*" Decision : supports
+    Configuration "1" --> "*" ResourceInstance : resolves
+    AIAssistant "*" --> "*" System : scopedTo
+    AIAssistant "*" --> "*" Facet : scopedTo

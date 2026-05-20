@@ -1,0 +1,302 @@
+# Copyright 2026 Open Services for Lifecycle Collaboration (OSLC)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix oslc_am: <http://open-services.net/ns/am#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann:    <http://purl.org/vocab/vann/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix aaki:    <http://open-services.net/ns/aaki#> .
+
+
+# ── Ontology declaration ──────────────────────────────────────────────
+
+aaki:
+  a owl:Ontology ;
+  dcterms:title "AI Assisted Knowledge Integration (AAKI) Vocabulary" ;
+  rdfs:label "AAKI Vocabulary" ;
+  dcterms:description "All vocabulary URIs defined in the AAKI namespace. AAKI is a strategic framework for making domain knowledge actionable across an enterprise by combining governed ontologies, AI-assisted authoring and analysis, and linked-data infrastructure. This vocabulary contains the types (rdf:Class and rdf:Property declarations) used to describe AAKI itself; named individuals representing the canonical AAKI taxa are populated as A-box instances in a running AAKI server's repository, not in this vocabulary."^^rdf:XMLLiteral ;
+  vann:preferredNamespacePrefix "aaki" ;
+  dcterms:publisher <https://open-services.net/about/> ;
+  dcterms:issued "2026-05-20"^^xsd:date ;
+  dcterms:license <http://www.apache.org/licenses/LICENSE-2.0> ;
+  dcterms:source <https://github.com/OSLC/oslc4js/blob/master/docs/aaki-ontology/aaki-vocab.ttl> ;
+  dcterms:dateCopyrighted "2026" .
+
+
+# ── Classes ───────────────────────────────────────────────────────────
+#
+# All AAKI classes are rdfs:subClassOf oslc_am:Resource so AAKI
+# resources inherit the common OSLC core properties (title,
+# description, creator, created, modified, serviceProvider,
+# instanceShape, plus the six common link types derives / elaborates /
+# refine / external / satisfy / trace).
+
+
+aaki:Stage a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Stage" ;
+    rdfs:comment "One of the three realization stages of AAKI: Define (vocabulary and shape authoring), Instantiate (population of governed artifacts and links), or Activate (extraction of value through queries, analytics, and AI-assisted decisions). Canonical instances live in the AAKI server's repository, not in this vocabulary." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Facet a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Facet" ;
+    rdfs:comment "One of the three facets of model evolution and use that an AI assistant operates at during AAKI Activate: Tool Resource Optimization (per-tool authoring assistance against a single domain), Integration (cross-tool reasoning over the OSLC link graph), or Analytics (queries over a materialized lifecycle view such as LQE). Canonical instances live in the AAKI server's repository." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:GovernancePattern a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Governance Pattern" ;
+    rdfs:comment "A named convention by which an AI assistant participates in AAKI without crossing the RACI line: Observe (read-only analysis, no approval needed), Propose (drafts artifacts and links into a proposed state requiring human review), or Execute (mechanical operations under pre-authorized policy). Canonical instances live in the AAKI server's repository." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Actor a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Actor" ;
+    rdfs:comment "Abstract supertype for participants in an AAKI lifecycle execution. Concrete subclasses are aaki:Human and aaki:AIAssistant." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Human a rdfs:Class ;
+    rdfs:subClassOf aaki:Actor ;
+    rdfs:label "Human" ;
+    rdfs:comment "A human participant in an AAKI lifecycle execution. Subject matter experts, reviewers, and decision owners are all Humans. Humans remain Responsible and Accountable for every decision the system records." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:AIAssistant a rdfs:Class ;
+    rdfs:subClassOf aaki:Actor ;
+    rdfs:label "AI Assistant" ;
+    rdfs:comment "An AI assistant participating in an AAKI lifecycle execution as a collaborator (not an agent on the RACI chart). Drafts vocabulary, populates instances, traverses the graph for analysis, and proposes actions — but never owns a decision." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Decision a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Decision" ;
+    rdfs:comment "A named, attributed act by a Human that produces a state change in the governed graph in response to (or independently of) AI-assisted analysis. Carries provenance: who decided, when, on what evidence, in which configuration context. Makes the RACI line queryable as graph data." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Capability a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Capability" ;
+    rdfs:comment "A capability exposed by an AAKI system: Authoring, Querying, ImpactAnalysis, GapDetection, Traceability, ComplianceReporting, WhatIfAnalysis, and similar. Each capability supports one or more kinds of human Decision." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Artifact a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Artifact" ;
+    rdfs:comment "Abstract supertype for the persistent products of AAKI: vocabularies, shapes, resource instances, links, configurations, baselines, change sets. Concrete subclasses identify the specific kinds." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Vocabulary a rdfs:Class ;
+    rdfs:subClassOf aaki:Artifact ;
+    rdfs:label "Vocabulary" ;
+    rdfs:comment "An RDF vocabulary defining the classes and properties of a domain. Produced during AAKI Define." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:ResourceShape a rdfs:Class ;
+    rdfs:subClassOf aaki:Artifact ;
+    rdfs:label "Resource Shape" ;
+    rdfs:comment "An OSLC ResourceShape constraining a vocabulary for a specific server's API contract. Produced during AAKI Define alongside the Vocabulary." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:ResourceInstance a rdfs:Class ;
+    rdfs:subClassOf aaki:Artifact ;
+    rdfs:label "Resource Instance" ;
+    rdfs:comment "A concrete instance of a domain class, conforming to a ResourceShape and populated during AAKI Instantiate." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Link a rdfs:Class ;
+    rdfs:subClassOf aaki:Artifact ;
+    rdfs:label "Link" ;
+    rdfs:comment "A typed connection between two ResourceInstances, expressed as a triple in the governed graph. Created during Instantiate and traversed during Activate." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Configuration a rdfs:Class ;
+    rdfs:subClassOf aaki:Artifact ;
+    rdfs:label "Configuration" ;
+    rdfs:comment "An OSLC Configuration that scopes which version resources are in effect for a given request. Resolves ResourceInstances per the OSLC Configuration Management resolution mechanism." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Baseline a rdfs:Class ;
+    rdfs:subClassOf aaki:Configuration ;
+    rdfs:label "Baseline" ;
+    rdfs:comment "An immutable Configuration capturing a specific point-in-time state of the governed graph for audit and traceability." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:ChangeSet a rdfs:Class ;
+    rdfs:subClassOf aaki:Artifact ;
+    rdfs:label "Change Set" ;
+    rdfs:comment "An OSLC ChangeSet bundling proposed modifications to ResourceInstances and Links for review and approval as a unit." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:System a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "System" ;
+    rdfs:comment "Abstract supertype for the runtime systems that participate in an AAKI lifecycle execution: OSLCServer, MCPEndpoint, Datamart, Tool." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:OSLCServer a rdfs:Class ;
+    rdfs:subClassOf aaki:System ;
+    rdfs:label "OSLC Server" ;
+    rdfs:comment "An OSLC server holding the governed graph for a domain. Persists ResourceInstances, Links, and Configurations; exposes the standard OSLC REST surface." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:MCPEndpoint a rdfs:Class ;
+    rdfs:subClassOf aaki:System ;
+    rdfs:label "MCP Endpoint" ;
+    rdfs:comment "An MCP (Model Context Protocol) endpoint giving an AI assistant tool-mediated access to a System. Each MCPEndpoint serves one or more OSLC servers, datamarts, or tools." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Datamart a rdfs:Class ;
+    rdfs:subClassOf aaki:System ;
+    rdfs:label "Datamart" ;
+    rdfs:comment "A materialized read-only view of the lifecycle graph (typically LQE-style), populated via OSLC Tracked Resource Sets from multiple source OSLC servers and queryable via SPARQL. The substrate for the Analytics facet." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Tool a rdfs:Class ;
+    rdfs:subClassOf aaki:System ;
+    rdfs:label "Tool" ;
+    rdfs:comment "A domain-specific authoring or analysis tool (a requirements manager, a CAD tool, a test manager) that exposes its content via OSLC and/or MCP. The substrate for the Tool Resource Optimization facet." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Domain a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Domain" ;
+    rdfs:comment "A named subject domain that AAKI is realized over — for example, BMM (Business Motivation Model), MRM (Municipal Reference Model), or ISO 9001 quality management. A Domain is what a Vocabulary and its ResourceShapes describe." ;
+    rdfs:isDefinedBy aaki: .
+
+aaki:Realization a rdfs:Class ;
+    rdfs:subClassOf oslc_am:Resource ;
+    rdfs:label "Realization" ;
+    rdfs:comment "A concrete implementation of AAKI on a specific Domain — typically an OSLC server (e.g., bmm-server, mrm-server) that demonstrates one or more AAKI Stages on that domain's vocabulary." ;
+    rdfs:isDefinedBy aaki: .
+
+
+# ── Properties ────────────────────────────────────────────────────────
+#
+# Open vocabulary: no rdfs:domain or rdfs:range. Constraints are
+# expressed in aaki-shapes.ttl. Each property has rdfs:label and
+# rdfs:comment only.
+
+
+aaki:produces
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "produces" ;
+  rdfs:comment "A Stage produces an Artifact. Define produces Vocabulary and ResourceShape; Instantiate produces ResourceInstance and Link." .
+
+aaki:consumes
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "consumes" ;
+  rdfs:comment "A Stage consumes an Artifact produced by a prior Stage. Instantiate consumes Vocabulary and ResourceShape; Activate consumes ResourceInstance and Link." .
+
+aaki:operatesOn
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "operates on" ;
+  rdfs:comment "A Stage operates on the populated graph during execution. Used primarily by Activate, which reads (and conditionally writes under Execute governance) the graph populated by Instantiate." .
+
+aaki:hasFacet
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "has facet" ;
+  rdfs:comment "The Activate Stage has three facets: Tool Resource Optimization, Integration, and Analytics. Each Facet corresponds to a different scope of AI assistance against the populated graph." .
+
+aaki:governs
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "governs" ;
+  rdfs:comment "A GovernancePattern governs an AIAssistant's actions of a particular category. Observe governs read-only analyses; Propose governs draft authoring; Execute governs policy-authorized mechanical operations." .
+
+aaki:owns
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "owns" ;
+  rdfs:comment "A Human owns a Decision. The RACI Responsible/Accountable position is recorded as ownership in the governed graph." .
+
+aaki:assists
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "assists" ;
+  rdfs:comment "An AIAssistant assists a Stage (or an Actor in that Stage). The AI participates as a collaborator; the Human owns the resulting Decision." .
+
+aaki:realizes
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "realizes" ;
+  rdfs:comment "A Realization realizes one or more AAKI Stages on a specific Domain. For example, bmm-server realizes Define, Instantiate, and Activate over the BMM domain." .
+
+aaki:exposes
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "exposes" ;
+  rdfs:comment "A System exposes Capabilities to participating AIAssistants and Humans." .
+
+aaki:scopedTo
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "scoped to" ;
+  rdfs:comment "Identifies the System or Facet within which an AIAssistant operates for a particular interaction. The Tool Resource Optimization facet scopes the AI to one Tool; the Integration facet scopes to the OSLC link graph; the Analytics facet scopes to a Datamart." .
+
+aaki:supports
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "supports" ;
+  rdfs:comment "A Capability supports one or more kinds of human Decision. For example, ImpactAnalysis supports change-approval decisions; GapDetection supports coverage decisions." .
+
+aaki:hasDomain
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "has domain" ;
+  rdfs:comment "A Realization has a Domain. bmm-server hasDomain BMM; mrm-server hasDomain MRM." .
+
+aaki:resolves
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "resolves" ;
+  rdfs:comment "A Configuration resolves to a set of ResourceInstance versions for a given request, per the OSLC Configuration Management resolution algorithm." .
+
+aaki:demonstratedBy
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "demonstrated by" ;
+  rdfs:comment "A Stage is demonstrated by a Realization that exercises the Stage end-to-end. Inverse direction of aaki:realizes." .
+
+aaki:decidedBy
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "decided by" ;
+  rdfs:comment "A Decision was made by a Human. The decider is named, attributed, and accountable." .
+
+aaki:decidedAt
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "decided at" ;
+  rdfs:comment "The xsd:dateTime at which a Decision was made." .
+
+aaki:basedOnEvidence
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "based on evidence" ;
+  rdfs:comment "An Artifact (typically an AI-produced analysis, query result, or proposal) that informed a Decision. Multiple evidence references are permitted." .
+
+aaki:inConfiguration
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "in configuration" ;
+  rdfs:comment "The Configuration context in which a Decision was made. Ensures decisions are reproducible and that the resolved state at decision time is traceable." .
+
+aaki:effectsChange
+  a rdf:Property ;
+  rdfs:isDefinedBy aaki: ;
+  rdfs:label "effects change" ;
+  rdfs:comment "An Artifact whose state changed as a result of a Decision. Approving a proposed ResourceInstance, promoting a draft to released, accepting an AI-suggested Link, sealing a Baseline — each is a Decision that effects a change on its target Artifact." .
