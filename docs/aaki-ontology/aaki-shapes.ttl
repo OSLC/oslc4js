@@ -1,0 +1,376 @@
+# Copyright 2026 Open Services for Lifecycle Collaboration (OSLC)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix oslc:    <http://open-services.net/ns/core#> .
+@prefix oslc_am: <http://open-services.net/ns/am#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix aaki:    <http://open-services.net/ns/aaki#> .
+@prefix amshapes: <http://open-services.net/ns/am/shapes/3.0#> .
+
+@prefix : <http://open-services.net/ns/aaki/shapes#> .
+
+
+: a oslc:ResourceShapeConstraints ;
+    rdfs:label "AAKI ResourceShape Constraints" ;
+    dcterms:title "AAKI ResourceShape Constraints" ;
+    dcterms:description "OSLC ResourceShapes constraining the AAKI vocabulary for a server-side API contract. Each shape declares oslc:superShape <http://open-services.net/ns/am/shapes/3.0#ResourceShape> to inherit the common OSLC core properties (title, description, creator, created, modified, serviceProvider, instanceShape, plus the six common link types derives / elaborates / refine / external / satisfy / trace). AAKI shapes carry only the AAKI-specific property constraints."^^rdf:XMLLiteral ;
+    dcterms:dateCopyrighted "2026" ;
+    dcterms:license <http://www.apache.org/licenses/LICENSE-2.0> ;
+    dcterms:source <https://github.com/OSLC/oslc4js/blob/master/docs/aaki-ontology/aaki-shapes.ttl> .
+
+
+# ── Property shapes (referenced from one or more ResourceShapes) ─────
+
+:produces a oslc:Property ;
+    oslc:name                "produces" ;
+    dcterms:title            "Produces" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:produces ;
+    oslc:range               aaki:Artifact ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Produced By" ;
+    dcterms:description      """A Stage produces an Artifact (Vocabulary, ResourceShape, ResourceInstance, Link, etc.)."""^^rdf:XMLLiteral .
+
+:consumes a oslc:Property ;
+    oslc:name                "consumes" ;
+    dcterms:title            "Consumes" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:consumes ;
+    oslc:range               aaki:Artifact ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Consumed By" ;
+    dcterms:description      """A Stage consumes an Artifact produced by a prior Stage."""^^rdf:XMLLiteral .
+
+:operatesOn a oslc:Property ;
+    oslc:name                "operatesOn" ;
+    dcterms:title            "Operates On" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:operatesOn ;
+    oslc:range               aaki:Artifact ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Operated On By" ;
+    dcterms:description      """A Stage operates on the populated graph during execution."""^^rdf:XMLLiteral .
+
+:hasFacet a oslc:Property ;
+    oslc:name                "hasFacet" ;
+    dcterms:title            "Has Facet" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:hasFacet ;
+    oslc:range               aaki:Facet ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Facet Of" ;
+    dcterms:description      """Activate has three facets: Tool Resource Optimization, Integration, and Analytics."""^^rdf:XMLLiteral .
+
+:demonstratedBy a oslc:Property ;
+    oslc:name                "demonstratedBy" ;
+    dcterms:title            "Demonstrated By" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:demonstratedBy ;
+    oslc:range               aaki:Realization ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Demonstrates" ;
+    dcterms:description      """A Stage is demonstrated by one or more Realizations that exercise it end-to-end."""^^rdf:XMLLiteral .
+
+:scopedTo a oslc:Property ;
+    oslc:name                "scopedTo" ;
+    dcterms:title            "Scoped To" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:scopedTo ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Scope Of" ;
+    dcterms:description      """The System or Facet that scopes this AIAssistant's actions."""^^rdf:XMLLiteral .
+
+:exposes a oslc:Property ;
+    oslc:name                "exposes" ;
+    dcterms:title            "Exposes" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:exposes ;
+    oslc:range               aaki:Capability ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Exposed By" ;
+    dcterms:description      """A System exposes Capabilities to participating Actors."""^^rdf:XMLLiteral .
+
+:governs a oslc:Property ;
+    oslc:name                "governs" ;
+    dcterms:title            "Governs" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:governs ;
+    oslc:range               aaki:AIAssistant ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Governed By" ;
+    dcterms:description      """A GovernancePattern governs an AIAssistant's actions of a particular category."""^^rdf:XMLLiteral .
+
+:owns a oslc:Property ;
+    oslc:name                "owns" ;
+    dcterms:title            "Owns" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:owns ;
+    oslc:range               aaki:Decision ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Owned By" ;
+    dcterms:description      """A Human owns a Decision — the RACI Responsible/Accountable position recorded as graph data."""^^rdf:XMLLiteral .
+
+:assists a oslc:Property ;
+    oslc:name                "assists" ;
+    dcterms:title            "Assists" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:assists ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Assisted By" ;
+    dcterms:description      """An AIAssistant assists a Stage (or an Actor in that Stage)."""^^rdf:XMLLiteral .
+
+:supports a oslc:Property ;
+    oslc:name                "supports" ;
+    dcterms:title            "Supports" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:supports ;
+    oslc:range               aaki:Decision ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Supported By" ;
+    dcterms:description      """A Capability supports one or more kinds of human Decision."""^^rdf:XMLLiteral .
+
+:resolves a oslc:Property ;
+    oslc:name                "resolves" ;
+    dcterms:title            "Resolves" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:resolves ;
+    oslc:range               aaki:ResourceInstance ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Resolved By" ;
+    dcterms:description      """A Configuration resolves to a set of ResourceInstance versions for a given request."""^^rdf:XMLLiteral .
+
+:realizes a oslc:Property ;
+    oslc:name                "realizes" ;
+    dcterms:title            "Realizes" ;
+    oslc:occurs              oslc:One-or-many ;
+    oslc:propertyDefinition  aaki:realizes ;
+    oslc:range               aaki:Stage ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Realized By" ;
+    dcterms:description      """A Realization realizes one or more AAKI Stages on a specific Domain."""^^rdf:XMLLiteral .
+
+:hasDomain a oslc:Property ;
+    oslc:name                "hasDomain" ;
+    dcterms:title            "Has Domain" ;
+    oslc:occurs              oslc:Exactly-one ;
+    oslc:propertyDefinition  aaki:hasDomain ;
+    oslc:range               aaki:Domain ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Domain Of" ;
+    dcterms:description      """A Realization has a Domain — bmm-server hasDomain BMM; mrm-server hasDomain MRM."""^^rdf:XMLLiteral .
+
+:decidedBy a oslc:Property ;
+    oslc:name                "decidedBy" ;
+    dcterms:title            "Decided By" ;
+    oslc:occurs              oslc:Exactly-one ;
+    oslc:propertyDefinition  aaki:decidedBy ;
+    oslc:range               aaki:Human ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Decisions" ;
+    dcterms:description      """The Human who made this Decision — named, attributed, accountable."""^^rdf:XMLLiteral .
+
+:decidedAt a oslc:Property ;
+    oslc:name                "decidedAt" ;
+    dcterms:title            "Decided At" ;
+    oslc:occurs              oslc:Exactly-one ;
+    oslc:propertyDefinition  aaki:decidedAt ;
+    oslc:representation      oslc:Either ;
+    oslc:valueType           xsd:dateTime ;
+    dcterms:description      """The xsd:dateTime at which this Decision was made."""^^rdf:XMLLiteral .
+
+:basedOnEvidence a oslc:Property ;
+    oslc:name                "basedOnEvidence" ;
+    dcterms:title            "Based On Evidence" ;
+    oslc:occurs              oslc:Zero-or-many ;
+    oslc:propertyDefinition  aaki:basedOnEvidence ;
+    oslc:range               aaki:Artifact ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Evidence For" ;
+    dcterms:description      """An Artifact (typically an AI-produced analysis, query result, or proposal) that informed this Decision."""^^rdf:XMLLiteral .
+
+:inConfiguration a oslc:Property ;
+    oslc:name                "inConfiguration" ;
+    dcterms:title            "In Configuration" ;
+    oslc:occurs              oslc:Zero-or-one ;
+    oslc:propertyDefinition  aaki:inConfiguration ;
+    oslc:range               aaki:Configuration ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Decisions In" ;
+    dcterms:description      """The Configuration context in which this Decision was made — ensures reproducibility."""^^rdf:XMLLiteral .
+
+:effectsChange a oslc:Property ;
+    oslc:name                "effectsChange" ;
+    dcterms:title            "Effects Change" ;
+    oslc:occurs              oslc:One-or-many ;
+    oslc:propertyDefinition  aaki:effectsChange ;
+    oslc:range               aaki:Artifact ;
+    oslc:representation      oslc:Reference ;
+    oslc:valueType           oslc:Resource ;
+    oslc:inversePropertyLabel "Changed By" ;
+    dcterms:description      """An Artifact whose state changed as a result of this Decision."""^^rdf:XMLLiteral .
+
+
+# ── Resource Shapes ──────────────────────────────────────────────────
+#
+# Each AAKI shape declares oslc:superShape
+# <http://open-services.net/ns/am/shapes/3.0#ResourceShape> to inherit
+# the common OSLC core properties from the OASIS-standard AM Resource
+# shape. AAKI shapes carry only the AAKI-specific properties.
+
+
+:StageShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Stage ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Stage" ;
+    dcterms:description  """A Stage of AAKI: Define, Instantiate, or Activate. Inherits common OSLC core properties from oslc_am:ResourceShape."""^^rdf:XMLLiteral ;
+    oslc:property :produces , :consumes , :operatesOn , :hasFacet , :demonstratedBy .
+
+:FacetShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Facet ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Facet" ;
+    dcterms:description  """A facet of model evolution and use during AAKI Activate: Tool Resource Optimization, Integration, or Analytics."""^^rdf:XMLLiteral ;
+    oslc:property :scopedTo , :exposes .
+
+:GovernancePatternShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:GovernancePattern ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Governance Pattern" ;
+    dcterms:description  """A named convention by which an AIAssistant participates in AAKI: Observe, Propose, or Execute."""^^rdf:XMLLiteral ;
+    oslc:property :governs .
+
+:HumanShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Human ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Human" ;
+    dcterms:description  """A human participant in an AAKI lifecycle execution. SMEs, reviewers, decision owners — all Humans."""^^rdf:XMLLiteral ;
+    oslc:property :owns .
+
+:AIAssistantShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:AIAssistant ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "AI Assistant" ;
+    dcterms:description  """An AI assistant participating in an AAKI lifecycle execution as a collaborator (not an agent on the RACI chart)."""^^rdf:XMLLiteral ;
+    oslc:property :assists , :scopedTo .
+
+:DecisionShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Decision ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Decision" ;
+    dcterms:description  """A named, attributed act by a Human that produces a state change in the governed graph."""^^rdf:XMLLiteral ;
+    oslc:property :decidedBy , :decidedAt , :basedOnEvidence , :inConfiguration , :effectsChange .
+
+:CapabilityShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Capability ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Capability" ;
+    dcterms:description  """A capability exposed by an AAKI System: Authoring, Querying, ImpactAnalysis, GapDetection, Traceability, ComplianceReporting, WhatIfAnalysis, etc."""^^rdf:XMLLiteral ;
+    oslc:property :supports .
+
+:VocabularyShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Vocabulary ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Vocabulary" ;
+    dcterms:description  """An RDF vocabulary defining the classes and properties of a domain. Produced during AAKI Define."""^^rdf:XMLLiteral .
+
+:ResourceShapeShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:ResourceShape ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Resource Shape" ;
+    dcterms:description  """An OSLC ResourceShape constraining a Vocabulary for a server's API contract. Produced during AAKI Define alongside the Vocabulary."""^^rdf:XMLLiteral .
+
+:ResourceInstanceShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:ResourceInstance ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Resource Instance" ;
+    dcterms:description  """A concrete instance of a domain class, conforming to a ResourceShape and populated during AAKI Instantiate."""^^rdf:XMLLiteral .
+
+:LinkShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Link ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Link" ;
+    dcterms:description  """A typed connection between two ResourceInstances, expressed as a triple in the governed graph."""^^rdf:XMLLiteral .
+
+:ConfigurationShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Configuration ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Configuration" ;
+    dcterms:description  """An OSLC Configuration that scopes which version resources are in effect for a given request."""^^rdf:XMLLiteral ;
+    oslc:property :resolves .
+
+:BaselineShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Baseline ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Baseline" ;
+    dcterms:description  """An immutable Configuration capturing a specific point-in-time state of the governed graph."""^^rdf:XMLLiteral ;
+    oslc:property :resolves .
+
+:ChangeSetShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:ChangeSet ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Change Set" ;
+    dcterms:description  """An OSLC ChangeSet bundling proposed modifications to ResourceInstances and Links for review and approval as a unit."""^^rdf:XMLLiteral .
+
+:OSLCServerShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:OSLCServer ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "OSLC Server" ;
+    dcterms:description  """An OSLC server holding the governed graph for a domain."""^^rdf:XMLLiteral ;
+    oslc:property :exposes .
+
+:MCPEndpointShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:MCPEndpoint ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "MCP Endpoint" ;
+    dcterms:description  """An MCP endpoint giving an AIAssistant tool-mediated access to a System."""^^rdf:XMLLiteral .
+
+:DatamartShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Datamart ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Datamart" ;
+    dcterms:description  """A materialized read-only view of the lifecycle graph, populated via OSLC TRS and queryable via SPARQL."""^^rdf:XMLLiteral .
+
+:ToolShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Tool ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Tool" ;
+    dcterms:description  """A domain-specific authoring or analysis tool that exposes its content via OSLC and/or MCP."""^^rdf:XMLLiteral .
+
+:DomainShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Domain ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Domain" ;
+    dcterms:description  """A named subject domain that AAKI is realized over — BMM, MRM, ISO 9001, etc."""^^rdf:XMLLiteral .
+
+:RealizationShape a oslc:ResourceShape ;
+    oslc:describes oslc_am:Resource , aaki:Realization ;
+    oslc:superShape amshapes:ResourceShape ;
+    dcterms:title  "Realization" ;
+    dcterms:description  """A concrete implementation of AAKI on a specific Domain — e.g., bmm-server, mrm-server."""^^rdf:XMLLiteral ;
+    oslc:property :realizes , :hasDomain .

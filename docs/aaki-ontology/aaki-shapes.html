@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AAKI Shapes</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 1100px; margin: 2em auto; padding: 0 1.5em; color: #222; line-height: 1.5; }
+    h1 { color: #1a5276; border-bottom: 2px solid #1a5276; padding-bottom: 0.2em; }
+    h2 { color: #2c3e50; margin-top: 2em; border-bottom: 1px solid #ddd; padding-bottom: 0.15em; }
+    code { background: #f4f6f8; padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+    .meta { color: #555; font-size: 0.92em; margin-bottom: 1.5em; }
+    .toc { background: #f9fafb; border-left: 4px solid #1a5276; padding: 1em 1.5em; }
+    .toc ul { columns: 2; margin: 0; padding-left: 1.2em; }
+    .shape { background: #fafbfc; padding: 0.8em 1em 1em; margin: 1em 0; border-radius: 4px; border-left: 3px solid #1a5276; }
+    .shape h3 { margin-top: 0.4em; color: #1a5276; }
+    .shape .meta-row { font-size: 0.88em; color: #555; margin-bottom: 0.5em; }
+    .shape .meta-row code { background: #ecf0f5; }
+    .shape .super { font-size: 0.87em; color: #2980b9; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9em; margin-top: 0.6em; }
+    th, td { text-align: left; padding: 0.4em 0.6em; border-bottom: 1px solid #e3e6ea; vertical-align: top; }
+    th { background: #ecf0f5; color: #1a5276; font-weight: 600; }
+    .nocaps { font-style: italic; color: #777; font-size: 0.92em; }
+  </style>
+</head>
+<body>
+
+<h1>AAKI Shapes</h1>
+
+<div class="meta">
+  <strong>Namespace:</strong> <code>http://open-services.net/ns/aaki/shapes#</code> &nbsp;|&nbsp;
+  <strong>Inherits from:</strong> <code>http://open-services.net/ns/am/shapes/3.0#ResourceShape</code> via <code>oslc:superShape</code>
+</div>
+
+<p>
+  OSLC ResourceShapes constraining the <a href="aaki-vocab.html">AAKI vocabulary</a> for a server-side API contract. Every AAKI shape declares <code>oslc:superShape &lt;http://open-services.net/ns/am/shapes/3.0#ResourceShape&gt;</code> to inherit the common OSLC core properties (<code>title</code>, <code>description</code>, <code>creator</code>, <code>created</code>, <code>modified</code>, <code>serviceProvider</code>, <code>instanceShape</code>, plus the six common link types <code>derives</code> / <code>elaborates</code> / <code>refine</code> / <code>external</code> / <code>satisfy</code> / <code>trace</code>) from the OASIS-standard AM Resource shape. AAKI shapes themselves carry only the AAKI-specific properties.
+</p>
+
+<p>See also: <a href="aaki-class-diagram.svg">class diagram</a>, <a href="aaki-stage-lifecycle.svg">stage-lifecycle sequence diagram</a>.</p>
+
+<div class="toc">
+  <h2 style="border:none; margin-top:0;">Shapes</h2>
+  <ul>
+    <li><a href="#StageShape">StageShape</a></li>
+    <li><a href="#FacetShape">FacetShape</a></li>
+    <li><a href="#GovernancePatternShape">GovernancePatternShape</a></li>
+    <li><a href="#HumanShape">HumanShape</a></li>
+    <li><a href="#AIAssistantShape">AIAssistantShape</a></li>
+    <li><a href="#DecisionShape">DecisionShape</a></li>
+    <li><a href="#CapabilityShape">CapabilityShape</a></li>
+    <li><a href="#VocabularyShape">VocabularyShape</a></li>
+    <li><a href="#ResourceShapeShape">ResourceShapeShape</a></li>
+    <li><a href="#ResourceInstanceShape">ResourceInstanceShape</a></li>
+    <li><a href="#LinkShape">LinkShape</a></li>
+    <li><a href="#ConfigurationShape">ConfigurationShape</a></li>
+    <li><a href="#BaselineShape">BaselineShape</a></li>
+    <li><a href="#ChangeSetShape">ChangeSetShape</a></li>
+    <li><a href="#OSLCServerShape">OSLCServerShape</a></li>
+    <li><a href="#MCPEndpointShape">MCPEndpointShape</a></li>
+    <li><a href="#DatamartShape">DatamartShape</a></li>
+    <li><a href="#ToolShape">ToolShape</a></li>
+    <li><a href="#DomainShape">DomainShape</a></li>
+    <li><a href="#RealizationShape">RealizationShape</a></li>
+  </ul>
+</div>
+
+<div class="shape" id="StageShape">
+  <h3>StageShape</h3>
+  <div class="meta-row">describes <code>aaki:Stage</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A Stage of AAKI: Define, Instantiate, or Activate.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>produces</td><td>Resource → Artifact</td><td>Zero-or-many</td><td>Artifact produced by this Stage</td><td>Produced By</td></tr>
+    <tr><td>consumes</td><td>Resource → Artifact</td><td>Zero-or-many</td><td>Artifact consumed by this Stage</td><td>Consumed By</td></tr>
+    <tr><td>operatesOn</td><td>Resource → Artifact</td><td>Zero-or-many</td><td>Populated graph this Stage operates on</td><td>Operated On By</td></tr>
+    <tr><td>hasFacet</td><td>Resource → Facet</td><td>Zero-or-many</td><td>Facets this Stage offers (Activate only)</td><td>Facet Of</td></tr>
+    <tr><td>demonstratedBy</td><td>Resource → Realization</td><td>Zero-or-many</td><td>Realizations exercising this Stage</td><td>Demonstrates</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="FacetShape">
+  <h3>FacetShape</h3>
+  <div class="meta-row">describes <code>aaki:Facet</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A facet of model evolution and use during AAKI Activate.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>scopedTo</td><td>Resource</td><td>Zero-or-many</td><td>System(s) this Facet scopes the AI to</td><td>Scope Of</td></tr>
+    <tr><td>exposes</td><td>Resource → Capability</td><td>Zero-or-many</td><td>Capabilities this Facet exposes</td><td>Exposed By</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="GovernancePatternShape">
+  <h3>GovernancePatternShape</h3>
+  <div class="meta-row">describes <code>aaki:GovernancePattern</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A named convention by which an AI assistant participates in AAKI: Observe, Propose, or Execute.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>governs</td><td>Resource → AIAssistant</td><td>Zero-or-many</td><td>AIAssistant actions this pattern governs</td><td>Governed By</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="HumanShape">
+  <h3>HumanShape</h3>
+  <div class="meta-row">describes <code>aaki:Human</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A human participant in an AAKI lifecycle execution.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>owns</td><td>Resource → Decision</td><td>Zero-or-many</td><td>Decisions for which this Human is Responsible/Accountable</td><td>Owned By</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="AIAssistantShape">
+  <h3>AIAssistantShape</h3>
+  <div class="meta-row">describes <code>aaki:AIAssistant</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>An AI assistant participating in an AAKI lifecycle execution as a collaborator (not an agent on the RACI chart).</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>assists</td><td>Resource</td><td>Zero-or-many</td><td>Stage or Actor this AIAssistant assists</td><td>Assisted By</td></tr>
+    <tr><td>scopedTo</td><td>Resource</td><td>Zero-or-many</td><td>System or Facet scoping this AIAssistant's actions</td><td>Scope Of</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="DecisionShape">
+  <h3>DecisionShape</h3>
+  <div class="meta-row">describes <code>aaki:Decision</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A named, attributed act by a Human that produces a state change in the governed graph.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>decidedBy</td><td>Resource → Human</td><td>Exactly-one</td><td>The Human who made this Decision</td><td>Decisions</td></tr>
+    <tr><td>decidedAt</td><td>xsd:dateTime</td><td>Exactly-one</td><td>Timestamp of the Decision</td><td>—</td></tr>
+    <tr><td>basedOnEvidence</td><td>Resource → Artifact</td><td>Zero-or-many</td><td>AI analyses / queries / proposals that informed the Decision</td><td>Evidence For</td></tr>
+    <tr><td>inConfiguration</td><td>Resource → Configuration</td><td>Zero-or-one</td><td>The Configuration context in which the Decision was made</td><td>Decisions In</td></tr>
+    <tr><td>effectsChange</td><td>Resource → Artifact</td><td>One-or-many</td><td>Artifact(s) whose state changed as a result</td><td>Changed By</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="CapabilityShape">
+  <h3>CapabilityShape</h3>
+  <div class="meta-row">describes <code>aaki:Capability</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A capability exposed by an AAKI System.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>supports</td><td>Resource → Decision</td><td>Zero-or-many</td><td>Decision kinds this Capability supports</td><td>Supported By</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="VocabularyShape">
+  <h3>VocabularyShape</h3>
+  <div class="meta-row">describes <code>aaki:Vocabulary</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>An RDF vocabulary defining the classes and properties of a domain. Produced during AAKI Define. Carries only the inherited OSLC common properties; no AAKI-specific constraints.</p>
+</div>
+
+<div class="shape" id="ResourceShapeShape">
+  <h3>ResourceShapeShape</h3>
+  <div class="meta-row">describes <code>aaki:ResourceShape</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>An OSLC ResourceShape constraining a Vocabulary. Inherits common OSLC properties; no AAKI-specific constraints.</p>
+</div>
+
+<div class="shape" id="ResourceInstanceShape">
+  <h3>ResourceInstanceShape</h3>
+  <div class="meta-row">describes <code>aaki:ResourceInstance</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A concrete instance of a domain class. Inherits common OSLC properties; no AAKI-specific constraints.</p>
+</div>
+
+<div class="shape" id="LinkShape">
+  <h3>LinkShape</h3>
+  <div class="meta-row">describes <code>aaki:Link</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A typed connection between two ResourceInstances. Inherits common OSLC properties.</p>
+</div>
+
+<div class="shape" id="ConfigurationShape">
+  <h3>ConfigurationShape</h3>
+  <div class="meta-row">describes <code>aaki:Configuration</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>An OSLC Configuration that scopes which version resources are in effect for a given request.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>resolves</td><td>Resource → ResourceInstance</td><td>Zero-or-many</td><td>ResourceInstance versions this Configuration resolves to</td><td>Resolved By</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="BaselineShape">
+  <h3>BaselineShape</h3>
+  <div class="meta-row">describes <code>aaki:Baseline</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>An immutable Configuration capturing a specific point-in-time state of the governed graph.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>resolves</td><td>Resource → ResourceInstance</td><td>Zero-or-many</td><td>ResourceInstance versions captured in the baseline</td><td>Resolved By</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="ChangeSetShape">
+  <h3>ChangeSetShape</h3>
+  <div class="meta-row">describes <code>aaki:ChangeSet</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>An OSLC ChangeSet bundling proposed modifications for review and approval as a unit.</p>
+</div>
+
+<div class="shape" id="OSLCServerShape">
+  <h3>OSLCServerShape</h3>
+  <div class="meta-row">describes <code>aaki:OSLCServer</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>An OSLC server holding the governed graph for a domain.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>exposes</td><td>Resource → Capability</td><td>Zero-or-many</td><td>Capabilities the server exposes</td><td>Exposed By</td></tr>
+  </table>
+</div>
+
+<div class="shape" id="MCPEndpointShape">
+  <h3>MCPEndpointShape</h3>
+  <div class="meta-row">describes <code>aaki:MCPEndpoint</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>An MCP endpoint giving an AIAssistant tool-mediated access to a System.</p>
+</div>
+
+<div class="shape" id="DatamartShape">
+  <h3>DatamartShape</h3>
+  <div class="meta-row">describes <code>aaki:Datamart</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A materialized read-only view of the lifecycle graph (LQE-style), populated via OSLC TRS and queryable via SPARQL.</p>
+</div>
+
+<div class="shape" id="ToolShape">
+  <h3>ToolShape</h3>
+  <div class="meta-row">describes <code>aaki:Tool</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A domain-specific authoring or analysis tool that exposes its content via OSLC and/or MCP.</p>
+</div>
+
+<div class="shape" id="DomainShape">
+  <h3>DomainShape</h3>
+  <div class="meta-row">describes <code>aaki:Domain</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A named subject domain that AAKI is realized over — BMM, MRM, ISO 9001, etc.</p>
+</div>
+
+<div class="shape" id="RealizationShape">
+  <h3>RealizationShape</h3>
+  <div class="meta-row">describes <code>aaki:Realization</code> &nbsp;|&nbsp; <span class="super">superShape <code>amshapes:ResourceShape</code></span></div>
+  <p>A concrete implementation of AAKI on a specific Domain — e.g., bmm-server, mrm-server.</p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>Cardinality</th><th>Description</th><th>Inverse</th></tr>
+    <tr><td>realizes</td><td>Resource → Stage</td><td>One-or-many</td><td>AAKI Stage(s) this Realization exercises</td><td>Realized By</td></tr>
+    <tr><td>hasDomain</td><td>Resource → Domain</td><td>Exactly-one</td><td>The Domain this Realization is over</td><td>Domain Of</td></tr>
+  </table>
+</div>
+
+</body>
+</html>
