@@ -176,6 +176,11 @@ AAKI's choice of RDF — and Turtle in particular — is no longer just an OSLC 
 - **Ontology governance** (e.g., TopBraid EDG) — stakeholder review workflows, change history, version control of the vocabulary, multi-user authoring
 - **OSLC ResourceShapes** — formalize the vocabulary as a REST API contract: required properties, cardinality, allowed values, UI metadata for creation dialogs
 
+**Reuse first, create only for gaps:**
+
+- *Reuse* an existing ontology whenever a shared concept space (SysML, PLM, OSLC RM/QM/CM/AM, BMM, …) already covers the domain at the right abstraction. Most engineering domains land here — Define becomes a **configuration** exercise.
+- *Create* a new ontology only when no shared semantics exist for the concepts you need. Rare; reserved for genuine conceptual gaps; usually best done through a standards body so the result is shared.
+
 **Without Stage 1:** Stage 2 produces a connected but semantically incoherent graph — links exist but mean different things in different tools.
 
 ---

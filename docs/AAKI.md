@@ -53,6 +53,16 @@ TopBraid EDG's specific contribution here is that it brings governance process t
 
 This defines the vocabularies and constraints for the OSLC resources. The OSLC server instance then defines the services on these vocabularies that enable knowledge integration across tools and AI agents.
 
+### Reuse first; create only for genuine gaps
+
+A frequent misreading of AAKI Define is that it always means *creating a new ontology*. In practice it almost never does. **Reuse an existing ontology whenever there is a shared concept space that already captures the meta-level semantics at the abstraction you need.** SysML for systems engineering, PLM and STEP for product lifecycle, OSLC RM/QM/CM/AM for the surrounding lifecycle data, BMM for business motivation, FIBO for finance — each is a public, battle-tested concept space whose tooling and community already exist. Reusing them collapses Define into a configuration exercise (load the vocabulary, load the shapes, scaffold the OSLC server) and immediately delivers cross-tool integration because the same vocabularies are already in use elsewhere.
+
+**Create a new ontology only when the concepts you're formalizing don't yet have established semantics that others have agreed on.** This is rare in mature engineering domains, and the resulting artifact carries more value as a shared standard than as a project-local vocabulary — which is why genuine new ontologies tend to emerge through standards-body processes (OMG for BMM and SysML; OASIS OSLC-OP for the OSLC domain vocabularies; ISO for STEP).
+
+The most common pattern is the **hybrid**: reuse one or more existing ontologies for the bulk of the model, then add a thin domain extension for concepts genuinely missing. A radar division reuses SysML for architecture, PLM for parts, OSLC RM/QM/CM/AM for the surrounding lifecycle data, and adds a small `radar:` extension only for radar-specific concepts (waveform parameters, antenna patterns) — perhaps as a few subclasses of existing types. The `bmm-server` reference implementation is a pure-reuse case: BMM as the shared concept space, no project-local extension needed.
+
+The `aaki-define` skill (`.claude/skills/aaki-define/SKILL.md`) covers both paths — its "when to use" entries include "Refactoring an existing vocabulary toward OSLC convention" and "Aligning a project-local vocabulary with how OSLC-OP publishes vocab/shape docs", not just authoring from scratch.
+
 ### RDF as knowledge representation in the age of AI
 
 RDF — and Turtle in particular — is unusually well-suited to AI workflows. Where data formats like JSON or SQL describe *structure*, RDF describes *meaning*: typed entities, named relationships, and inferable constraints. AI assistants are very good at producing and consuming Turtle precisely because Turtle expresses knowledge rather than imposing a schema-bound shape. A vocabulary and shape document — written in Turtle — is something an AI can read, reason about, and extend conversationally; a JSON schema is not.

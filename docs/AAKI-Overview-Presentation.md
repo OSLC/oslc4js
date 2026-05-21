@@ -110,7 +110,7 @@ style: |
 
 | The "what if" | AAKI stage |
 |---|---|
-| Harvest docs into a governed ontology *fast* | **Define** — AI drafts vocabulary + ResourceShapes from your specs/policies/methods |
+| Harvest docs into a governed ontology *fast* | **Define** — AI **drafts or configures**, depending on whether existing shared vocabularies (SysML, PLM, OSLC RM/QM/CM/AM, BMM) already cover the domain |
 | SMEs populate the OSLC server *without hand-crafting* | **Instantiate** — AI translates SME intent into shape-conformant resources and links via MCP |
 | Ask the graph questions and make decisions | **Activate** — natural-language Q&A, what-if, gap & impact analysis, compliance reporting |
 
@@ -129,11 +129,13 @@ style: |
 The meaning layer. *What kinds of things exist, what properties they have, how they relate.*
 
 - **Input**: spec / policy / method documents (PDFs, ReSpec drafts, slides, SME knowledge)
-- **AI's role**: drafts an open RDF vocabulary (`vocab.ttl`) and OSLC ResourceShapes (`shapes.ttl`) that constrain it for a specific service contract; produces matching human-readable HTML
+- **AI's role — two paths, one tool**:
+  - **Configure** an OSLC server over existing shared vocabularies (SysML, PLM, OSLC RM/QM/CM/AM, BMM, …) when those vocabularies already cover the domain. *Most common.*
+  - **Draft** a new open RDF vocabulary + OSLC ResourceShapes when no shared concept space exists at the right abstraction. *Rare; reserved for genuine conceptual gaps.*
 - **Your role**: review, refine, govern. Approve the contract that downstream consumers will rely on.
 - **Output**: a real OSLC server domain — governed from day one
 
-> Days or weeks, not months or years — because the AI is doing the typing and cross-checking, and you're doing the deciding.
+> Days or weeks, not months or years — and most of those days are configuration, not vocabulary authoring. *Reuse whenever a shared concept space exists; create only for genuine gaps.*
 
 ---
 
