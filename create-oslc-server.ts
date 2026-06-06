@@ -776,7 +776,7 @@ export interface AppEnv extends StorageEnv {
   templatePath?: string;
 }
 
-const listenHost = process.env.VCAP_APP_HOST || process.env.OPENSHIFT_NODEJS_IP || config.host;
+const listenHost = process.env.HOST || process.env.VCAP_APP_HOST || process.env.OPENSHIFT_NODEJS_IP || config.host;
 const listenPort = Number(process.env.VCAP_APP_PORT || process.env.OPENSHIFT_NODEJS_PORT || config.port);
 
 let scheme: string;
