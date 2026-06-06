@@ -634,8 +634,9 @@ async function fetchSameServerIncomingLinks(
 export function useOslcClient(): UseOslcClientReturn {
   const [connection, setConnection] = useState<ConnectionState>(() => {
     const saved = loadSavedConnection();
+    const defaultURL = typeof window !== 'undefined' ? `${window.location.origin}/oslc` : '';
     return {
-      serverURL: saved.serverURL ?? '',
+      serverURL: saved.serverURL ?? defaultURL,
       username: saved.username ?? '',
       password: '',
       connected: false,
