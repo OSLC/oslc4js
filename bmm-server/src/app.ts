@@ -57,5 +57,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 app.listen(env.listenPort, env.listenHost, () => {
-  console.log('bmm-server running on ' + env.appBase);
+  console.log('\n============================================================');
+  console.log('Browse the OSLC BMM Server at: ' + env.ldpBase);
+  console.log('============================================================\n');
 });

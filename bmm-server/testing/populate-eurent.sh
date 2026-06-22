@@ -29,7 +29,7 @@
 # scripted, deterministic equivalent useful for development and CI.
 
 set -u
-BASE="http://localhost:3005"
+BASE="${BMM_SERVER_URL:-http://localhost:3005}"
 MCP="$BASE/mcp"
 
 # ── Initialize MCP session ─────────────────────────────────────

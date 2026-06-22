@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AAKI &times; V-Model — Define · Instantiate · Activate</title>
+<style>
+  :root{
+    --ink:#1c2733; --muted:#5b6b7b; --line:#d7dee6; --bg:#ffffff;
+    --define:#1f6feb; --inst:#0f9d58; --act:#b8860b; --gov:#7b3fe4;
+    --define-bg:#eaf2ff; --inst-bg:#e8f7ee; --act-bg:#fbf3df; --gov-bg:#f1ebfb;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--ink); background:var(--bg); margin:0; line-height:1.55;}
+  .wrap{max-width:1180px; margin:0 auto; padding:40px 28px 80px;}
+  h1{font-size:30px; margin:0 0 6px; letter-spacing:-.01em;}
+  .sub{color:var(--muted); font-size:16px; margin:0 0 28px;}
+  h2{font-size:21px; margin:46px 0 4px; letter-spacing:-.01em;}
+  .lead{color:var(--muted); font-size:15px; margin:0 0 18px; max-width:860px;}
+  .card{border:1px solid var(--line); border-radius:14px; padding:22px 20px 12px;
+        background:#fcfdff; box-shadow:0 1px 2px rgba(20,40,70,.04); overflow-x:auto;}
+  .mermaid{display:flex; justify-content:center;}
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin:14px 2px 0; font-size:13px; color:var(--muted);}
+  .legend span{display:inline-flex; align-items:center; gap:7px;}
+  .dot{width:12px; height:12px; border-radius:3px; display:inline-block;}
+  .key{font-size:13.5px; color:var(--muted); margin:10px 2px 0; max-width:900px;}
+  .key b{color:var(--ink);}
+  .pill{display:inline-block; padding:1px 8px; border-radius:20px; font-size:12px; font-weight:600;
+        border:1px solid currentColor;}
+  footer{margin-top:60px; padding-top:18px; border-top:1px solid var(--line);
+          color:var(--muted); font-size:13px;}
+  code{background:#eef2f6; padding:1px 5px; border-radius:5px; font-size:.92em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>AAKI in the Systems &amp; Software Engineering V-Model</h1>
+  <p class="sub">AI Assisted Knowledge Integration — <b>Define</b>, <b>Instantiate</b>, <b>Activate</b> — over a governed, versioned, configuration-aware OSLC system of record.</p>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--define)"></i> Define (vocabulary + shapes)</span>
+    <span><i class="dot" style="background:var(--inst)"></i> Instantiate (artifacts + links)</span>
+    <span><i class="dot" style="background:var(--act)"></i> Activate (decisions + agent actions)</span>
+    <span><i class="dot" style="background:var(--gov)"></i> Governance / AI assistant</span>
+  </div>
+
+  <!-- ============================================================= -->
+  <h2>1 &nbsp;The AAKI pipeline — from documents to a governed knowledge graph</h2>
+  <p class="lead">The three stages turn source knowledge into a system of record. The AI assistant collaborates at every stage but never owns a decision — outputs land in a <span class="pill" style="color:var(--gov)">Propose</span> state for a named human to approve. Inputs that <b>define meaning</b> (left) are deliberately separated from inputs that <b>populate instances</b> (right of the server).</p>
+  <div class="card">
+    <pre class="mermaid">
+flowchart LR
+
+  subgraph DEFINE["&#9312; DEFINE &mdash; meaning layer"]
+    direction TB
+    SRC["Defining inputs<br/><i>specs &middot; policies &middot; method docs</i><br/><i>standards &middot; SME concept knowledge</i>"]
+    EXIST["Existing shared ontologies<br/>SysML &middot; PLM/STEP<br/>OSLC RM/QM/CM/AM &middot; BMM &middot; FIBO"]
+    DEC{"Reuse &middot; Extend<br/>&middot; Create?"}
+    VOCAB["Open vocabulary<br/><b>&lt;Domain&gt;.ttl</b><br/><i>classes + properties</i>"]
+    SHAPES["OSLC ResourceShapes<br/><b>&lt;Domain&gt;-Shapes.ttl</b><br/><i>cardinality, valueType, range, UI</i>"]
+    HDOC["vocab.html &middot; shapes.html<br/><i>ReSpec docs</i>"]
+    EXIST --> DEC
+    SRC --> DEC
+    DEC -->|"reuse = config"| SHAPES
+    DEC -->|"gap = author"| VOCAB
+    VOCAB --> SHAPES --> HDOC
+  end
+
+  subgraph BUILD["&#9313;&#189; SCAFFOLD"]
+    direction TB
+    TPL["Service Provider<br/>catalog template"]
+    GEN["create-oslc-server"]
+    TPL --> GEN
+  end
+
+  subgraph INST["&#9313; INSTANTIATE &mdash; artifact layer"]
+    direction TB
+    SRC2["Populating inputs<br/><i>example data &middot; legacy tools</i><br/><i>SME intent &middot; source docs</i>"]
+    SERVER["OSLC Server + MCP endpoint<br/><i>shape-validated, config-aware</i>"]
+    RES["Shape-conformant resources<br/>+ typed cross-domain links"]
+    CFG["Config mgmt<br/><i>streams &middot; baselines &middot; provenance</i>"]
+    SRC2 --> SERVER
+    SERVER --> RES --> CFG
+  end
+
+  subgraph ACT["&#9314; ACTIVATE &mdash; value layer"]
+    direction TB
+    Q["NL queries &middot; what-if"]
+    GAP["gap / impact / coverage<br/>compliance analysis"]
+    AGENT["agentic actions via MCP"]
+    LQE["LQE analytics<br/><i>materialized SPARQL/SQL</i>"]
+    Q --> GAP --> AGENT
+    GAP --> LQE
+  end
+
+  SHAPES --> GEN
+  VOCAB --> GEN
+  GEN ==> SERVER
+  CFG ==> Q
+  AGENT -. "feedback: new gaps re-enter Define / Instantiate" .-> SRC
+
+  classDef def fill:#eaf2ff,stroke:#1f6feb,color:#11375f;
+  classDef ins fill:#e8f7ee,stroke:#0f9d58,color:#0a5f37;
+  classDef act fill:#fbf3df,stroke:#b8860b,color:#6b5106;
+  classDef bld fill:#f1ebfb,stroke:#7b3fe4,color:#43237d;
+  class SRC,EXIST,DEC,VOCAB,SHAPES,HDOC def;
+  class SRC2,SERVER,RES,CFG ins;
+  class Q,GAP,AGENT,LQE act;
+  class TPL,GEN bld;
+    </pre>
+  </div>
+  <p class="key"><b>Read it as:</b> Define produces the <b>contract</b> (vocabulary + shapes); <code>create-oslc-server</code> fuses that contract with a service-provider catalog template into a running server; Instantiate fills the server with governed, versioned artifacts; Activate turns the graph into decisions. The dotted arrow is the feedback loop — analysis surfaces gaps that re-enter Define or Instantiate.</p>
+
+  <!-- ============================================================= -->
+  <h2>2 &nbsp;How an OSLC server is created from the Define outputs</h2>
+  <p class="lead">The Scaffold step deserves its own view. <code>create-oslc-server</code> takes the vocabulary, the shapes, a service-provider catalog template, and the list of <i>managed</i> (instantiable) classes, and emits a fully operational server — no domain-specific application code.</p>
+  <div class="card">
+    <pre class="mermaid">
+flowchart LR
+  V["&lt;Domain&gt;.ttl<br/><i>open vocabulary</i>"]:::def
+  S["&lt;Domain&gt;-Shapes.ttl<br/><i>ResourceShapes</i>"]:::def
+  T["ServiceProvider<br/>catalog template"]:::bld
+  M["--managed classes<br/><i>e.g. Means,End,Strategy</i>"]:::def
+  G(["create-oslc-server"]):::bld
+
+  V --> G
+  S --> G
+  T --> G
+  M --> G
+
+  G ==> CAT
+
+  subgraph SRV["Running OSLC Server"]
+    direction TB
+    CAT["Service Provider Catalog"]
+    SP["Service Provider(s)"]
+    CF["Creation factories<br/><i>each bound to a ResourceShape</i>"]
+    QC["Query capabilities<br/><i>oslc.where over queryBase</i>"]
+    MCP["MCP endpoint<br/><i>read_catalog · query · create_*</i>"]
+    LDM["LDM /discover-links<br/><i>incoming-link discovery</i>"]
+    CAT --> SP --> CF
+    SP --> QC
+    SP --> MCP
+    SP --> LDM
+  end
+
+  MCP -. "AI assistant authors & queries here" .-> AI(["AI assistant"]):::gov
+
+  classDef def fill:#eaf2ff,stroke:#1f6feb,color:#11375f;
+  classDef bld fill:#f1ebfb,stroke:#7b3fe4,color:#43237d;
+  classDef gov fill:#f1ebfb,stroke:#7b3fe4,color:#43237d,stroke-dasharray:4 3;
+    </pre>
+  </div>
+  <p class="key"><b>Why it matters:</b> because the creation factories are bound to the shapes from Define, every resource the AI (or a human) posts through the MCP endpoint is validated against the same contract. The server is the system of record; the catalog template makes it interoperable with other OSLC tools out of the box.</p>
+
+  <!-- ============================================================= -->
+  <h2>3 &nbsp;AAKI mapped onto the V-model — the traceability graph</h2>
+  <p class="lead">In the V-model every left-side artifact carries a verification obligation to a right-side artifact. In OSLC terms each <b>&#8596;</b> is a <i>typed link</i> (<code>oslc_rm:validatedBy</code>, <code>oslc_qm:validatesRequirement</code>…). The V is not a document — it is a live link graph. AAKI's three stages <b>define</b> what valid traceability looks like, <b>instantiate</b> the artifacts and links, and <b>activate</b> the graph for decisions.</p>
+  <div class="card">
+    <pre class="mermaid">
+flowchart TB
+  subgraph LEFT["Left side &mdash; decomposition"]
+    direction TB
+    L1["Stakeholder Needs"]
+    L2["System Requirements"]
+    L3["Subsystem Requirements"]
+    L4["Component Requirements"]
+    L5["Detailed Design"]
+    L1 --> L2 --> L3 --> L4 --> L5
+  end
+
+  IMPL["Implementation"]:::impl
+  L5 --> IMPL
+
+  subgraph RIGHT["Right side &mdash; verification"]
+    direction TB
+    R1["Acceptance Tests"]
+    R2["System Tests"]
+    R3["Integration Tests"]
+    R4["Unit Tests"]
+    R4 --> R3 --> R2 --> R1
+  end
+  IMPL --> R4
+
+  L1 <-->|"validatedBy"| R1
+  L2 <-->|"validatedBy"| R2
+  L3 <-->|"validatedBy"| R3
+  L4 <-->|"validatedBy"| R4
+
+  DEF["&#9312; DEFINE<br/>OSLC RM/QM/AM vocab + shapes<br/><i>declare valid link types</i>"]:::def
+  INS["&#9313; INSTANTIATE<br/>create artifacts &amp; typed links<br/><i>across DOORS Next, ETM, EWM, Rhapsody</i>"]:::ins
+  ACT["&#9314; ACTIVATE<br/>gap · impact · coverage · compliance<br/><i>over the whole V</i>"]:::act
+
+  DEF -. "constrains" .-> LEFT
+  DEF -. "constrains" .-> RIGHT
+  INS -. "populates" .-> IMPL
+  ACT -. "analyzes" .-> RIGHT
+  ACT -. "analyzes" .-> LEFT
+
+  classDef def fill:#eaf2ff,stroke:#1f6feb,color:#11375f;
+  classDef ins fill:#e8f7ee,stroke:#0f9d58,color:#0a5f37;
+  classDef act fill:#fbf3df,stroke:#b8860b,color:#6b5106;
+  classDef impl fill:#eceff3,stroke:#5b6b7b,color:#27323d;
+    </pre>
+  </div>
+  <p class="key"><b>The horizontal &#8596; links are the payoff:</b> they let the AI answer questions no single tool can — "which requirements lack tests?", "what does this interface change break downstream?" — because the typed link graph, not text similarity, is the reasoning substrate.</p>
+
+  <!-- ============================================================= -->
+  <h2>4 &nbsp;Three layers of AI assistance across the tool chain</h2>
+  <p class="lead">An AI assistant connected by MCP sees three scopes. Tool-local authoring, cross-tool integration over the OSLC link graph, and enterprise analytics over a materialized view (LQE). The feedback loop runs top-to-bottom and back.</p>
+  <div class="card">
+    <pre class="mermaid">
+flowchart TB
+  subgraph L3["Layer 3 &mdash; Analytics AI (LQE)"]
+    direction LR
+    A1["Detect: gaps · coverage ratios<br/>impact propagation · compliance state"]
+  end
+  subgraph L2["Layer 2 &mdash; Integration AI (OSLC server)"]
+    direction LR
+    B1["Propose cross-tool actions:<br/>affected artifacts · coordinated changes"]
+  end
+  subgraph L1["Layer 1 &mdash; Tool-local AI (DOORS Next, ETM, EWM)"]
+    direction LR
+    C1["Execute authoring in native vocabulary:<br/>requirements · test cases · work items"]
+  end
+
+  A1 -->|"structured findings (URIs + metrics)"| B1
+  B1 -->|"action plan per tool"| C1
+  C1 -->|"new / updated governed artifacts"| B1
+  B1 -->|"updated link graph"| A1
+
+  classDef l3 fill:#fbf3df,stroke:#b8860b,color:#6b5106;
+  classDef l2 fill:#e8f7ee,stroke:#0f9d58,color:#0a5f37;
+  classDef l1 fill:#eaf2ff,stroke:#1f6feb,color:#11375f;
+  class A1 l3; class B1 l2; class C1 l1;
+    </pre>
+  </div>
+  <p class="key"><b>Mapping to AAKI:</b> Layer 1 &asymp; Activate within one tool silo; Layer 2 &asymp; Instantiate + Activate across tools; Layer 3 &asymp; Activate across the enterprise. Same governance, same provenance, same RDF substrate — different cost and scope per layer.</p>
+
+  <!-- ============================================================= -->
+  <h2>5 &nbsp;Governing the assistant: skills, rules &amp; agents per ASPICE</h2>
+  <p class="lead">The workspace ships three Claude skills (one per AAKI stage) plus governance rules that keep the AI a <b>collaborator, not an agent on the RACI chart</b>. Authority is graded Observe &rarr; Propose &rarr; Execute, and every AI action is attributed to a named human via provenance — which is exactly what an ASPICE / ISO&nbsp;26262 audit needs to see.</p>
+  <div class="card">
+    <pre class="mermaid">
+flowchart LR
+  subgraph SKILLS["Skills (one per stage)"]
+    direction TB
+    SK1["aaki-define<br/><i>vocab + shapes + ReSpec</i>"]
+    SK2["aaki-instantiate<br/><i>discover-first, link ownership</i>"]
+    SK3["aaki-activate<br/><i>5 analysis archetypes, citations</i>"]
+  end
+
+  subgraph RULES["Rules (governance contract)"]
+    direction TB
+    RC["Credentials = the user's;<br/>AI never holds its own"]
+    RR["RACI: human Responsible<br/>&amp; Accountable"]
+    RX["No deliver / merge / promote<br/>on the user's behalf"]
+  end
+
+  subgraph AUTH["Authority levels"]
+    direction TB
+    OBS["Observe &mdash; read-only, no approval"]
+    PRO["Propose &mdash; lands in Draft, human gate"]
+    EXE["Execute &mdash; policy-authorized, mechanical"]
+  end
+
+  AIA(["AI assistant"]):::gov
+  ASPICE["ASPICE / ISO 26262<br/><i>process &amp; safety compliance</i>"]:::act
+  PROV["Provenance: dcterms:creator,<br/>created, approval state, config context"]:::ins
+
+  SKILLS --> AIA
+  RULES --> AIA
+  AUTH --> AIA
+  AIA --> PROV
+  PROV --> ASPICE
+
+  classDef gov fill:#f1ebfb,stroke:#7b3fe4,color:#43237d;
+  classDef sk fill:#f1ebfb,stroke:#7b3fe4,color:#43237d;
+  classDef act fill:#fbf3df,stroke:#b8860b,color:#6b5106;
+  classDef ins fill:#e8f7ee,stroke:#0f9d58,color:#0a5f37;
+  class SK1,SK2,SK3,RC,RR,RX,OBS,PRO,EXE sk;
+    </pre>
+  </div>
+  <p class="key"><b>The point:</b> skills tell the assistant <i>how</i> to do each stage the same way every time; rules and authority levels keep a human Responsible and Accountable; provenance makes the AI's contribution itself auditable and queryable — so the lifecycle stays ASPICE-conformant rather than "the AI said so."</p>
+
+  <footer>
+    Generated from the AAKI material in <code>docs/AAKI.md</code>, <code>docs/AAKI-Overview.md</code>,
+    <code>docs/aaki-ontology/</code>, and the <code>.claude/skills/aaki-{define,instantiate,activate}</code> skills.
+    Diagrams rendered with Mermaid.
+  </footer>
+
+</div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "base",
+    themeVariables: {
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      fontSize: "14px",
+      lineColor: "#5b6b7b",
+      primaryColor: "#eaf2ff",
+      primaryBorderColor: "#1f6feb",
+      primaryTextColor: "#11375f"
+    },
+    flowchart: { curve: "basis", padding: 14, useMaxWidth: true }
+  });
+</script>
+</body>
+</html>
