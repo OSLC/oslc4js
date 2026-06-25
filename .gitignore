@@ -12,4 +12,4 @@ node_modules/
 .claude/settings.local.*
 
 # Private specs — not candidates for open-source delivery (move to a private location)
-/docs/superpowers/specs/2026-06-25-aspice-aaki-continuous-assessment-design.md
+/docs/superpowers/specs/*aspice-aaki*
