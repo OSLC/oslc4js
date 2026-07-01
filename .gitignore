@@ -13,3 +13,6 @@ node_modules/
 
 # Private specs — not candidates for open-source delivery (move to a private location)
 /docs/superpowers/specs/*aspice-aaki*
+
+# Draft pending review/placement — keep untracked for now
+/docs/AAKI-and-the-Digital-Thread.md
