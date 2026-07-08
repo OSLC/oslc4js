@@ -6,7 +6,7 @@ Framed at lifecycle scale, AAKI's purpose is to **close the gaps in the digital 
 
 ## Challenge Brief
 
-The following sections summarize challenges around establishing and using shared information, how AAKI addresses these challenges, and what value users could expect to achieve using AAKI.
+The following sections summarize challenges around establishing an  d using shared information, how AAKI addresses these challenges, and what value users could expect to achieve using AAKI.
 
 For additional information on how oslc4js helps address the three ontology barriers (creating ontology-based models, connecting domains, and creating/consuming model data) — see [`oslc4js-stakeholder-presentation.md`](oslc4js-stakeholder-presentation.md). The [`AAKI-Example.md`](AAKI-Example.md) companion grounds the framework in a concrete walkthrough using the OMG Business Motivation Model (BMM).
 
@@ -170,7 +170,7 @@ AAKI positions ontologies and OSLC servers not as alternatives to AI, but as the
 
 ## Authoring skills for AAKI
 
-This workspace ships three Claude Code skills under [`.claude/skills/`](../.claude/skills/) — one per AAKI stage — so AI assistants helping with the codebase apply the same conventions consistently and respect the user's RACI position (credentials, working context, no delivery / merge / promote on the user's behalf).
+This workspace ships three Claude Code skills under `.claude/skills/` (linked individually below) — one per AAKI stage — so AI assistants helping with the codebase apply the same conventions consistently and respect the user's RACI position (credentials, working context, no delivery / merge / promote on the user's behalf).
 
 | Skill | Use when... |
 |---|---|

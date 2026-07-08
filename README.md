@@ -60,7 +60,7 @@ The architectural framework, walkthroughs, and presentations live in [`docs/`](d
 
 ## Authoring skills
 
-This workspace ships three Claude Code skills under [`.claude/skills/`](.claude/skills/) — one per AAKI stage — so AI assistants helping with this codebase use the same conventions consistently.
+This workspace ships three Claude Code skills under `.claude/skills/` (linked individually below) — one per AAKI stage — so AI assistants helping with this codebase use the same conventions consistently.
 
 | Skill | Use when... |
 |---|---|

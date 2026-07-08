@@ -109,16 +109,22 @@ Two more follow: data is **hard to reach** (no federation → lossy data marts),
 
 ---
 
+# The digital thread — the gaps at a glance
+
+![h:560](AAKI-Digital-Thread.svg)
+
+---
+
 # AAKI closes the gaps — AI assistants + OSLC
 
 **AI Assisted Knowledge Integration (AAKI)** puts AI assistants to work over an OSLC linked-data substrate to close those gaps while keeping the thread governed, semantic, and compliant.
 
-- **OSLC + connectors add the missing links** — a standardized, discoverable interface (catalog → service providers → creation factories, query capabilities, vocabularies, shapes), discoverable by AI via **MCP**.
-- **Define adds the missing nodes** — model an absent domain and stand up a working OSLC server for it.
-- **Instantiate populates nodes and links** — removing the linking cost from the author.
+- **Define adds the missing nodes — and defines the link *types*** — model an absent domain, stand it up as an OSLC server, and declare the vocabulary + shapes that make cross-tool links *expressible* as governed, versioned OSLC links.
+- **OSLC + connectors expose the tools** — a standardized, discoverable interface (catalog → service providers → creation factories, query capabilities, vocabularies, shapes), discoverable by AI via **MCP**, so the links have somewhere to live.
+- **Instantiate helps *create* the missing links** — populating nodes with resources and the typed links between them, moving the linking cost off the author.
 - **Activate makes the thread actionable** — gap, coverage, and impact analysis, traceability, compliance reporting, drafted proposals.
 
-> Focus is squarely the connectivity/traceability and domain-data gaps; access and actionability follow from closing them well.
+> Focus is squarely the connectivity/traceability and domain-data gaps; access and actionability follow. The missing-link gap has **one cause, two remedies**: a link is missing either because it was never *defined* in a machine-readable way (Define) or never *created* (Instantiate).
 
 ---
 
@@ -145,8 +151,8 @@ Turning a fragmented set of tools into a governed, semantic, actionable thread t
 
 | Stage | The gap it closes | Answers |
 |-------|-------------------|---------|
-| **1. Define** | Adds a **missing node** — vocabulary + shapes, stood up as an OSLC server | What kinds of things exist? How do they relate? |
-| **2. Instantiate** | Adds the **missing links** — populates nodes with resources and typed links | What are the actual resources, and how do they connect? |
+| **1. Define** | Adds a **missing node** — vocabulary + shapes (incl. link **types**), stood up as an OSLC server | What kinds of things exist? How do they relate? |
+| **2. Instantiate** | Helps **create the missing links** — populates nodes with resources and typed links | What are the actual resources, and how do they connect? |
 | **3. Activate** | Makes the thread **actionable** — analysis, traceability, decisions | What can we decide from this connected data? |
 
 This maps onto the classic **schema / instance / use** distinction — realized over OSLC linked data and AI-addressable via MCP.
@@ -254,7 +260,7 @@ The ontology defines precisely how concepts connect. These typed relationships a
 
 ---
 
-# Stage 2 — Instantiate (add the missing links)
+# Stage 2 — Instantiate (help create the missing links)
 
 **The artifact layer** — the transition from ontology experts to **subject matter experts**, populating the node with resources *and the typed links between them*.
 
