@@ -1,6 +1,5 @@
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
-@prefix dc11:    <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -16,6 +15,7 @@
   dcterms:description "RDF vocabulary for the OMG Business Motivation Model (BMM) 1.3 metamodel, adapted for OSLC. BMM provides a scheme for developing, communicating, and managing business plans in an organized manner." ;
   rdfs:label "OMG Business Motivation Model Vocabulary" ;
   vann:preferredNamespacePrefix "bmm" ;
+  vann:preferredNamespaceUri "http://www.omg.org/spec/BMM#" ;
   dcterms:publisher <https://open-services.net/about/> ;
   dcterms:issued "2026-04-24"^^<http://www.w3.org/2001/XMLSchema#date> ;
   dcterms:license <http://www.apache.org/licenses/LICENSE-2.0> ;
@@ -31,8 +31,10 @@
 
 bmm:MotivationalElement
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf oslc_am:Resource ;
-  dc11:description "The root abstract superclass of all BMM elements. A motivational element is any element that can be part of a business motivation model." .
+  rdfs:label "Motivational Element" ;
+  rdfs:comment "The root abstract superclass of all BMM elements. A motivational element is any element that can be part of a business motivation model." .
 
 # ============================================================
 # Ends — What the enterprise wishes to achieve
@@ -40,28 +42,38 @@ bmm:MotivationalElement
 
 bmm:End
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:MotivationalElement ;
-  dc11:description "Something the enterprise wishes to achieve. Ends describe the desired future state of the enterprise. Ends are of two kinds: Vision and DesiredResult." .
+  rdfs:label "End" ;
+  rdfs:comment "Something the enterprise wishes to achieve. Ends describe the desired future state of the enterprise. Ends are of two kinds: Vision and DesiredResult." .
 
 bmm:Vision
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:End ;
-  dc11:description "An overall image of what the enterprise wants to be or become. A Vision is the ultimate, possibly unachievable, state the enterprise would like to attain. It describes the future in terms of what the enterprise wants to be rather than what it does." .
+  rdfs:label "Vision" ;
+  rdfs:comment "An overall image of what the enterprise wants to be or become. A Vision is the ultimate, possibly unachievable, state the enterprise would like to attain. It describes the future in terms of what the enterprise wants to be rather than what it does." .
 
 bmm:DesiredResult
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:End ;
-  dc11:description "An End that is a desired state or target the enterprise intends to maintain or sustain. DesiredResult is a superclass for Goal and Objective." .
+  rdfs:label "Desired Result" ;
+  rdfs:comment "An End that is a desired state or target the enterprise intends to maintain or sustain. DesiredResult is a superclass for Goal and Objective." .
 
 bmm:Goal
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:DesiredResult ;
-  dc11:description "A statement about a state or condition of the enterprise to be brought about or sustained through appropriate Means. A Goal is a long-term, ongoing, qualitative statement of intent. A Goal amplifies a Vision — that is, it indicates what must be done to make the Vision a reality." .
+  rdfs:label "Goal" ;
+  rdfs:comment "A statement about a state or condition of the enterprise to be brought about or sustained through appropriate Means. A Goal is a long-term, ongoing, qualitative statement of intent. A Goal amplifies a Vision — that is, it indicates what must be done to make the Vision a reality." .
 
 bmm:Objective
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:DesiredResult ;
-  dc11:description "A statement of an attainable, time-targeted, and measurable target that the enterprise seeks to meet in order to achieve its Goals. An Objective quantifies a Goal — it makes the Goal measurable by defining specific, achievable targets with deadlines." .
+  rdfs:label "Objective" ;
+  rdfs:comment "A statement of an attainable, time-targeted, and measurable target that the enterprise seeks to meet in order to achieve its Goals. An Objective quantifies a Goal — it makes the Goal measurable by defining specific, achievable targets with deadlines." .
 
 # ============================================================
 # Means — How the enterprise intends to achieve its Ends
@@ -69,43 +81,59 @@ bmm:Objective
 
 bmm:Means
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:MotivationalElement ;
-  dc11:description "Any device, capability, regime, technique, restriction, agency, instrument, or method that may be called upon, activated, or enforced to achieve Ends. Means are of three kinds: Mission, CourseOfAction, and Directive." .
+  rdfs:label "Means" ;
+  rdfs:comment "Any device, capability, regime, technique, restriction, agency, instrument, or method that may be called upon, activated, or enforced to achieve Ends. Means are of three kinds: Mission, CourseOfAction, and Directive." .
 
 bmm:Mission
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:Means ;
-  dc11:description "The ongoing operational activity of the enterprise that makes the Vision operative. A Mission describes what the enterprise does day-to-day to pursue its Vision. A Mission makes a Vision operative." .
+  rdfs:label "Mission" ;
+  rdfs:comment "The ongoing operational activity of the enterprise that makes the Vision operative. A Mission describes what the enterprise does day-to-day to pursue its Vision. A Mission makes a Vision operative." .
 
 bmm:CourseOfAction
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:Means ;
-  dc11:description "An approach or plan for configuring some aspect of the enterprise involving things, processes, locations, people, timing, or motivation, undertaken to achieve Ends. CourseOfAction is a superclass for Strategy and Tactic." .
+  rdfs:label "Course of Action" ;
+  rdfs:comment "An approach or plan for configuring some aspect of the enterprise involving things, processes, locations, people, timing, or motivation, undertaken to achieve Ends. CourseOfAction is a superclass for Strategy and Tactic." .
 
 bmm:Strategy
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:CourseOfAction ;
-  dc11:description "A CourseOfAction that represents a longer-term, broader approach to achieving Ends. A Strategy defines the essential courses the enterprise needs to pursue over time. A Strategy typically channels efforts toward Goals." .
+  rdfs:label "Strategy" ;
+  rdfs:comment "A CourseOfAction that represents a longer-term, broader approach to achieving Ends. A Strategy defines the essential courses the enterprise needs to pursue over time. A Strategy typically channels efforts toward Goals." .
 
 bmm:Tactic
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:CourseOfAction ;
-  dc11:description "A CourseOfAction that represents a shorter-term, more specific approach to achieving Ends. A Tactic implements a Strategy. A Tactic is narrowly focused and has a shorter time horizon than a Strategy." .
+  rdfs:label "Tactic" ;
+  rdfs:comment "A CourseOfAction that represents a shorter-term, more specific approach to achieving Ends. A Tactic implements a Strategy. A Tactic is narrowly focused and has a shorter time horizon than a Strategy." .
 
 bmm:Directive
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:Means ;
-  dc11:description "A Means that governs CourseOfActions. A Directive provides the basis for guidance and constraints on the enterprise. Directive is a superclass for BusinessPolicy and BusinessRule." .
+  rdfs:label "Directive" ;
+  rdfs:comment "A Means that governs CourseOfActions. A Directive provides the basis for guidance and constraints on the enterprise. Directive is a superclass for BusinessPolicy and BusinessRule." .
 
 bmm:BusinessPolicy
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:Directive ;
-  dc11:description "A Directive that is not directly actionable. A BusinessPolicy exists to govern, guide, or constrain the enterprise and its activities. A BusinessPolicy provides the basis for BusinessRules." .
+  rdfs:label "Business Policy" ;
+  rdfs:comment "A Directive that is not directly actionable. A BusinessPolicy exists to govern, guide, or constrain the enterprise and its activities. A BusinessPolicy provides the basis for BusinessRules." .
 
 bmm:BusinessRule
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:Directive ;
-  dc11:description "A Directive that is a specific, actionable, testable constraint or guidance that is under business jurisdiction. A BusinessRule provides specific operational guidance that can be directly enforced." .
+  rdfs:label "Business Rule" ;
+  rdfs:comment "A Directive that is a specific, actionable, testable constraint or guidance that is under business jurisdiction. A BusinessRule provides specific operational guidance that can be directly enforced." .
 
 # ============================================================
 # Influencers — Things that can affect Means and Ends
@@ -113,18 +141,24 @@ bmm:BusinessRule
 
 bmm:Influencer
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:MotivationalElement ;
-  dc11:description "Something that can cause changes affecting the enterprise in its employment of its Means or achievement of its Ends. An Influencer is an act, event, or state that is not under the control of the enterprise but has or may have an influence on business motivation elements." .
+  rdfs:label "Influencer" ;
+  rdfs:comment "Something that can cause changes affecting the enterprise in its employment of its Means or achievement of its Ends. An Influencer is an act, event, or state that is not under the control of the enterprise but has or may have an influence on business motivation elements." .
 
 bmm:ExternalInfluencer
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:Influencer ;
-  dc11:description "An Influencer that comes from outside the enterprise. Examples include competitors, technology trends, regulations, economic conditions, and market changes." .
+  rdfs:label "External Influencer" ;
+  rdfs:comment "An Influencer that comes from outside the enterprise. Examples include competitors, technology trends, regulations, economic conditions, and market changes." .
 
 bmm:InternalInfluencer
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:Influencer ;
-  dc11:description "An Influencer that comes from inside the enterprise. Examples include resources, habits, infrastructure, management prerogatives, and corporate values." .
+  rdfs:label "Internal Influencer" ;
+  rdfs:comment "An Influencer that comes from inside the enterprise. Examples include resources, habits, infrastructure, management prerogatives, and corporate values." .
 
 # ============================================================
 # Assessment — Judgment about Influencers
@@ -132,13 +166,17 @@ bmm:InternalInfluencer
 
 bmm:Assessment
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:MotivationalElement ;
-  dc11:description "A judgment about an Influencer, specifically about its impact on the employment of specific Means or on the achievement of specific Ends. An Assessment uses the SWOT categories: Strength, Weakness, Opportunity, or Threat." .
+  rdfs:label "Assessment" ;
+  rdfs:comment "A judgment about an Influencer, specifically about its impact on the employment of specific Means or on the achievement of specific Ends. An Assessment uses the SWOT categories: Strength, Weakness, Opportunity, or Threat." .
 
 bmm:PotentialImpact
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:MotivationalElement ;
-  dc11:description "A possible effect that an Influencer may have on the enterprise, expressed as either a risk or a potential reward. A PotentialImpact is identified by an Assessment and can provide impetus for a Directive." .
+  rdfs:label "Potential Impact" ;
+  rdfs:comment "A possible effect that an Influencer may have on the enterprise, expressed as either a risk or a potential reward. A PotentialImpact is identified by an Assessment and can provide impetus for a Directive." .
 
 # ============================================================
 # Organization and Process
@@ -146,97 +184,228 @@ bmm:PotentialImpact
 
 bmm:OrganizationUnit
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:MotivationalElement ;
-  dc11:description "An organized group of people that forms a recognized part of an organizational structure. An OrganizationUnit is responsible for achieving Ends, establishing and deploying Means, recognizing Influencers, and making Assessments." .
+  rdfs:label "Organization Unit" ;
+  rdfs:comment "An organized group of people that forms a recognized part of an organizational structure. An OrganizationUnit is responsible for achieving Ends, establishing and deploying Means, recognizing Influencers, and making Assessments." .
 
 bmm:BusinessProcess
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:MotivationalElement ;
-  dc11:description "A partially-ordered set of enterprise activities that can be executed to achieve some desired End or to realize a CourseOfAction. BusinessProcesses are governed by BusinessPolicies and BusinessRules." .
+  rdfs:label "Business Process" ;
+  rdfs:comment "A partially-ordered set of enterprise activities that can be executed to achieve some desired End or to realize a CourseOfAction. BusinessProcesses are governed by BusinessPolicies and BusinessRules." .
 
 bmm:Asset
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:MotivationalElement ;
-  dc11:description "A resource of value owned or controlled by the enterprise. Assets are deployed to support CoursesOfAction and may be affected by Directives." .
+  rdfs:label "Asset" ;
+  rdfs:comment "A resource of value owned or controlled by the enterprise. Assets are deployed to support CoursesOfAction and may be affected by Directives." .
 
 bmm:InfluencingOrganization
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:ExternalInfluencer ;
-  dc11:description "An organization outside the enterprise that acts as an Influencer, such as a competitor, partner, regulator, or industry body." .
+  rdfs:label "Influencing Organization" ;
+  rdfs:comment "An organization outside the enterprise that acts as an Influencer, such as a competitor, partner, regulator, or industry body." .
 
 bmm:Regulation
   a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
   rdfs:subClassOf bmm:ExternalInfluencer ;
-  dc11:description "A rule or directive made and maintained by an authority external to the enterprise, such as a government agency or standards body." .
+  rdfs:label "Regulation" ;
+  rdfs:comment "A rule or directive made and maintained by an authority external to the enterprise, such as a government agency or standards body." .
 
 # ============================================================
 # Enumeration Types
+#
+# Each enumeration is a plain rdfs:Class whose instances are the
+# allowed values (individuals with rdfs:label). Resource shapes
+# reference the enumeration via oslc:range; they omit oslc:valueType
+# and oslc:allowedValue unless a shape restricts to a subset of the
+# values. See the OSLC Core vocabulary "Enumerations" section.
 # ============================================================
 
-bmm:InfluencerCategoryType
+bmm:AssessmentCategory
   a rdfs:Class ;
-  rdfs:subClassOf rdfs:Datatype ;
-  dc11:description "The SWOT category of an Assessment: Strength, Weakness, Opportunity, or Threat." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Assessment Category" ;
+  rdfs:comment "The SWOT category of an Assessment: Strength, Weakness, Opportunity, or Threat." .
 
-bmm:InfluencerCategoryType-Strength
-  a bmm:InfluencerCategoryType ;
-  rdfs:label "Strength" .
+bmm:AssessmentCategory-Strength
+  a bmm:AssessmentCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Strength" ;
+  rdfs:comment "The \"Strength\" value of the AssessmentCategory enumeration." .
 
-bmm:InfluencerCategoryType-Weakness
-  a bmm:InfluencerCategoryType ;
-  rdfs:label "Weakness" .
+bmm:AssessmentCategory-Weakness
+  a bmm:AssessmentCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Weakness" ;
+  rdfs:comment "The \"Weakness\" value of the AssessmentCategory enumeration." .
 
-bmm:InfluencerCategoryType-Opportunity
-  a bmm:InfluencerCategoryType ;
-  rdfs:label "Opportunity" .
+bmm:AssessmentCategory-Opportunity
+  a bmm:AssessmentCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Opportunity" ;
+  rdfs:comment "The \"Opportunity\" value of the AssessmentCategory enumeration." .
 
-bmm:InfluencerCategoryType-Threat
-  a bmm:InfluencerCategoryType ;
-  rdfs:label "Threat" .
+bmm:AssessmentCategory-Threat
+  a bmm:AssessmentCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Threat" ;
+  rdfs:comment "The \"Threat\" value of the AssessmentCategory enumeration." .
+
+bmm:InfluencerCategory
+  a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Influencer Category" ;
+  rdfs:comment "The category of an Influencer, e.g. Competition, Customer, Environment, Habit, Infrastructure, Issue, Management Prerogative, Partner, Regulation, Resource, Supplier, or Technology. The set is open for extension." .
+
+bmm:InfluencerCategory-Competition
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Competition" ;
+  rdfs:comment "The \"Competition\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Customer
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Customer" ;
+  rdfs:comment "The \"Customer\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Environment
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Environment" ;
+  rdfs:comment "The \"Environment\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Habit
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Habit" ;
+  rdfs:comment "The \"Habit\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Infrastructure
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Infrastructure" ;
+  rdfs:comment "The \"Infrastructure\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Issue
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Issue" ;
+  rdfs:comment "The \"Issue\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-ManagementPrerogative
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Management Prerogative" ;
+  rdfs:comment "The \"Management Prerogative\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Partner
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Partner" ;
+  rdfs:comment "The \"Partner\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Regulation
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Regulation (category)" ;
+  rdfs:comment "The \"Regulation\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Resource
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Resource" ;
+  rdfs:comment "The \"Resource\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Supplier
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Supplier" ;
+  rdfs:comment "The \"Supplier\" value of the InfluencerCategory enumeration." .
+
+bmm:InfluencerCategory-Technology
+  a bmm:InfluencerCategory ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Technology" ;
+  rdfs:comment "The \"Technology\" value of the InfluencerCategory enumeration." .
+
+bmm:EnforcementLevel
+  a rdfs:Class ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Enforcement Level" ;
+  rdfs:comment "The level at which a BusinessRule is enforced: strictly enforced, deferred enforcement, or override with explanation." .
+
+bmm:EnforcementLevel-StrictlyEnforced
+  a bmm:EnforcementLevel ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Strictly Enforced" ;
+  rdfs:comment "The \"Strictly Enforced\" value of the EnforcementLevel enumeration." .
+
+bmm:EnforcementLevel-DeferredEnforcement
+  a bmm:EnforcementLevel ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Deferred Enforcement" ;
+  rdfs:comment "The \"Deferred Enforcement\" value of the EnforcementLevel enumeration." .
+
+bmm:EnforcementLevel-OverrideWithExplanation
+  a bmm:EnforcementLevel ;
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "Override With Explanation" ;
+  rdfs:comment "The \"Override With Explanation\" value of the EnforcementLevel enumeration." .
 
 # ============================================================
 # End Relationships
 #
 # Forward directions only. Inverse URIs (e.g., bmm:amplifies,
 # bmm:makesOperative, bmm:quantifies) are identifiers referenced by
-# ResourceShape oslc:inversePropertyDefinition but are never asserted
-# as triples, so they are not declared here.
+# ResourceShape inverse metadata but are never asserted as triples,
+# so they are not declared here.
+#
+# Per OSLC convention, properties carry no rdfs:domain or rdfs:range;
+# the domain and range constraints for this server's API live in the
+# ResourceShapes (BMM-Shapes.ttl).
 # ============================================================
 
 # Vision → Goal
 bmm:amplifiedBy
   a rdf:Property ;
-  rdfs:domain bmm:Vision ;
-  rdfs:range bmm:Goal ;
-  dc11:description "A Goal that amplifies this Vision into more specific desired results." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "amplified by" ;
+  rdfs:comment "A Goal that amplifies this Vision into more specific desired results." .
 
 # Vision → Mission
 bmm:madeOperativeBy
   a rdf:Property ;
-  rdfs:domain bmm:Vision ;
-  rdfs:range bmm:Mission ;
-  dc11:description "The Mission that makes this Vision operative — indicates what must be done to make the Vision a reality." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "made operative by" ;
+  rdfs:comment "The Mission that makes this Vision operative — indicates what must be done to make the Vision a reality." .
 
 # Goal → Objective
 bmm:quantifiedBy
   a rdf:Property ;
-  rdfs:domain bmm:Goal ;
-  rdfs:range bmm:Objective ;
-  dc11:description "An Objective that quantifies this Goal by defining a specific, measurable target." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "quantified by" ;
+  rdfs:comment "An Objective that quantifies this Goal by defining a specific, measurable target." .
 
 # Goal → Goal (part-whole)
 bmm:includesGoal
   a rdf:Property ;
-  rdfs:domain bmm:Goal ;
-  rdfs:range bmm:Goal ;
-  dc11:description "A sub-Goal that is part of this Goal." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "includes goal" ;
+  rdfs:comment "A sub-Goal that is part of this Goal." .
 
 # Objective → Objective (part-whole)
 bmm:includesObjective
   a rdf:Property ;
-  rdfs:domain bmm:Objective ;
-  rdfs:range bmm:Objective ;
-  dc11:description "A sub-Objective that is part of this Objective." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "includes objective" ;
+  rdfs:comment "A sub-Objective that is part of this Objective." .
 
 # ============================================================
 # Means Relationships
@@ -245,72 +414,72 @@ bmm:includesObjective
 # CourseOfAction → End
 bmm:enablesEnd
   a rdf:Property ;
-  rdfs:domain bmm:CourseOfAction ;
-  rdfs:range bmm:End ;
-  dc11:description "An End that this CourseOfAction enables or contributes to achieving." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "enables end" ;
+  rdfs:comment "An End that this CourseOfAction enables or contributes to achieving." .
 
 # Strategy → End (Vision or Goal)
 bmm:channelsEffortsToward
   a rdf:Property ;
-  rdfs:domain bmm:Strategy ;
-  rdfs:range bmm:End ;
-  dc11:description "An End (Vision or Goal) toward which this Strategy channels efforts." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "channels efforts toward" ;
+  rdfs:comment "An End (Vision or Goal) toward which this Strategy channels efforts." .
 
 # Strategy → Strategy (part-whole)
 bmm:includesStrategy
   a rdf:Property ;
-  rdfs:domain bmm:Strategy ;
-  rdfs:range bmm:Strategy ;
-  dc11:description "A sub-Strategy that is a component of this Strategy." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "includes strategy" ;
+  rdfs:comment "A sub-Strategy that is a component of this Strategy." .
 
 # Tactic → Strategy
 bmm:implements
   a rdf:Property ;
-  rdfs:domain bmm:Tactic ;
-  rdfs:range bmm:Strategy ;
-  dc11:description "The Strategy that this Tactic implements." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "implements" ;
+  rdfs:comment "The Strategy that this Tactic implements." .
 
 # Tactic → Tactic (part-whole)
 bmm:includesTactic
   a rdf:Property ;
-  rdfs:domain bmm:Tactic ;
-  rdfs:range bmm:Tactic ;
-  dc11:description "A sub-Tactic that is a component of this Tactic." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "includes tactic" ;
+  rdfs:comment "A sub-Tactic that is a component of this Tactic." .
 
 # Directive → CourseOfAction
 bmm:governs
   a rdf:Property ;
-  rdfs:domain bmm:Directive ;
-  rdfs:range bmm:CourseOfAction ;
-  dc11:description "A CourseOfAction that is governed by this Directive." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "governs" ;
+  rdfs:comment "A CourseOfAction that is governed by this Directive." .
 
 # BusinessRule → BusinessPolicy
 bmm:basedOn
   a rdf:Property ;
-  rdfs:domain bmm:BusinessRule ;
-  rdfs:range bmm:BusinessPolicy ;
-  dc11:description "The BusinessPolicy that this BusinessRule is based on." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "based on" ;
+  rdfs:comment "The BusinessPolicy that this BusinessRule is based on." .
 
 # BusinessPolicy → BusinessProcess
 bmm:governsProcess
   a rdf:Property ;
-  rdfs:domain bmm:BusinessPolicy ;
-  rdfs:range bmm:BusinessProcess ;
-  dc11:description "A BusinessProcess that is governed by this BusinessPolicy." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "governs process" ;
+  rdfs:comment "A BusinessProcess that is governed by this BusinessPolicy." .
 
 # BusinessRule → BusinessProcess
 bmm:enforcedByBusinessProcess
   a rdf:Property ;
-  rdfs:domain bmm:BusinessRule ;
-  rdfs:range bmm:BusinessProcess ;
-  dc11:description "A BusinessProcess that enforces this BusinessRule." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "enforced by business process" ;
+  rdfs:comment "A BusinessProcess that enforces this BusinessRule." .
 
 # Tactic → BusinessRule
 bmm:effectsEnforcementOfBusinessRule
   a rdf:Property ;
-  rdfs:domain bmm:Tactic ;
-  rdfs:range bmm:BusinessRule ;
-  dc11:description "A BusinessRule whose enforcement is effected by this Tactic." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "effects enforcement of business rule" ;
+  rdfs:comment "A BusinessRule whose enforcement is effected by this Tactic." .
 
 # ============================================================
 # Influencer and Assessment Relationships
@@ -319,72 +488,72 @@ bmm:effectsEnforcementOfBusinessRule
 # Assessment → Influencer
 bmm:assesses
   a rdf:Property ;
-  rdfs:domain bmm:Assessment ;
-  rdfs:range bmm:Influencer ;
-  dc11:description "The Influencer that this Assessment is about." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "assesses" ;
+  rdfs:comment "The Influencer that this Assessment is about." .
 
 # Assessment → PotentialImpact
 bmm:identifiesPotentialImpact
   a rdf:Property ;
-  rdfs:domain bmm:Assessment ;
-  rdfs:range bmm:PotentialImpact ;
-  dc11:description "A PotentialImpact identified by this Assessment." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "identifies potential impact" ;
+  rdfs:comment "A PotentialImpact identified by this Assessment." .
 
 # Assessment → End
 bmm:affectsAchievementOfEnd
   a rdf:Property ;
-  rdfs:domain bmm:Assessment ;
-  rdfs:range bmm:End ;
-  dc11:description "An End whose achievement is affected by this Assessment." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "affects achievement of end" ;
+  rdfs:comment "An End whose achievement is affected by this Assessment." .
 
 # Assessment → Means
 bmm:affectsEmploymentOfMeans
   a rdf:Property ;
-  rdfs:domain bmm:Assessment ;
-  rdfs:range bmm:Means ;
-  dc11:description "A Means whose employment is affected by this Assessment." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "affects employment of means" ;
+  rdfs:comment "A Means whose employment is affected by this Assessment." .
 
-# Assessment category
+# Assessment category (enumeration: bmm:AssessmentCategory)
 bmm:assessmentCategory
   a rdf:Property ;
-  rdfs:domain bmm:Assessment ;
-  rdfs:range bmm:InfluencerCategoryType ;
-  dc11:description "The SWOT category of this Assessment: Strength, Weakness, Opportunity, or Threat." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "assessment category" ;
+  rdfs:comment "The SWOT category of this Assessment: Strength, Weakness, Opportunity, or Threat." .
 
 # PotentialImpact → Directive
 bmm:providesImpetusFor
   a rdf:Property ;
-  rdfs:domain bmm:PotentialImpact ;
-  rdfs:range bmm:Directive ;
-  dc11:description "A Directive for which this PotentialImpact provides impetus." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "provides impetus for" ;
+  rdfs:comment "A Directive for which this PotentialImpact provides impetus." .
 
 # PotentialImpact → End
 bmm:isRiskForEnd
   a rdf:Property ;
-  rdfs:domain bmm:PotentialImpact ;
-  rdfs:range bmm:End ;
-  dc11:description "An End for which this PotentialImpact represents a risk." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "is risk for end" ;
+  rdfs:comment "An End for which this PotentialImpact represents a risk." .
 
 # PotentialImpact → Means
 bmm:isRiskForMeans
   a rdf:Property ;
-  rdfs:domain bmm:PotentialImpact ;
-  rdfs:range bmm:Means ;
-  dc11:description "A Means for which this PotentialImpact represents a risk." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "is risk for means" ;
+  rdfs:comment "A Means for which this PotentialImpact represents a risk." .
 
 # PotentialImpact → End
 bmm:isRewardForEnd
   a rdf:Property ;
-  rdfs:domain bmm:PotentialImpact ;
-  rdfs:range bmm:End ;
-  dc11:description "An End for which this PotentialImpact represents a potential reward." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "is reward for end" ;
+  rdfs:comment "An End for which this PotentialImpact represents a potential reward." .
 
 # PotentialImpact → Means
 bmm:isRewardForMeans
   a rdf:Property ;
-  rdfs:domain bmm:PotentialImpact ;
-  rdfs:range bmm:Means ;
-  dc11:description "A Means for which this PotentialImpact represents a potential reward." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "is reward for means" ;
+  rdfs:comment "A Means for which this PotentialImpact represents a potential reward." .
 
 # ============================================================
 # OrganizationUnit Relationships
@@ -392,39 +561,39 @@ bmm:isRewardForMeans
 
 bmm:isResponsibleFor
   a rdf:Property ;
-  rdfs:domain bmm:OrganizationUnit ;
-  rdfs:range bmm:End ;
-  dc11:description "An End that this OrganizationUnit is responsible for achieving." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "is responsible for" ;
+  rdfs:comment "An End that this OrganizationUnit is responsible for achieving." .
 
 bmm:establishes
   a rdf:Property ;
-  rdfs:domain bmm:OrganizationUnit ;
-  rdfs:range bmm:Means ;
-  dc11:description "A Means that this OrganizationUnit establishes or deploys." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "establishes" ;
+  rdfs:comment "A Means that this OrganizationUnit establishes or deploys." .
 
 bmm:recognizes
   a rdf:Property ;
-  rdfs:domain bmm:OrganizationUnit ;
-  rdfs:range bmm:Influencer ;
-  dc11:description "An Influencer that this OrganizationUnit has recognized." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "recognizes" ;
+  rdfs:comment "An Influencer that this OrganizationUnit has recognized." .
 
 bmm:makesAssessment
   a rdf:Property ;
-  rdfs:domain bmm:OrganizationUnit ;
-  rdfs:range bmm:Assessment ;
-  dc11:description "An Assessment that this OrganizationUnit has made." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "makes assessment" ;
+  rdfs:comment "An Assessment that this OrganizationUnit has made." .
 
 bmm:definedBy
   a rdf:Property ;
-  rdfs:domain bmm:OrganizationUnit ;
-  rdfs:range bmm:BusinessProcess ;
-  dc11:description "A BusinessProcess that defines the operations of this OrganizationUnit." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "defined by" ;
+  rdfs:comment "A BusinessProcess that defines the operations of this OrganizationUnit." .
 
 bmm:subOrganizationUnits
   a rdf:Property ;
-  rdfs:domain bmm:OrganizationUnit ;
-  rdfs:range bmm:OrganizationUnit ;
-  dc11:description "A child OrganizationUnit that is part of this OrganizationUnit." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "sub organization units" ;
+  rdfs:comment "A child OrganizationUnit that is part of this OrganizationUnit." .
 
 # ============================================================
 # BusinessProcess Relationships
@@ -432,40 +601,42 @@ bmm:subOrganizationUnits
 
 bmm:realizes
   a rdf:Property ;
-  rdfs:domain bmm:BusinessProcess ;
-  rdfs:range bmm:Tactic ;
-  dc11:description "A Tactic that this BusinessProcess realizes." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "realizes" ;
+  rdfs:comment "A Tactic that this BusinessProcess realizes." .
 
 bmm:governedByBusinessRule
   a rdf:Property ;
-  rdfs:domain bmm:BusinessProcess ;
-  rdfs:range bmm:BusinessRule ;
-  dc11:description "A BusinessRule that governs this BusinessProcess." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "governed by business rule" ;
+  rdfs:comment "A BusinessRule that governs this BusinessProcess." .
 
 # ============================================================
-# Datatype Properties
+# Literal Properties
 # ============================================================
 
 bmm:targetDate
   a rdf:Property ;
-  rdfs:domain bmm:Objective ;
-  rdfs:range xsd:date ;
-  dc11:description "The date by which this Objective is targeted to be achieved." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "target date" ;
+  rdfs:comment "The date by which this Objective is targeted to be achieved." .
 
 bmm:measureOfProgress
   a rdf:Property ;
-  rdfs:domain bmm:Objective ;
-  rdfs:range xsd:string ;
-  dc11:description "A quantifiable measure used to evaluate progress toward achieving this Objective." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "measure of progress" ;
+  rdfs:comment "A quantifiable measure used to evaluate progress toward achieving this Objective." .
 
+# BusinessRule enforcement level (enumeration: bmm:EnforcementLevel)
 bmm:enforcementLevel
   a rdf:Property ;
-  rdfs:domain bmm:BusinessRule ;
-  rdfs:range xsd:string ;
-  dc11:description "The level at which the BusinessRule is enforced: strictly enforced, deferred enforcement, or override with explanation." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "enforcement level" ;
+  rdfs:comment "The level at which the BusinessRule is enforced: strictly enforced, deferred enforcement, or override with explanation." .
 
+# Influencer category (enumeration: bmm:InfluencerCategory)
 bmm:influencerCategory
   a rdf:Property ;
-  rdfs:domain bmm:Influencer ;
-  rdfs:range xsd:string ;
-  dc11:description "The category of this Influencer: Competition, Customer, Environment, Habit, Infrastructure, Issue, Management Prerogative, Partner, Regulation, Resource, Supplier, Technology, etc." .
+  rdfs:isDefinedBy <http://www.omg.org/spec/BMM> ;
+  rdfs:label "influencer category" ;
+  rdfs:comment "The category of this Influencer: Competition, Customer, Environment, Habit, Infrastructure, Issue, Management Prerogative, Partner, Regulation, Resource, Supplier, Technology, etc." .

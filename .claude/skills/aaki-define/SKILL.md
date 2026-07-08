@@ -45,6 +45,8 @@ What stays at the **term** level is the bare minimum for identification:
   rdfs:comment "Plain-language description of what this property represents." .
 ```
 
+**Every term — every class, property, and enumeration individual — carries `rdfs:label`, and every class and property carries `rdfs:comment`.** Use `rdfs:comment` for the term's human-readable description; do **not** use `dc11:description` (Dublin Core 1.1) or `dcterms:description` at the term level. The `dcterms:*` properties belong on the `owl:Ontology` document node (title, description, publisher, …), not on individual terms.
+
 What goes in the shape is the constraint for this server's API:
 
 ```turtle
@@ -128,6 +130,47 @@ This is guidance, not a requirement. The point is that absence-of-label should n
   - For link properties: `oslc:representation oslc:Reference`, `oslc:range` (the *shape* range — what types this server expects to see at the other end), plus the inverse metadata above when incoming-link discovery and labeling matter (recommended but optional).
   - Optional: `oslc:icon` (proposed extension) when a type-icon makes sense in UIs.
 - **Inheritance is manual.** OSLC ResourceShapes do not honor `rdfs:subClassOf` traversal — that's an inferential mechanism OSLC deliberately avoids. Each concrete shape lists every property it allows, including ones shared across types. Use named property nodes (`<#p-title>`, `<#p-creator>`, …) and reference them from each shape's `oslc:property` list so the duplication is editorial, not by copy-paste.
+
+## Enumerations
+
+When a property's value comes from a fixed set of terms (a category, a status, a level), model it with the OSLC enumeration pattern — **not** as a free `xsd:string`. See the OSLC Core vocabulary [Enumerations](https://docs.oasis-open-projects.org/oslc-op/core/v3.0/os/core-vocab.html#enumerations) section.
+
+1. **In the vocabulary, declare the enumeration as a plain `rdfs:Class`** (not `rdfs:subClassOf rdfs:Datatype`), with `rdfs:label` and `rdfs:comment`.
+2. **Declare each allowed value as an individual** of that class, each with an `rdfs:label`:
+
+   ```turtle
+   ex:AssessmentCategory
+     a rdfs:Class ;
+     rdfs:label "Assessment Category" ;
+     rdfs:comment "The SWOT category of an Assessment." .
+
+   ex:AssessmentCategory-Strength  a ex:AssessmentCategory ; rdfs:label "Strength" .
+   ex:AssessmentCategory-Weakness  a ex:AssessmentCategory ; rdfs:label "Weakness" .
+   ```
+3. **In the shape, reference the enumeration with `oslc:range` only** — omit `oslc:valueType` and `oslc:allowedValue`. `oslc:range` already constrains the value to be an instance of the enumeration class:
+
+   ```turtle
+   <#p-assessmentCategory>
+     a oslc:Property ;
+     oslc:name "assessmentCategory" ;
+     oslc:propertyDefinition ex:assessmentCategory ;
+     oslc:occurs oslc:Exactly-one ;
+     oslc:range ex:AssessmentCategory .
+   ```
+
+   This mirrors the OSLC CM `oslc_cm:state` constraint, which uses `oslc:range oslc_cm:State` with no `oslc:valueType`:
+
+   ```turtle
+   :state a oslc:Property ;
+     oslc:name "state" ;
+     oslc:occurs oslc:Zero-or-one ;
+     oslc:propertyDefinition oslc_cm:state ;
+     oslc:range oslc_cm:State ;
+     dcterms:description "…"^^rdf:XMLLiteral .
+   ```
+4. **Add `oslc:allowedValue` only to restrict** a particular shape to a *subset* of the enumeration's values (e.g., a shape that permits only `Strength` and `Opportunity`). If the shape allows the whole enumeration, `oslc:allowedValue` is unnecessary.
+
+The enumeration values live in the vocabulary (open for extension), so other servers can add values or restrict to subsets through their own shapes — the same open-vocabulary + constraining-shape split as everything else.
 
 ## HTML rendering
 
@@ -272,6 +315,10 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 | Mistake | Fix |
 |---|---|
 | Putting `rdfs:domain` / `rdfs:range` on properties in the vocabulary | Constrain at the shape level instead. The vocabulary stays open and reusable; the shape declares how the property is used on each resource type. |
+| Describing terms with `dc11:description` or `dcterms:description` | Terms use `rdfs:comment` (with `rdfs:label`). Reserve `dcterms:*` for the `owl:Ontology` document node. |
+| Missing `rdfs:label` on terms | Every class, property, and enumeration individual needs an `rdfs:label`. |
+| Modeling a fixed value set as `xsd:string` | Use the enumeration pattern: an `rdfs:Class` + individuals in the vocabulary, referenced from the shape by `oslc:range` (no `oslc:valueType`/`oslc:allowedValue` unless restricting to a subset). See "Enumerations". |
+| Declaring an enumeration as `rdfs:subClassOf rdfs:Datatype` | An enumeration is a plain `rdfs:Class` whose instances are the allowed-value individuals. |
 | Treating shapes as inferable subtypes of one another | OSLC shapes do not inherit. Enumerate every property on every concrete shape, using named property nodes to keep maintenance tractable. |
 | One shape per class (including abstract supertypes) | Shapes are only for instantiable classes. Supertypes structure the type hierarchy; they are never created directly. |
 | Java-style predicate naming | Drop the target-type suffix (`:amplifiedByMission` → `:amplifiedBy`). |

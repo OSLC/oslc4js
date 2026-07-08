@@ -417,7 +417,7 @@
   oslc:propertyDefinition bmm:targetDate ;
   dcterms:description "The date by which this Objective is targeted to be achieved." ;
   oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType xsd:date .
+  oslc:valueType xsd:dateTime .
 
 <#p-measureOfProgress>
   a oslc:Property ;
@@ -552,7 +552,7 @@
   oslc:propertyDefinition bmm:enforcementLevel ;
   dcterms:description "The enforcement level: strictly enforced, deferred enforcement, or override with explanation." ;
   oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType xsd:string .
+  oslc:range bmm:EnforcementLevel .
 
 # ================================================================
 # Influencer-specific properties
@@ -564,7 +564,7 @@
   oslc:propertyDefinition bmm:influencerCategory ;
   dcterms:description "Category of this Influencer (e.g. Competition, Technology, Regulation)." ;
   oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType xsd:string .
+  oslc:range bmm:InfluencerCategory .
 
 # ================================================================
 # Assessment-specific properties
@@ -598,8 +598,7 @@
   oslc:propertyDefinition bmm:assessmentCategory ;
   dcterms:description "SWOT category: Strength, Weakness, Opportunity, or Threat." ;
   oslc:occurs oslc:Exactly-one ;
-  oslc:valueType oslc:Resource ;
-  oslc:representation oslc:Reference .
+  oslc:range bmm:AssessmentCategory .
 
 # ================================================================
 # PotentialImpact-specific properties
