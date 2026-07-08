@@ -8,17 +8,9 @@ Picture the Systems & Software Engineering / PLM lifecycle as the classic OSLC d
 
 ![The digital thread as OSLC-connected nodes, with missing links (connectivity gap), a missing node (data gap), and ASPICE/ISO 26262 governing from the side](AAKI-Digital-Thread.svg)
 
-The industry has pursued this promise for years and seen thin returns. Viewed as a graph of nodes and links, the reasons come into focus — and two of them are AAKI's primary target:
+The industry has pursued this promise for years and seen thin returns. Viewed as a graph, two gaps are AAKI's primary target — **missing links between nodes** (the connectivity/traceability gap: cross-tool links are manual, decay as their endpoints change, and lack version context, so data can't be reliably exchanged or traced) and **missing domain nodes** (the data gap: information such as business motivation and portfolio management has no node at all, so the thread traces *how* something was built but not *why it was the right thing to build*). Two more follow once those are closed: the connected data is **hard to reach** (no federation → lossy data-mart copies) and, even when complete, **inert** (populating and querying it stay manual).
 
-- **Missing links between nodes — the connectivity/traceability gap.** The tools covering the V-model are islands. Even where a link is *possible*, creating it is manual, slow, expensive, and error-prone, so it mostly doesn't happen; and when links do exist they decay as their endpoints change, while without configuration context "which version?" is ambiguous. The result is a thread you cannot reliably exchange data over or trace across.
-- **Missing domain nodes — the data gap.** Some information the organization needs has no node at all. **Business motivation and portfolio management** — *Doing the Right Things Right* — are frequently absent entirely, so the thread can trace *how* something was built but not *why it was the right thing to build*. Standing up a new domain and a tool to support it has historically been slow and specialized.
-
-Two further gaps follow from these and are eased once they are closed:
-
-- **Access.** Data scattered across servers with no federation gets copied into lossy data marts; and people act only on data whose provenance they trust.
-- **Actionability.** Even a complete, connected thread is just data — populating it and extracting value from it have been manual, and the *author* pays the linking cost while the *analyst* reaps the benefit, so the thread stays sparse and unused.
-
-**In short:** the thread has missing links and missing nodes, is hard to reach, and — even at its best — describes without acting.
+*(For the full four-gap challenge brief — and the domain-level challenges beneath each node — see [`AAKI.md`](AAKI.md).)*
 
 ## AAKI closes the gaps — with AI assistants and OSLC
 
