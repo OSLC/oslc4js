@@ -4,6 +4,8 @@
 
 **Companion to [`AAKI.md`](AAKI.md).** That document lays out the abstract framework for AAKI — why the Define / Instantiate / Activate stages need each other, why AI and governed knowledge graphs are complementary, why RDF/Turtle is a deliberate fit with AI authoring, and how the pattern applies to the SSE V-model. This document grounds every claim of the framework in a concrete, reproducible walkthrough: build an OSLC server for BMM, populate it with the EU-Rent example from the spec, and activate it for AI-assisted analysis. Every step can be replayed against the `bmm-server` in this repository.
 
+**Where this fits in the digital thread.** The [AAKI Overview](AAKI-Overview.md) frames the digital thread as OSLC-connected tool and domain *nodes* linked across the V-model, and names two primary gaps: missing links between nodes, and *missing domain nodes* — most often business motivation, the "why" the thread cannot otherwise trace. This walkthrough is a concrete instance of closing that **data gap**: `bmm-server` is *one node* of a broader digital thread — the business-motivation domain that was previously a missing node — stood up from a spec and made linkable, populatable, and queryable. The same Define / Instantiate / Activate moves shown here for one node scale to the whole thread.
+
 ![AAKI OverviewC](AAKI-Overview.png)
 
 

@@ -62,6 +62,18 @@ What goes in the shape is the constraint for this server's API:
 
 This separation — open vocabulary, constraining shape — is the OSLC pattern. The skill name "Define" really means *define the vocabulary as identifiers and define the API contract as shapes*, not "define an ontology with reasoning."
 
+## Relationship to OWL and formal ontologies
+
+Authors coming from the OWL / formal-ontology tradition sometimes read "open vocabulary, no inferencing" as under-engineering. It is not — it is the same separation of concerns the W3C itself ratified, applied to a different job. State the reasoning explicitly so the choice reads as principled, not naive:
+
+- **Two different jobs: inference vs. validation.** OWL is open-world and optimized for *inferring and integrating* facts. The digital thread's actual need is closed-world *validation* — "this requirement MUST have exactly one `verifiedBy` link; without it the resource is incomplete." OWL cannot state that natively; constraint languages can. This is precisely why **SHACL** exists (W3C Recommendation, 2017), and OSLC `oslc:ResourceShape` is part of SHACL's lineage — Arthur Ryman's *Resource Shape 2.0* W3C Member Submission (2014) is one of its ancestors. AAKI's "open vocabulary + constraining shapes" *is* that split: the vocabulary carries meaning, the shapes carry the contract.
+- **"No runtime reasoning" is mainstream, not fringe.** schema.org (deliberately non-entailing — see its `domainIncludes`/`rangeIncludes`), Wikidata (no OWL-DL entailment in practice), and most production enterprise knowledge graphs run little or no reasoning at query time, for reasons of determinism, performance, and debuggability. OSLC is with the majority here, not against a settled consensus.
+- **OWL-compatible, not OWL-required — a bridge, not a wall.** The vocabulary is plain RDF. Nothing stops a consumer from layering OWL axioms over the published terms or running a reasoner over the instance data. AAKI simply does not make reasoning a *precondition for interoperability*. Say this out loud to skeptics: AAKI does not reject OWL, it refuses to *require* it.
+- **Consume an authoritative ontology when one exists.** Where a domain already has a governing formal ontology (SysML v2, ISO 15926, an IOF/BFO-based model, FIBO), align to or import it as the vocabulary layer and add OSLC shapes for the API contract on top. The formal-ontology community becomes an upstream supplier, not a competitor. Greenfield vocabulary authoring is reserved for genuine conceptual gaps (e.g., business motivation, portfolio management).
+- **The specific simplifications are deliberate and OWL-compatible.** Omitting `rdfs:domain`/`rdfs:range` (constraints live in shapes), using `oslc:inversePropertyLabel` rather than `owl:inverseOf` (one stored triple rendered both ways, not a materialized inverse), and pairing `oslc:superShape` with `rdfs:subClassOf` without runtime entailment are protocol and validation decisions with rationale — not gaps in understanding. Each keeps the vocabulary reusable and the data reasoner-ready for anyone who chooses to reason over it later.
+
+**What this means for naming and positioning.** AAKI-define produces an **application vocabulary plus an API/validation contract** in the RDF / linked-data / SHACL tradition — not a formal reasoning ontology. Describe it that way. The bare word "ontology" invites a turf debate with formal-ontology purists that AAKI does not need to win: AAKI's job is connectivity and governance of the digital thread (see `docs/AAKI-Overview.md`), a gap that formal ontologies do not address and OSLC does.
+
 ## When to use
 
 - Standing up a new OSLC domain.

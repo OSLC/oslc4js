@@ -7,6 +7,8 @@ description: Use when populating an OSLC server with instances via MCP — trans
 
 Stage 2 of AI Assisted Knowledge Integration. The AI reads a source document and creates governed, linked artifacts directly through the OSLC server's MCP endpoint. The server validates against the shapes defined in Stage 1; the typed link graph that emerges is the system of record.
 
+Instantiate is the stage that **closes the connectivity gap and populates the nodes** of the digital thread: the AI adds both the resources and the typed cross-resource/cross-tool **links** the thread was missing, removing the linking cost from the author who otherwise pays it. It operates at both scales — filling a single domain node, and weaving the links across the whole collection of domains and tools that make up the thread. See [`docs/AAKI-Overview.md`](../../../docs/AAKI-Overview.md) for the framing.
+
 The skill is self-contained — it does not require reading any external prompt file. The "Population approach" section below provides a generic, reusable prompt template you can adapt to any domain.
 
 ## When to use
@@ -103,9 +105,9 @@ Example (wrong):
 The server exposes one tool per creation factory, named after the resource type:
 
 - `create_<Type>` — POST a new resource (e.g., `create_Vision`, `create_Goal`).
-- `update_<Type>` — modify an existing resource (e.g., to add a link after both endpoints exist).
+- `update_<Type>` — modify an existing resource (e.g., to add a link after both endpoints exist). **GET the resource immediately before the update — never reuse RDF you cached at create time.** PUT is a full-resource replace under optimistic concurrency; a body built from stale create-time state will fail the ETag/`If-Match` check or silently clobber server-assigned properties and any edits made since. Fetch live, modify, PUT — in one tight sequence.
 - `query_resources <queryBase>` — enumerate resources with optional `oslc.where=rdf:type=<...>` filtering. Per-class `query_<Type>` tools have been consolidated into a single query capability per ServiceProvider.
-- `get_resource <uri>` — fetch any resource (a shape, a vocabulary, or an instance) and read its triples.
+- `get_resource <uri>` — fetch any resource (a shape, a vocabulary, or an instance) and read its triples. For an instance you are about to modify, call this **immediately before** the `update_<Type>` to obtain the live state and current ETag; do not pre-cache the RDF returned at create time and PUT it back later. (Shapes and vocabularies are the exception — they don't change during a session, so caching *those* lookups is fine; see Common mistakes.)
 - `create_service_provider` — create a new SP if one doesn't exist for the scope you're populating.
 
 ## Authoring sequence (a typical session)
@@ -152,7 +154,7 @@ Brief an AI assistant (or yourself) with a prompt of this shape, replacing the b
 >
 > **Step 4 — Plan the creation order.** Resources can only link to things that already exist. Build leaves first (resources with no outgoing links to other types you're creating), then mid-level, then top-level. When a class needs a forward link to a class that hasn't been created yet, either create the target first or add the link via `update_<Type>` after both exist.
 >
-> **Step 5 — Create resources.** Use the per-type `create_<Type>` MCP tools (one per creation factory). Each tool accepts the shape's properties as arguments; the server validates against the shape and assigns URIs. For every link, pass the target's URI as the value of the **forward** property declared by the source side's shape — never try to create the inverse direction as a triple.
+> **Step 5 — Create resources.** Use the per-type `create_<Type>` MCP tools (one per creation factory). Each tool accepts the shape's properties as arguments; the server validates against the shape and assigns URIs. For every link, pass the target's URI as the value of the **forward** property declared by the source side's shape — never try to create the inverse direction as a triple. When you add a link (or make any change) to an already-created resource via `update_<Type>`, **`get_resource` on it immediately beforehand to fetch the live state and current ETag — do not PUT back RDF you cached when you created it.** PUT is a full-resource replace under optimistic concurrency; a stale create-time body will fail the ETag check or clobber server-assigned properties and intervening edits. Shapes and vocabularies, by contrast, don't change mid-session, so those you may cache.
 >
 > **Step 6 — Verify and report.** Use `query_resources <queryBase> oslc.where=rdf:type=<...>` for each resource type you created, and report counts. Spot-check a few resources by `get_resource` to confirm forward and incoming (LDM `/discover-links`) links match expectations.
 >
@@ -184,5 +186,6 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[source documen
 | Hallucinating an inverse link as a triple | The triple is on the forward side. The inverse URI is metadata, not a property to assert. |
 | Asking the user "should I create the next resource?" between every create | Populate continuously. Report every ~10. The user only needs to see exceptions. |
 | Re-fetching shapes already read in the same session | Cache shape lookups in your working memory; they don't change during a populate session. |
+| Caching an instance's create-time RDF and PUTting it back on a later `update_<Type>` | `get_resource` the instance immediately before the update to get live state + ETag. PUT is a full replace under optimistic concurrency; a stale body fails the ETag check or clobbers server-assigned properties and intervening edits. (Shapes/vocabularies are safe to cache; live instances are not.) |
 | Creating resources in random order | Build leaves first, then mid-level, then top-level. Add cross-tier links via `update_*` after both endpoints exist. |
 | Inventing business content not in the source | The source document is the authority. Note gaps explicitly; do not paper over them with plausible-sounding content. |

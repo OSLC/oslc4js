@@ -2,6 +2,8 @@
 
 *How AI-Assisted Knowledge Integration compares with graph-based retrieval-augmented generation — and where AAKI's claims need scrutiny.*
 
+> **Framing note.** In AAKI's terms the contrast below is a *governed semantic digital thread* (OSLC-connected, versioned nodes of record) versus an *extraction-based index over a data lake* (a disposable projection of documents). See [`docs/AAKI-Overview.md`](AAKI-Overview.md) for the digital-thread framing this comparison assumes.
+
 ## TL;DR
 
 AAKI and GraphRAG both put a graph between an AI and a body of domain knowledge, and both use an LLM to build that graph. There the resemblance ends. **GraphRAG builds a *derived index* to answer questions well; AAKI builds a *system of record* to make engineering decisions defensible.** GraphRAG's graph is a means to better retrieval — it can be regenerated, discarded, and rebuilt, and it is not meant to be the authoritative copy of anything. AAKI's graph *is* the authoritative copy: governed, versioned, configuration-aware OSLC resources with stable URIs and typed links that participate in a digital thread spanning engineering tools. The AI assists in authoring and linking those assets, but a named human remains responsible and accountable for every one.

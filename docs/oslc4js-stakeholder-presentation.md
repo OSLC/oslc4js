@@ -403,6 +403,25 @@ Other domains this fits: systems and software engineering, IT service management
 
 ---
 
+# AAKI vs. GraphRAG
+
+Both put a graph between AI and your knowledge — but for different jobs.
+
+| | **GraphRAG** | **AAKI** |
+|---|---|---|
+| The graph is… | a *derived index* — regenerable, disposable | the *system of record* — the authoritative artifact |
+| Built to… | answer questions over documents | be governed, versioned, and linked across tools |
+| Links | statistical, inferred | typed, semantic (e.g. `validatedBy`) |
+| Provenance | external / "none by design" | first-class: author, approval, baseline |
+| Best at | sensemaking over unstructured text | the V-model digital thread, audit, traceability |
+| Human role | reads the answers | **Responsible & Accountable** — AI proposes, human approves |
+
+> GraphRAG makes AI better at *answering*; AAKI makes AI a governed contributor to the *record*. They're complementary — GraphRAG can propose into the governed graph AAKI maintains.
+
+*See [AAKI-vs-GraphRAG.md](AAKI-vs-GraphRAG.md) for the full comparison and a critical look at AAKI's gaps.*
+
+---
+
 # The Opportunity
 
 - **oslc4js** is open source — try it with your domain

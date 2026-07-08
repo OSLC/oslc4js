@@ -309,6 +309,31 @@ OSLC vocabularies use `rdfs:subClassOf` to express class hierarchies (e.g., `bmm
 
 `oslc:superShape` lets a shape declare it extends one or more parents, and a conforming server/client resolves the chain at parse time to produce the effective constraint set.
 
+### Why not derive inheritance from `rdfs:subClassOf`?
+
+A natural objection: the vocabulary already expresses the class hierarchy via `rdfs:subClassOf`, so couldn't a validator discover which properties to inherit from that, making `oslc:superShape` redundant? In the simplest deployments — one shape per class, and every shape describing a class — the two would indeed produce the same result, and carrying both would be duplicative. But `oslc:superShape` is strictly more expressive, and the apparent redundancy disappears in exactly the cases this extension is designed to serve:
+
+- **It resolves to a specific shape, not a class.** `rdfs:subClassOf` yields a parent *class* URI, but inheritance needs the parent *shape*. There is no ecosystem-wide index from class to shape, so deriving the shape would require having already loaded every candidate shape and searching by `oslc:describes`. `oslc:superShape` is a directly dereferenceable pointer to the shape itself — the same mechanism "Cross-document resolution" relies on.
+- **It supports mixin shapes that describe no class.** A super shape MAY omit `oslc:describes` and act as a pure constraint bundle (e.g., a Dublin Core metadata mixin) shared across otherwise-unrelated shapes. There is no `rdfs:subClassOf` edge to derive from in that case; only a shape-level reference can express it.
+- **It disambiguates when a class has multiple shapes.** A single class may have several shapes for different ServiceProviders, creation factories, or API contracts. `rdfs:subClassOf` cannot say which of them to inherit; `oslc:superShape` names the exact one.
+- **It keeps shape parsing decoupled from the vocabulary.** Making `rdfs:subClassOf` the inheritance signal would force every shape parser to resolve and reason over vocabulary documents — precisely the coupling the "SHOULD, not MUST" consistency rule (see "Relationship to `rdfs:subClassOf`") deliberately avoids.
+
+The two mechanisms live in different layers and complement rather than compete: `rdfs:subClassOf` is class-hierarchy semantics in the **vocabulary**; `oslc:superShape` is constraint inheritance in the **shape**. Their relationship, and the recommendation to keep the described classes consistent, is detailed in "Relationship to `rdfs:subClassOf`" below. This mirrors `jrs:superShape` in IBM ELM, which likewise expresses inheritance at the shape level rather than deriving it from the class hierarchy.
+
+### Two orthogonal concerns: when to flatten, and what to publish
+
+Two further questions must be answered independently of whether `oslc:superShape` exists — they concern the *plumbing* of inheritance, not its *signal*, so they are recorded here rather than being lost:
+
+1. **When is the inherited constraint set materialized?** Three points are available, and they compose rather than exclude one another:
+   - author DRY with `oslc:superShape`, then **publish flattened** Turtle so the served shape is self-contained and legacy clients need not resolve the chain (recommended — see Open Question 1);
+   - flatten at server read-time, before validating instances against the effective shape;
+   - flatten at client parse-time (the consumer behavior specified under "Client behavior").
+
+   The recommended default — author with `oslc:superShape`, publish flattened — yields DRY source *and* self-contained wire artifacts. This is what dissolves any genuine duplication concern: authors never hand-maintain both `oslc:superShape` and a flattened property list; the flattened form is generated, not authored.
+2. **What do the human-readable `*-Shapes.html` files show?** Either the full effective (flattened) constraint set, or only the properties the subclass adds with a link to the parent. Recommendation: show the full effective set so a reader sees the complete contract an instance must satisfy, with inherited rows visually marked and attributed to their originating shape.
+
+These are authoring/publishing guidelines, not part of the normative property semantics.
+
 ### Property definition
 
 ```turtle

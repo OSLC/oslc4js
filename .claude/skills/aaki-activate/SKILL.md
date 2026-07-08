@@ -7,6 +7,8 @@ description: Use when extracting value from a populated OSLC server — gap anal
 
 Stage 3 of AI Assisted Knowledge Integration. With governed instances in place, the AI traverses the cross-resource link graph to surface gaps, impacts, coverage metrics, compliance violations, and proposed actions. Output is auditable and grounded in resource URIs the user can verify.
 
+Activate is the stage that makes the thread **actionable**: the AI navigates and interprets a thread — a collection of linked domains and tools — far too large for any human to hold, running gap/impact/coverage analysis, traceability, and compliance reporting over governed, linked data rather than a stale copy. See [`docs/AAKI-Overview.md`](../../../docs/AAKI-Overview.md) for the framing.
+
 The skill is self-contained — it does not require reading any external prompt file. The "Generic prompt templates per archetype" section below provides reusable prompt skeletons you can adapt to any domain.
 
 ## When to use

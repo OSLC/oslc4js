@@ -49,6 +49,8 @@ style: |
 
 A scripted walkthrough that makes the AAKI value proposition concrete. One server, three stages, three artifacts on screen, and a closing-the-loop analysis the audience can verify by URI.
 
+What the audience is really watching is one *node* of a digital thread get built and used: `bmm-server` is the business-motivation domain — a node the thread usually lacks — stood up from a public spec, populated, and queried live. The same Define / Instantiate / Activate moves in this demo scale from this single node to the whole OSLC-connected thread across the V-model (see [`docs/AAKI-Overview.md`](AAKI-Overview.md)).
+
 > *Companion slide deck:* this is the **demo script**. The fuller framework deck is `AAKI-Presentation.md`; the worked-example deep-dive is `AAKI-Presentation-Example.md`. Use *this* deck when an audience needs to *see* AAKI work, not read about it.
 
 ---

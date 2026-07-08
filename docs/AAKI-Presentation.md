@@ -44,9 +44,9 @@ style: |
 
 # AI Assisted Knowledge Integration
 
-## Define — Instantiate — Activate
+## Making the digital thread actionable — with AI assistants and OSLC
 
-### Realizing AAKI over OSLC Linked Data, with AI as a First-Class Participant
+### Closing the thread's missing links and missing nodes: Define — Instantiate — Activate
 
 ---
 
@@ -54,83 +54,82 @@ style: |
 
 # Contents
 
-- [Challenge Brief](#challenge-brief)
-  - [The Customer Challenge](#the-customer-challenge)
-  - [The AAKI Solution](#the-aaki-solution)
-  - [The Business Value](#the-business-value)
+- [The digital thread — and why it underdelivers](#the-digital-thread--and-why-it-underdelivers)
+  - [The digital thread](#the-digital-thread)
+  - [Why it underdelivers](#why-it-underdelivers--a-graph-with-holes)
+  - [AAKI closes the gaps](#aaki-closes-the-gaps--ai-assistants--oslc)
+  - [From one domain to the whole thread](#from-one-domain-to-the-whole-thread)
   - [AAKI at a glance](#aaki-at-a-glance)
-- [The Define, Instantiate and Activate Strategic Framework](#the-define-instantiate-and-activate-strategic-framework)
+- [Define, Instantiate, Activate — the three moves](#define-instantiate-activate--the-three-moves-that-close-the-gaps)
 - [Why RDF, Why Turtle](#why-rdf-why-turtle)
-- [Stage 1 — Define](#stage-1--define)
-- [Stage 1 Example: BMM Vocabulary](#stage-1-example-bmm-vocabulary)
-- [Stage 2 — Instantiate](#stage-2--instantiate)
-- [Stage 2 Example: EU-Rent](#stage-2-example-eu-rent)
-- [AI Transforms Stage 2](#ai-transforms-stage-2)
-- [Stage 3 — Activate](#stage-3--activate)
-- [Stage 3 Example: MCP Endpoint](#stage-3-example-mcp-endpoint)
-- [The Feedback Loop](#the-feedback-loop)
+- [The connectivity substrate — OSLC](#the-connectivity-substrate--oslc)
+- [Stage 1 — Define](#stage-1--define-add-the-missing-node)
+- [A note on the "ontology"](#a-note-on-the-ontology)
+- [Stage 2 — Instantiate](#stage-2--instantiate-add-the-missing-links)
+- [Stage 3 — Activate](#stage-3--activate-make-the-thread-actionable)
 - [Why Not Just Use AI Alone?](#why-not-just-use-ai-alone)
-- [BMM Server: Working Example](#bmm-server-working-example)
+- [Collaborators, Not Agents](#collaborators-not-agents-on-the-raci-chart)
+- [BMM Server: Working Example](#bmm-server-a-complete-working-example)
+- [Why now](#why-now)
 - [Key Takeaway](#key-takeaway)
-- [AI-Assisted V-Model](#ai-assisted-v-model)
+- [AI-Assisted V-Model](#applying-aaki-to-an-ai-assisted-v-model)
 - [Three Layers of AI Assistance](#three-layers-of-ai-assistance)
-- [Scenario: Requirements Change](#scenario-requirements-change)
-- [The V-Model Feedback Loop](#the-v-model-feedback-loop)
+- [Scenario: Requirements Change](#scenario-requirements-change-impact)
+- [What's in the thread, and who governs it](#whats-in-the-thread-and-who-governs-it)
+- [Governance: Observe / Propose / Execute](#governance-observe--propose--execute)
 
 ---
 
 <!-- _class: lead -->
 
-# Challenge Brief
+# The digital thread — and why it underdelivers
 
-## Customer challenge → AAKI solution → business value
-
----
-
-# The Customer Challenge
-
-Organizations that depend on shared domain knowledge face **three persistent gaps**:
-
-**1. Defining shared concept spaces is hard.**
-Each team's tools encode domain knowledge differently — same concept, different URIs, different structures. Integration becomes glue code, not meaning sharing. Building a tool that supports a concept space, *and* integrates with others, is a substantial undertaking on its own.
-
-**2. Populating those concept spaces is slow.**
-Getting SMEs to translate documents, conversations, and tacit knowledge into governed, linked artifacts is a manual, expert-heavy bottleneck. Most domain knowledge stays in PDFs, spreadsheets, and people's heads.
-
-**3. Extracting value is mostly manual.**
-Stakeholder views and reports help, but impact analyses, gap detection, traceability assessments, and decision support still get done by hand — slowly, inconsistently, and often not at all.
+## The lifecycle as a graph of nodes and links — and the gaps that keep it from paying off
 
 ---
 
-# The AAKI Solution
+# The digital thread
 
-**AI Assisted Knowledge Integration (AAKI)** addresses all three gaps together — a strategic framework realized in three stages on linked-data infrastructure.
+The Systems & Software Engineering / PLM lifecycle as the classic OSLC picture: tool and domain **nodes** — business motivation, requirements, architecture, design, implementation, test and verification, change and configuration management — connected by **links** that let data be exchanged and traced across the whole **V-model**.
 
-| Stage | What it produces | Who participates |
-|---|---|---|
-| **Define** | Governed vocabulary and shapes | Ontologists + AI drafting from source documents |
-| **Instantiate** | Governed artifacts and links | SMEs + AI translating intent into shape-conformant resources |
-| **Activate** | Decisions, queries, traceability, agent actions | AI analyzing the graph; stakeholders consuming the results |
+That connected, traceable, queryable definition of the product *across its lifecycle* **is** the digital thread.
 
-> The OSLC server is the **system of record** — auditable, versionable, interoperable.
-> The AI is the **most capable authoring and analysis tool** that system of record has ever had.
-
-**oslc4js** is a concrete AAKI implementation. `bmm-server` and `mrm-server` demonstrate every stage end-to-end against real domain ontologies — proving the framework works in practice.
+> The promise: trace not just *how* the product was built, but *why it was the right thing to build* — end to end, across every tool.
 
 ---
 
-# The Business Value
+# Why it underdelivers — a graph with holes
 
-When integration is framed as AAKI, the conversation moves **up the abstraction stack**.
+The industry has pursued this promise for years and seen thin returns. Seen as nodes and links, two gaps dominate — and they are AAKI's primary target:
 
-| What we used to talk about | What AAKI lets us talk about |
-|---|---|
-| Tool adaptors, selection dialogs | Producers and consumers of shared concept spaces |
-| Link creation, RDF representations | Ontologies and shapes as the contract |
-| Manual integration plumbing | Versioning, traceability, provenance as architectural side effects |
-| Engineers wiring up tools | SMEs and stakeholders working in their own domain language |
+- **Missing links between nodes — the connectivity/traceability gap.** The tools are islands. Even where a link is *possible*, creating it is manual, slow, expensive, and error-prone, so it mostly doesn't happen — and links that do exist decay as their endpoints change.
+- **Missing domain nodes — the data gap.** Some information has no node at all. **Business motivation and portfolio management** — *Doing the Right Things Right* — are frequently absent entirely, so the thread traces *how* something was built but not *why it was the right thing to build*.
 
-The result: **less effort** to Define, Instantiate, and Activate domain knowledge — and a **much wider set of stakeholders** able to use that knowledge to drive effective, timely action.
+Two more follow: data is **hard to reach** (no federation → lossy data marts), and even a complete thread is **inert** — it describes, it doesn't act.
+
+---
+
+# AAKI closes the gaps — AI assistants + OSLC
+
+**AI Assisted Knowledge Integration (AAKI)** puts AI assistants to work over an OSLC linked-data substrate to close those gaps while keeping the thread governed, semantic, and compliant.
+
+- **OSLC + connectors add the missing links** — a standardized, discoverable interface (catalog → service providers → creation factories, query capabilities, vocabularies, shapes), discoverable by AI via **MCP**.
+- **Define adds the missing nodes** — model an absent domain and stand up a working OSLC server for it.
+- **Instantiate populates nodes and links** — removing the linking cost from the author.
+- **Activate makes the thread actionable** — gap, coverage, and impact analysis, traceability, compliance reporting, drafted proposals.
+
+> Focus is squarely the connectivity/traceability and domain-data gaps; access and actionability follow from closing them well.
+
+---
+
+# From one domain to the whole thread
+
+This is the scale-up in AAKI's ambition.
+
+- **The original frame:** a *single* domain and the *single* OSLC server behind it — `bmm-server` is one such node.
+- **The digital-thread frame:** a **collection of domains and integrated tools** — many governed nodes (some newly Defined, most existing tools exposed through OSLC connectors), woven together by the cross-domain links that make a thread.
+
+> Define / Instantiate / Activate apply at **both** scales — to build and fill one node, and to connect, populate, and query the whole. AAKI is no longer "author a domain"; it is **close the gaps in a lifecycle-spanning thread of many domains and tools.**
 
 ---
 
@@ -140,17 +139,17 @@ The result: **less effort** to Define, Instantiate, and Activate domain knowledg
 
 ---
 
-# The Define, Instantiate and Activate Strategic Framework
+# Define, Instantiate, Activate — the three moves that close the gaps
 
-Making shared meaning actionable across an enterprise requires three distinct stages:
+Turning a fragmented set of tools into a governed, semantic, actionable thread takes three distinct moves:
 
-| Stage | Purpose | Answers |
-|-------|---------|---------|
-| **1. Define** | Vocabulary governance | What kinds of things exist? How do they relate? |
-| **2. Instantiate** | Artifact creation & governance | What are the actual resources in this project? |
-| **3. Activate** | Outcomes & value delivery | What decisions can we make from this data? |
+| Stage | The gap it closes | Answers |
+|-------|-------------------|---------|
+| **1. Define** | Adds a **missing node** — vocabulary + shapes, stood up as an OSLC server | What kinds of things exist? How do they relate? |
+| **2. Instantiate** | Adds the **missing links** — populates nodes with resources and typed links | What are the actual resources, and how do they connect? |
+| **3. Activate** | Makes the thread **actionable** — analysis, traceability, decisions | What can we decide from this connected data? |
 
-This maps onto the classic **schema / instance / use** distinction from information architecture — applied to **AAKI: realized over OSLC linked data and AI-addressable knowledge stores via MCP.**
+This maps onto the classic **schema / instance / use** distinction — realized over OSLC linked data and AI-addressable via MCP.
 
 ---
 
@@ -167,21 +166,46 @@ AAKI's choice of RDF — and Turtle in particular — is no longer just an OSLC 
 
 ---
 
-# Stage 1 — Define
+# The connectivity substrate — OSLC
 
-**The meaning layer**: It establishes shared understanding before any data is created.
+Closing the *connectivity* gap needs a standard way for tools to link and be discovered:
+
+- **OSLC connectors** expose otherwise-unintegrated tools through a discoverable interface: catalog → service providers → creation factories, query capabilities, vocabularies, shapes — discoverable by AI via **MCP**.
+- **Link ownership** gives every link a home and a queryable reverse direction.
+- **Link validity** marks a link **suspect** when an endpoint changes — staleness made visible.
+- **Configuration Management** answers "which baseline?" — traceability with version context.
+
+> Without this substrate the AI has only text similarity — unsafe for engineering decisions. With it, the AI reasons over typed, governed, versioned links.
+
+---
+
+# Stage 1 — Define (add the missing node)
+
+**The meaning layer** — establishes shared understanding before any data is created, turning an absent domain into a first-class, linkable node.
 
 **Two complementary mechanisms:**
 
-- **Ontology governance** (e.g., TopBraid EDG) — stakeholder review workflows, change history, version control of the vocabulary, multi-user authoring
+- **Ontology governance** (e.g., TopBraid EDG) — stakeholder review workflows, change history, version control, multi-user authoring
 - **OSLC ResourceShapes** — formalize the vocabulary as a REST API contract: required properties, cardinality, allowed values, UI metadata for creation dialogs
 
 **Reuse first, create only for gaps:**
 
-- *Reuse* an existing ontology whenever a shared concept space (SysML, PLM, OSLC RM/QM/CM/AM, BMM, …) already covers the domain at the right abstraction. Most engineering domains land here — Define becomes a **configuration** exercise.
-- *Create* a new ontology only when no shared semantics exist for the concepts you need. Rare; reserved for genuine conceptual gaps; usually best done through a standards body so the result is shared.
+- *Reuse* a shared concept space (SysML, PLM, OSLC RM/QM/CM/AM, BMM, FIBO) whenever it already covers the domain — Define becomes a **configuration** exercise. Most engineering domains land here.
+- *Create* a new open RDF vocabulary only for a genuine conceptual gap — like business motivation, which `bmm-server` fills.
 
-**Without Stage 1:** Stage 2 produces a connected but semantically incoherent graph — links exist but mean different things in different tools.
+> Days or weeks, not months — and most of those days are configuration, not authoring.
+
+---
+
+# A note on the "ontology"
+
+Define produces an **application vocabulary + an API/validation contract** — in the lineage of W3C **SHACL** (OSLC's ResourceShape is one of its ancestors).
+
+- It **validates**, it does not **infer** — like schema.org and most production knowledge graphs.
+- **OWL-compatible, not OWL-required**: the vocabulary is plain RDF; layer OWL over it if you wish, but reasoning is never a precondition for interoperability.
+- Where an authoritative formal ontology already exists (SysML v2, ISO 15926, IOF/BFO, FIBO), Define **reuses** it as the vocabulary layer.
+
+> AAKI's contribution is closing the thread's connectivity and data gaps — which formal ontologies do not themselves address.
 
 ---
 
@@ -230,18 +254,18 @@ The ontology defines precisely how concepts connect. These typed relationships a
 
 ---
 
-# Stage 2 — Instantiate
+# Stage 2 — Instantiate (add the missing links)
 
-**The artifact layer**: Here we transition from ontology experts to **subject matter experts** in the domain.
+**The artifact layer** — the transition from ontology experts to **subject matter experts**, populating the node with resources *and the typed links between them*.
 
 **What it produces:**
 - Actual resources — requirements, plans, assessments, strategies
-- Typed links between resources
+- Typed cross-resource and cross-domain links
 - Version history and governance state (draft, approved, baselined)
 
 **Configuration management** (streams, baselines, change sets) gives this stage its temporal dimension — reasoning about "the system as of this baseline" rather than just today's snapshot.
 
-**Without Stage 2 governance:** Stage 3 can't answer versioned questions.
+> The linking cost moves off the author. The AI never delivers without approval. The incentive problem that kept the thread sparse dissolves.
 
 ---
 
@@ -285,16 +309,18 @@ Traditionally, Stage 2 was the bottleneck — entirely human-authored through fo
 
 ---
 
-# Stage 3 — Activate
+# Stage 3 — Activate (make the thread actionable)
 
-**The value layer**: Without it, Stages 1 and 2 produce a beautifully governed but unused knowledge graph.
+**The value layer** — use the connected thread to drive decisions. Without it, Stages 1 and 2 produce a beautifully governed but unused knowledge graph.
+
+Natural-language questions, cross-domain queries, "what-if" analyses, gap and coverage detection, impact analysis, compliance reports, traceability views — all over the same governed graph, with the same provenance, configuration context, and approval state.
 
 **Three activation mechanisms:**
 
 | Mechanism | Use | Example |
 |-----------|-----|---------|
-| **LQE - SPARQL/SQL** | Analytical | Traceability reports, coverage metrics, validation |
-| **MCP Endpoint** | Agentic | AI agents reasoning over live data, proposing changes |
+| **LQE — SPARQL/SQL** | Analytical | Traceability reports, coverage metrics, validation |
+| **MCP Endpoint** | Agentic | AI reasoning over live data, proposing changes |
 | **Tool Integrations** | Operational | Engineers seeing linked data in DOORS Next, EWM, Polarion |
 
 ---
@@ -343,7 +369,7 @@ This creates a virtuous cycle that didn't exist before MCP:
 
 > *"Can't we just feed all our documents to an LLM and ask it questions?"*
 
-**Yes — but AI outputs are ephemeral.** A conversation produces text, not governed artifacts.
+**Yes — but AI outputs are ephemeral.** A conversation produces text, not governed artifacts — and no links across the thread.
 
 | Concern | AI Alone | AI + OSLC Server |
 |---------|----------|-------------------|
@@ -356,28 +382,19 @@ This creates a virtuous cycle that didn't exist before MCP:
 
 ---
 
-# AI Needs Structure to Be Reliable
+# Why the governed thread makes AI reliable
 
-- **Better patterns, better results.** RDF assertions governed by ResourceShapes are consistent in expression, precisely typed, and richly linked.
+**AI needs structure to be trustworthy — the thread supplies it:**
 
-- **The ontology gives the AI a map.** Without it, the AI is a very expensive search engine that produces fluent but structurally ungrounded answers.
+- **The ontology gives the AI a map.** Without it, the AI is an expensive search engine producing fluent but structurally ungrounded answers.
+- **Explicit gaps vs. hallucination.** A gap in the model is a *visible, queryable* gap — not a fluent non-answer.
+- **Quantitative analytics.** Shape-governed data delivers precise, repeatable results for compliance reporting and impact analysis.
 
-- **Explicit gaps vs. hallucination.** The system of record forces explicit representation of what is known vs. unknown. A gap in the model is a visible, queryable gap — not a fluent non-answer.
+**And AI brings capability the system of record never had:**
 
-- **Quantitative analytics.** Ontology-structured data delivers precise, repeatable results for compliance reporting and impact analysis.
-
----
-
-# What AI Brings to the System of Record
-
-**Authoring acceleration**
-SMEs who can't write RDF or navigate complex tool UIs can now contribute their knowledge conversationally. The AI translates intent into ontology-conformant resources.
-
-**Analytical depth**
-AI can consume the entire linked data graph and perform analysis impractical for humans with queries and reports alone — identifying gaps, contradictions, and inconsistencies across hundreds of interconnected resources.
-
-**Humans in the loop**
-Ontologies provide stakeholder viewpoints — structured perspectives tailored to different roles. These keep humans meaningfully engaged, which matters because humans take responsibility for action and outcome.
+- **Authoring acceleration** — SMEs who can't write RDF contribute conversationally; the AI translates intent into ontology-conformant resources.
+- **Analytical depth** — the AI consumes the entire linked graph, finding gaps, contradictions, and inconsistencies across hundreds of interconnected resources.
+- **Humans in the loop** — stakeholder viewpoints keep humans engaged and accountable for action and outcome.
 
 ---
 
@@ -405,7 +422,7 @@ They draft vocabulary, populate instances, traverse the graph for analysis, and 
 
 # BMM Server: A Complete Working Example
 
-**Scaffolded with `create-oslc-server.ts` from the AI-authored vocabulary and shapes:**
+One node of a digital thread — the business-motivation domain, a real *data-gap* fill. **Scaffolded with `create-oslc-server.ts` from the AI-authored vocabulary and shapes:**
 
 ```bash
 npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
@@ -420,13 +437,23 @@ npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
 | **Stage 2 — Instantiate** | RDF triple store (Jena Fuseki); EU-Rent example from BMM 1.3 spec, populated by AI |
 | **Stage 3 — Activate** | OSLC REST API + MCP endpoint (34 tools) + oslc-browser UI |
 
-**Try it:** Start Fuseki, then `cd bmm-server && npm start` — server on `localhost:3005`
+> Real shapes. Real OSLC server. Real MCP endpoints. Not slide-ware.
+
+---
+
+# Why now
+
+- **RDF was built for this.** Turtle expresses *meaning*, not just structure — AI assistants are unusually fluent in it.
+- **OSLC was built for this.** Typed, governed, linked artifacts across tools is the substrate AI needs to reason reliably.
+- **AI is the missing component.** A 6-month manual integration becomes a 6-week guided collaboration; a thread nobody queried becomes one everyone queries.
+
+> Stages 1 and 2 used to be too expensive to justify Stage 3. AI changes that economics — the linking cost that kept the thread sparse moves off the author.
 
 ---
 
 # Key Takeaway
 
-**AAKI** positions ontologies and OSLC servers not as alternatives to AI, but as the infrastructure that makes AI-assisted work:
+**AAKI** positions ontologies and OSLC servers not as alternatives to AI, but as the infrastructure that makes AI-assisted work — and the digital thread itself — auditable, repeatable, governable, and interoperable.
 
 - **Auditable** — every resource has provenance and version history
 - **Repeatable** — deterministic queries on governed data, not statistical approximation
@@ -435,7 +462,7 @@ npx tsx create-oslc-server.ts --name bmm-server --port 3005 \
 
 > The OSLC server is the **system of record**.
 > The AI is the most capable **authoring and analysis tool** that system of record has ever had.
-> The ontology is what makes their collaboration **precise** rather than statistically approximate.
+> The shared vocabulary is what makes their collaboration **precise** rather than statistically approximate.
 > RDF is the **lingua franca** that lets the AI and the system of record exchange knowledge without translation loss.
 
 ---
@@ -462,7 +489,7 @@ To invoke explicitly: *"use the aaki-define / aaki-instantiate / aaki-activate s
 
 # Applying AAKI to an AI-Assisted V-Model
 
-AAKI applies not just to individual OSLC servers, but to the **entire systems engineering lifecycle**.
+AAKI applies not just to individual OSLC servers, but to the **entire systems engineering lifecycle** — the whole digital thread.
 
 ![w:700](images/v-model.png)
 
@@ -472,7 +499,7 @@ In OSLC terms, each traceability link is **typed** — the V-model's traceabilit
 
 # Three Layers of AI Assistance
 
-> *Note: "Layer 1/2/3" here refers to AI tiers in an integrated tool chain — distinct from AAKI's Stage 1/2/3 above.*
+> *These are Activate's three facets in an integrated tool chain — distinct from AAKI's Stage 1/2/3 above.*
 
 An AI assistant connected via MCP to an integrated tool chain operates at three layers:
 
@@ -517,9 +544,19 @@ This is **AAKI applied to the lifecycle**: vocabularies define valid traceabilit
 
 ---
 
-# Governance: Authority and Approval
+# What's in the thread, and who governs it
 
-Governance helps ensure we achieve intended outcomes with proper authority and approval traceability. 
+- **The V-model is what's in the thread** — motivation and portfolio at the top, down the left through requirements/architecture/design to implementation, up the right through integration/verification/validation into operation.
+- **ASPICE and ISO 26262 govern its evolution** — they sit *off to the side*, each with its **own OSLC vocabulary**, linking *into* the thread's artifacts.
+- An ASPICE process outcome or an ISO 26262 safety requirement is a **governed resource** linked to the requirements, designs, and tests it attests to.
+
+> Because criteria *and* evidence are linked data, conformance can be assessed **continuously over the live thread** — compliance becomes a confirmation, not a crisis. AAKI's job is to close the gaps; ASPICE and ISO 26262 attach to the closed thread to govern it.
+
+---
+
+# Governance: Observe / Propose / Execute
+
+Governance ensures intended outcomes with proper authority and approval traceability. The AI operates *within* OSLC access controls — it authenticates with the user's identity, and the same role-based permissions apply whether the request comes from a browser or from an AI through MCP.
 
 | Level | AI Action | Approval | Example |
 |-------|-----------|----------|---------|
@@ -527,7 +564,7 @@ Governance helps ensure we achieve intended outcomes with proper authority and a
 | **Propose** | Draft artifacts in "Draft" state | Human review required | AI-generated test cases, requirement updates |
 | **Execute** | Create links by policy | Pre-authorized | Mechanical linking: test case to requirement |
 
-The AI operates within OSLC access controls — it does not bypass governance. The AI authenticates with the user's identity; the same role-based permissions apply whether the request comes from a browser or from an AI through MCP.
+> Collaborator, not agent. The AI never bypasses governance.
 
 ---
 
@@ -551,10 +588,13 @@ The AI operates within OSLC access controls — it does not bypass governance. T
 
 # Thank You
 
+> *The digital thread's promise was traceability; its unmet need was action. AAKI uses AI assistants and OSLC to close the thread's missing links and missing nodes — then lets experts populate it and everyone query it — so the organization can Do the Right Things Right, and let ASPICE and ISO 26262 govern the thread's evolution over trustworthy, connected data.*
+
 **Resources:**
 
 - oslc4js repository: [github.com/OSLC/oslc4js](https://github.com/OSLC/oslc4js)
 - BMM Server: [oslc4js/bmm-server/](https://github.com/OSLC/oslc4js/tree/master/bmm-server)
+- AAKI Overview: [oslc4js/docs/AAKI-Overview.md](https://github.com/OSLC/oslc4js/blob/master/docs/AAKI-Overview.md)
 - AAKI framework: [oslc4js/docs/AAKI.md](https://github.com/OSLC/oslc4js/blob/master/docs/AAKI.md)
 - AAKI BMM walkthrough: [oslc4js/docs/AAKI-Example.md](https://github.com/OSLC/oslc4js/blob/master/docs/AAKI-Example.md)
 - OSLC specifications: [open-services.net](https://open-services.net)
