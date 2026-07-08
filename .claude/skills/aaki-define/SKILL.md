@@ -41,11 +41,12 @@ What stays at the **term** level is the bare minimum for identification:
 ```turtle
 <#someProperty>
   a rdf:Property ;
+  rdfs:isDefinedBy <vocabularyNamespace> ;
   rdfs:label "some property" ;
   rdfs:comment "Plain-language description of what this property represents." .
 ```
 
-**Every term — every class, property, and enumeration individual — carries `rdfs:label`, and every class and property carries `rdfs:comment`.** Use `rdfs:comment` for the term's human-readable description; do **not** use `dc11:description` (Dublin Core 1.1) or `dcterms:description` at the term level. The `dcterms:*` properties belong on the `owl:Ontology` document node (title, description, publisher, …), not on individual terms.
+**Every term — every class, property, and enumeration individual — carries `rdfs:label`, `rdfs:comment`, and `rdfs:isDefinedBy` pointing at the ontology's base URI.** (Enumeration individuals need all three too — a bare `rdfs:label` triggers a validation error once the term is associated with the ontology.) Use `rdfs:comment` for the term's human-readable description; do **not** use `dc11:description` (Dublin Core 1.1) or `dcterms:description` at the term level. The `dcterms:*` properties belong on the `owl:Ontology` document node (title, description, publisher, …), not on individual terms. See "Namespace discipline" in the authoring approach for why `rdfs:isDefinedBy` + `vann:preferredNamespaceUri` matter.
 
 What goes in the shape is the constraint for this server's API:
 
@@ -219,14 +220,15 @@ In either style, the shapes HTML must:
      -v /Users/jamsden/Developer/OSLC/oslc4js/bmm-server/config/domain/BMM.ttl \
      -s /Users/jamsden/Developer/OSLC/oslc4js/bmm-server/config/domain/BMM-Shapes.ttl
    ```
-3. The vocabulary file opens with one `owl:Ontology` declaration carrying publication metadata.
-4. The vocabulary file declares classes and properties as plain identifiers — no `rdfs:domain` or `rdfs:range` (those would invite reasoning the rest of the OSLC stack does not perform).
-5. Every property URI used in a shape exists in the vocabulary.
-6. Every link property in a shape that should support incoming-link discovery declares `oslc:inversePropertyLabel` (strongly recommended; not strictly required for shape validity).
-7. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
-8. Property names match camelCase; predicates are short verb phrases without target-type folding.
-9. The HTML renders without errors in a modern browser.
-10. Resource shape count matches the count of **instantiable** classes — supertypes and enums do not have shapes.
+3. The vocabulary file opens with one `owl:Ontology` declaration (subject = the base namespace URI, no trailing `#`) carrying publication metadata, `vann:preferredNamespacePrefix`, and `vann:preferredNamespaceUri` (the `#` form).
+4. Every term (class, property, enumeration individual) carries `rdfs:isDefinedBy <ontology-base-URI>` plus `rdfs:label` and `rdfs:comment`. Without `isDefinedBy` + `preferredNamespaceUri`, ShapeChecker floods with "subject not part of an ontology" findings.
+5. The vocabulary file declares classes and properties as plain identifiers — no `rdfs:domain` or `rdfs:range` (those would invite reasoning the rest of the OSLC stack does not perform).
+6. Every property URI used in a shape exists in the vocabulary.
+7. Every link property in a shape that should support incoming-link discovery declares `oslc:inversePropertyLabel` (strongly recommended; not strictly required for shape validity).
+8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
+9. Property names match camelCase; predicates are short verb phrases without target-type folding.
+10. The HTML renders without errors in a modern browser.
+11. Resource shape count matches the count of **instantiable** classes — supertypes and enums do not have shapes.
 
 When you finish, summarize: count of classes, link properties, literal properties, shapes, and any concepts you deliberately omitted (with a one-line rationale each).
 
@@ -238,7 +240,7 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 >
 > **Deliverables (place in `config/domain/`):**
 >
-> 1. `[Prefix].ttl` — the open RDF vocabulary. Begin with one `owl:Ontology` declaration carrying publication metadata for the vocabulary as a whole, then declare one `rdf:Class` per type and one `rdf:Property` per attribute and forward link. Use only `rdfs:label` and `rdfs:comment` on terms. **Do not** add `rdfs:domain` or `rdfs:range` to properties — leave them open so the same identifier can be reused across contexts.
+> 1. `[Prefix].ttl` — the open RDF vocabulary. Begin with one `owl:Ontology` declaration carrying publication metadata for the vocabulary as a whole (including `vann:preferredNamespaceUri`), then declare one `rdf:Class` per type and one `rdf:Property` per attribute and forward link. On each term use only `rdfs:label`, `rdfs:comment`, and `rdfs:isDefinedBy` (pointing at the ontology's base URI). **Do not** add `rdfs:domain` or `rdfs:range` to properties — leave them open so the same identifier can be reused across contexts.
 > 2. `[Prefix]-Shapes.ttl` — one `oslc:ResourceShape` per **instantiable** class, declaring how the open vocabulary is used and constrained on this server.
 > 3. `[Prefix]-vocab.html` — human-browsable rendering of the vocabulary.
 > 4. `[Prefix]-Shapes.html` — human-browsable rendering of the shapes.
@@ -256,15 +258,16 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 > @prefix vann:    <http://purl.org/vocab/vann/> .
 > ```
 >
-> **Ontology declaration (top of `[Prefix].ttl`):** declare the vocabulary's namespace URI as an `owl:Ontology` with the standard OSLC-OP publication metadata. This is document-level bookkeeping — it does not enable reasoning over instance data. Match the structure used in the OSLC-OP specs:
+> **Ontology declaration (top of `[Prefix].ttl`):** declare the vocabulary's namespace as an `owl:Ontology` with the standard OSLC-OP publication metadata. This is document-level bookkeeping — it does not enable reasoning over instance data. Identify the ontology by the **base URI without the trailing `#`** (`<[domain-namespace-URI]>`); the terms live in the `#` namespace (`[domain-namespace-URI]#…`, which is what the `[prefix]:` prefix maps to). Declare `vann:preferredNamespaceUri` (the `#` form) so tools and consumers can associate the terms with this ontology. Match the structure used in the OSLC-OP specs:
 >
 > ```turtle
-> [prefix]:
+> <[domain-namespace-URI]>
 >   a owl:Ontology ;
 >   dcterms:title "[Domain Name] Vocabulary" ;
 >   rdfs:label "[Domain Name] Vocabulary" ;
 >   dcterms:description "All vocabulary URIs defined in the [Domain Name] namespace."^^rdf:XMLLiteral ;
 >   vann:preferredNamespacePrefix "[prefix]" ;
+>   vann:preferredNamespaceUri "[domain-namespace-URI]#" ;
 >   dcterms:publisher <[publisher-URL]> ;
 >   dcterms:issued "[YYYY-MM-DD]"^^xsd:date ;
 >   dcterms:license <http://www.apache.org/licenses/LICENSE-2.0> ;
@@ -275,6 +278,12 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 > ```
 >
 > Substitute `[Domain Name]`, `[prefix]`, `[publisher-URL]`, `[YYYY-MM-DD]`, `[canonical-source-URL]`, `[spec-html-URL]`, `[version-tag]`, and `[year-or-range]` with values for the new domain. The `dcterms:license` URI may be replaced with whatever license applies to the vocabulary.
+>
+> **Namespace discipline.** Three related points that let tools (ShapeChecker, browsers, LDM) associate every term with its vocabulary — skip them and you get a flood of "subject not part of an ontology" and "unused vocabulary" findings:
+>
+> - **Ontology URI vs. term namespace.** The `owl:Ontology` subject is the base URI *without* the trailing `#` (`<[domain-namespace-URI]>`); terms are in the `#` namespace (`[domain-namespace-URI]#Term`). Declare both `vann:preferredNamespacePrefix` and `vann:preferredNamespaceUri "[domain-namespace-URI]#"`.
+> - **`rdfs:isDefinedBy` on every term.** Give each class, property, and enumeration individual `rdfs:isDefinedBy <[domain-namespace-URI]>` (pointing at the ontology's base URI). This is what ties the term to the ontology for consuming tools.
+> - **Casing.** The **prefix** is a short lowercase token (`bmm`, `oslc`, `dcterms`), by universal RDF convention. The **namespace URI**, however, is copied verbatim from the owning authority and is case-sensitive — use exactly what they publish. OMG spec namespaces use uppercase acronyms (`http://www.omg.org/spec/BMM#`, `.../SysML#`, `.../UML#`), so an uppercase `BMM` in the URI is correct and must not be lowercased; a lowercased URI would be a *different*, non-canonical namespace. Match the authority, whatever its case.
 >
 > **Naming rules:** short, domain-agnostic verb-phrase predicates. Do not fold the target type into the predicate name unless required for disambiguation between two predicates that share the verb. Predicates read as verbs (`amplifiedBy`, `quantifies`, `channelsEffortsToward`), not as nouns or relationship-record names.
 >
@@ -288,14 +297,15 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 >
 > 1. Both `.ttl` files parse successfully as Turtle (use any RDF parser: `rapper`, rdflib, Jena's `riot`, etc.).
 > 2. Run the **OSLC-OP ShapeChecker** (https://github.com/oslc-op/oslc-specs/tree/master/tools/ShapeChecker) against both files and resolve every reported issue. ShapeChecker validates that the vocabulary and shapes are well-formed against OSLC Core and that cross-references are consistent.
-> 3. The vocabulary file opens with one `owl:Ontology` declaration carrying publication metadata (title, description, publisher, issue date, license, source, version, copyright).
-> 4. The vocabulary file declares classes and properties as plain identifiers — no `rdfs:domain`/`rdfs:range` on properties.
-> 5. Every property URI used in a shape exists in the vocabulary.
-> 6. Every link property whose incoming side should be discoverable declares `oslc:inversePropertyLabel` (recommended; not strictly required).
-> 7. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
-> 8. Property names match camelCase; predicates are short verb phrases without target-type folding.
-> 9. The HTML renders cleanly.
-> 10. Resource shape count equals the count of instantiable classes — supertypes and enums do not have shapes.
+> 3. The vocabulary file opens with one `owl:Ontology` declaration (subject = base namespace URI, no trailing `#`) carrying publication metadata plus `vann:preferredNamespacePrefix` and `vann:preferredNamespaceUri` (the `#` form).
+> 4. Every term (class, property, enumeration individual) carries `rdfs:isDefinedBy <ontology-base-URI>`, `rdfs:label`, and `rdfs:comment`.
+> 5. The vocabulary file declares classes and properties as plain identifiers — no `rdfs:domain`/`rdfs:range` on properties.
+> 6. Every property URI used in a shape exists in the vocabulary.
+> 7. Every link property whose incoming side should be discoverable declares `oslc:inversePropertyLabel` (recommended; not strictly required).
+> 8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
+> 9. Property names match camelCase; predicates are short verb phrases without target-type folding.
+> 10. The HTML renders cleanly.
+> 11. Resource shape count equals the count of instantiable classes — supertypes and enums do not have shapes.
 >
 > When you finish, summarize: count of classes, link properties, literal properties, shapes, and any concepts you deliberately omitted (with a one-line rationale each).
 
@@ -327,4 +337,6 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 | Duplicating property constraints across shapes by copy-paste | Use named property nodes (`<#p-title>`) and reference them from each shape's `oslc:property` list. |
 | Designing for reasoning ("the system will infer that…") | OSLC servers don't reason. If a constraint matters at the API, encode it in the shape; if it matters as a runtime check, use SHACL alongside, but don't expect property-level inference. |
 | Vocabulary file with no `owl:Ontology` header | Add the ontology declaration block at the top with title, description, publisher, issue date, license, source, version, and copyright — match the OSLC-OP convention. It's metadata, not reasoning. |
+| Terms not associated with the ontology (ShapeChecker: "subject not part of an ontology" / "unused vocabulary") | Declare `vann:preferredNamespaceUri "<base>#"` on the ontology and `rdfs:isDefinedBy <base>` on every term. Ontology subject = base URI (no `#`); terms live in the `#` namespace. |
+| Lowercasing the namespace URI to match the prefix | Prefixes are lowercase by convention (`bmm`), but the namespace URI is case-sensitive and copied verbatim from the owning authority — OMG spec URIs use uppercase acronyms (`…/spec/BMM#`). Don't lowercase the URI. |
 | Confusing `owl:Ontology` document metadata with OWL reasoning over instances | The document declares itself an ontology only to publish its identity and provenance. OSLC servers do not run an OWL reasoner; the choice of `owl:Ontology` over (say) `rdfs:Resource` is purely conventional. |

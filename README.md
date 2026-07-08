@@ -186,6 +186,53 @@ const resource = await client.getResource('http://localhost:3005/oslc/eu-rent/re
 console.log(resource.getTitle());
 ```
 
+## MCP server — connecting an AI assistant
+
+Every `oslc-service`-based server (`bmm-server`, `mrm-server`, and servers scaffolded with `create-oslc-server`) exposes a **built-in Model Context Protocol endpoint at `/mcp`** using the [Streamable HTTP](https://modelcontextprotocol.io/docs/concepts/transports) transport. No separate process is needed — start the server and the endpoint is live (e.g., `http://localhost:3005/mcp` for `bmm-server`, `http://localhost:3002/mcp` for `mrm-server`). At startup it discovers the catalog, vocabularies, and shapes and exposes them as MCP tools, re-discovering when a new ServiceProvider is created.
+
+### Tools it provides
+
+**Global tools** — a fixed set, always available:
+
+| Tool | What it does |
+|---|---|
+| `read_catalog` | Return the ServiceProvider Catalog — every ServiceProvider with its creation factories, query capabilities, resource types, `oslc:domain` vocabularies, and `oslc:resourceShape` references. The discovery entry point. |
+| `get_resource` | Fetch any OSLC resource by URI and return all its properties (an instance, a shape, or a vocabulary). |
+| `update_resource` | Update properties on an existing resource (uses ETag for optimistic concurrency). |
+| `delete_resource` | Delete a resource by URI. |
+| `query_resources` | Query any resource type via a query-capability URL with `oslc.where` / `oslc.select` / `oslc.orderBy` (e.g. `oslc.where=rdf:type=<…>`). |
+| `list_resource_types` | List all discovered resource types with their factories and properties. |
+| `create_service_provider` | Create a new ServiceProvider (a project/scope) on the server. |
+
+**Service-provider-specific tools** — generated dynamically from each ServiceProvider's creation factories at discovery time:
+
+| Tool | What it does |
+|---|---|
+| `create_<Type>` | One per creation factory — e.g. `create_Vision`, `create_Goal`. The input schema is derived from the type's OSLC ResourceShape (property types, required fields, allowed values). |
+
+Per-type `query_<Type>` tools are intentionally **not** generated — the single `query_resources` tool with an `oslc.where=rdf:type=<…>` filter covers per-type querying. The server also exposes three read-only MCP **resources** for context: `oslc://catalog`, `oslc://vocabulary`, and `oslc://shapes`.
+
+### Adding it to Claude Code — mind the transport
+
+The embedded endpoint speaks **Streamable HTTP**, but `claude mcp add` defaults to **stdio**. You **must** pass **`--transport http`**, or Claude Code will try to launch the URL as a local command and fail:
+
+```bash
+# 1. Start the server (bmm-server listens on 3005):
+cd bmm-server && npm start
+
+# 2. Register its /mcp endpoint with Claude Code — note --transport http:
+claude mcp add --transport http bmm http://localhost:3005/mcp
+```
+
+Register each server under its own name to work across several at once, then verify with `claude mcp list`:
+
+```bash
+claude mcp add --transport http mrm http://localhost:3002/mcp
+claude mcp list
+```
+
+Once connected, `read_catalog`, the `create_<Type>` tools, and the rest are callable in a session.
+
 ## Tools
 
 ### create-oslc-server
