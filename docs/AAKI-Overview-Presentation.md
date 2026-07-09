@@ -69,26 +69,22 @@ style: |
 
 # The digital thread
 
-<div class="hook">
+Tool and domain **nodes** across the V-model, connected by **links** — the connected, traceable, queryable definition of the product across its lifecycle. AAKI's job: close its gaps (missing **data** and **links**), keep it governed, make it actionable.
 
-The Systems & Software Engineering / PLM lifecycle as the classic OSLC picture: tool and domain **nodes** — motivation, requirements, architecture, design, implementation, test — connected by **links** across the whole V-model.
+![h:400](images/AAKI-Digital-Thread.svg)
 
-That connected, traceable, queryable definition of the product *is* the **digital thread**.
-
-</div>
-
-> The promise: trace not just *how* the product was built, but *why it was the right thing to build* — end to end, across every tool.
+> The promise: **AI assistants helping close the gaps in your digital thread and make it actionable — to "Do the Right Things Right."**
 
 ---
 
 # Why it underdelivers — a graph with holes
 
-Seen as nodes and links, two gaps dominate:
+Seen as nodes and links, three gaps stand in the way:
 
 - **Missing links between nodes — the connectivity/traceability gap.** Tools are islands; linking them is manual, slow, error-prone, and decays over time. You can't reliably exchange or trace data across the thread.
 - **Missing domain nodes — the data gap.** Some information has no node at all. **Business motivation and portfolio** — *Doing the Right Things Right* — are often absent entirely.
 
-Two more follow: data is **hard to reach** (no federation → lossy data marts) and, even when complete, **inert** — it describes, it doesn't act.
+- **Ungoverned evolution — the governance & continuous-improvement gap.** A connected, populated thread only pays off if it's governed as it evolves — otherwise it stays **hard to reach** (no federation → lossy data marts), **inert**, and its conformance lives in episodic audits with no feedback loop. This is where the thread's value is ultimately realized.
 
 ---
 
@@ -98,43 +94,32 @@ Two more follow: data is **hard to reach** (no federation → lossy data marts) 
 
 **What if** an AI assistant could **add the missing nodes** (harvest a domain into a governed OSLC server in *days*, not months) …
 
-**What if** it could **add the missing links** — populating resources and the typed cross-tool links between them, *without the author hand-crafting each one* …
+**What if** it could **add the missing data and links** — populating resources and the typed cross-tool links between them, *without the author hand-crafting each one* …
 
-**What if** you could then **ask the whole connected thread** questions and act on governed, trustworthy answers?
+**What if** you could then **ask the whole connected thread** questions and act on governed, trustworthy answers …
+
+**What if** conformance to your governance regime were a **continuously-held state** over that live thread — not a report rebuilt at audit time — and the same thread showed you where to improve?
 
 </div>
 
 ---
 
-# From one domain to the whole thread
-
-<div class="hook">
-
-The original frame: a *single* domain and the *single* OSLC server behind it — `bmm-server` is one such node.
-
-The digital-thread frame: a **collection of domains and integrated tools** — many governed nodes, woven together by cross-domain links.
-
-</div>
-
-> AAKI is no longer "author a domain." It is **close the gaps in a lifecycle-spanning thread of many domains and tools** — and the same three stages apply at both scales.
-
----
-
-# The three "what ifs" are the three AAKI stages
+# The four "what ifs" are the four AAKI stages
 
 | The "what if" | AAKI stage |
 |---|---|
 | Add a missing node — harvest a domain into a governed OSLC server *fast* | **Define** — AI **configures** over existing shared vocabularies (SysML, PLM, OSLC RM/QM/CM/AM, BMM), or **drafts** a new one for a genuine gap |
-| Add the missing links — populate resources and links *without hand-crafting* | **Instantiate** — AI translates SME intent into shape-conformant resources and typed links via MCP |
+| Add the missing data and links — populate resources and links *without hand-crafting* | **Instantiate** — AI translates SME intent into shape-conformant resources and typed links via MCP |
 | Ask the connected thread and decide | **Activate** — natural-language Q&A, what-if, gap/impact analysis, compliance reporting |
+| Hold conformance to your governance regime as a *continuously-held* state, and see where to improve | **Govern** — a regime's criteria governed as OSLC data linked to their evidence; continuous conformance assessment reusing Activate's queries; AI drafts findings/ratings, humans own the rating |
 
-> **AAKI = AI Assisted Knowledge Integration.** Define, Instantiate, Activate over an OSLC linked-data thread.
+> **AAKI = AI Assisted Knowledge Integration.** Define, Instantiate, Activate, Govern over an OSLC linked-data thread.
 
 ---
 
 # AAKI at a glance
 
-![AAKI Overview — Define / Instantiate / Activate across a thread of domains, AI via MCP](AAKI-Overview.png)
+![AAKI Overview — Define / Instantiate / Activate across a thread of domains, AI via MCP](images/AAKI-Overview.png)
 
 ---
 
@@ -215,17 +200,21 @@ Same MCP protocol, same RDF substrate, different cost and scope per facet.
 
 ---
 
-# What's in the thread, and who governs it
+# Stage 4 — Govern (conformance & improvement)
 
-- **The V-model is what's in the thread** — motivation and portfolio at the top, down the left through requirements/architecture/design to implementation, up the right through integration/verification/validation into operation.
-- **ASPICE and ISO 26262 govern its evolution** — they sit *off to the side*, each with its **own OSLC vocabulary**, linking *into* the thread's artifacts.
-- An ASPICE outcome or an ISO 26262 safety requirement is a **governed resource** linked to the requirements, designs, and tests it attests to.
+The evolution layer. *Govern how the thread evolves against external criteria — reusing Activate's queries, aimed at a governance regime.* In AAKI a regime is **first-class OSLC data**, part of the thread, not documents on a shared drive:
 
-> Because criteria *and* evidence are linked data, conformance can be assessed **continuously over the live thread** — compliance becomes a confirmation, not a crisis.
+- **Criteria governed as OSLC data** — an ASPICE process outcome, an ISO 26262 safety requirement, an internal quality gate is itself a **governed, versioned resource**. Regimes are **optional and plural** — ASPICE and ISO 26262 are examples; the model is regime-agnostic (IEC 61508, DO-178C, ISO 9001, …).
+- **Linked to their evidence** — each criterion points at the requirements, designs, and tests that are its evidence in the thread.
+- **Versioned linked data → metrics over time** — because criteria *and* evidence are **versioned** linked data, conformance is assessed **over the live thread** (never reconstructed in an episodic audit), and its history yields conformance and process **metrics over time**: capability trends, recurring gap types, time-to-close. AI drafts findings/ratings/remediation under Observe-Propose-Execute; the official rating stays with an accountable human.
+
+> Compliance becomes a continuously-held state, not a crisis — and the same governed thread surfaces process-improvement signals that feed back into Define and Instantiate.
 
 ---
 
-# Governance: Observe / Propose / Execute
+# Governance discipline: Observe / Propose / Execute
+
+*This is the cross-cutting governance **discipline** — RACI, Observe-Propose-Execute, provenance — that runs across **all four** stages, not a stage itself (distinct from the Govern stage above).*
 
 The AI does not appear on the RACI chart. Three patterns let it assist without taking the wheel:
 

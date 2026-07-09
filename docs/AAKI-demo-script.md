@@ -47,7 +47,7 @@ style: |
 
 ## A live demo of Define, Instantiate, Activate against `bmm-server`
 
-A scripted walkthrough that makes the AAKI value proposition concrete. One server, three stages, three artifacts on screen, and a closing-the-loop analysis the audience can verify by URI.
+A scripted walkthrough that makes the AAKI value proposition concrete. One server, three live stages (Define, Instantiate, Activate — Govern is the fourth stage, an ongoing discipline rather than a live beat), three artifacts on screen, and a closing-the-loop analysis the audience can verify by URI.
 
 What the audience is really watching is one *node* of a digital thread get built and used: `bmm-server` is the business-motivation domain — a node the thread usually lacks — stood up from a public spec, populated, and queried live. The same Define / Instantiate / Activate moves in this demo scale from this single node to the whole OSLC-connected thread across the V-model (see [`docs/AAKI-Overview.md`](AAKI-Overview.md)).
 
@@ -76,9 +76,11 @@ Run through this 5 minutes before showtime:
 
 # What you'll see in the next 10 minutes
 
-![h:380](AAKI-Overview.png)
+![h:380](images/AAKI-Overview.png)
 
 Three beats — **Define**, **Instantiate**, **Activate** — each ~2–3 minutes, ending with a one-minute "what just happened" recap. No prep magic: every artifact you see was produced by the AI from a public spec, replayable on your own machine.
+
+> *AAKI's fourth stage, **Govern** — continuous conformance assessment and process improvement over the governed thread — is an ongoing discipline rather than a two-minute beat, so this short demo doesn't walk it live. It's regime-agnostic: ASPICE and ISO 26262 are examples, not requirements (IEC 61508, DO-178C, internal gates all fit).*
 
 ---
 

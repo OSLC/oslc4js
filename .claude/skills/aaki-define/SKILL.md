@@ -5,7 +5,7 @@ description: Use when creating or extending an OSLC domain — authoring an open
 
 # AAKI — Define stage: authoring an OSLC domain
 
-Stage 1 of AI Assisted Knowledge Integration. The pattern here applies to **any** OSLC domain (engineering, regulation, operations, business motivation, custom). Produce four artifacts so an `oslc4js`-style server can be scaffolded over them with no domain-specific application code:
+Stage 1 of AI Assisted Knowledge Integration — a four-stage framework (Define, Instantiate, Activate, Govern). The pattern here applies to **any** OSLC domain (engineering, regulation, operations, business motivation, custom). Produce four artifacts so an `oslc4js`-style server can be scaffolded over them with no domain-specific application code:
 
 1. **`<Domain>.ttl`** — the **open vocabulary**: one `rdf:Class` per type and one `rdf:Property` per attribute or forward link. Plain identifiers with `rdfs:label` and `rdfs:comment` only.
 2. **`<Domain>-Shapes.ttl`** — one `oslc:ResourceShape` per **instantiable** class, declaring how the open vocabulary is **used and constrained** in this server's REST API. This is where typing, cardinality, value spaces, and ranges live.

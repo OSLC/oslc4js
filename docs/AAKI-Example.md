@@ -2,11 +2,11 @@
 
 ## End-to-end walkthrough of AI Assisted Knowledge Integration using the OMG Business Motivation Model
 
-**Companion to [`AAKI.md`](AAKI.md).** That document lays out the abstract framework for AAKI — why the Define / Instantiate / Activate stages need each other, why AI and governed knowledge graphs are complementary, why RDF/Turtle is a deliberate fit with AI authoring, and how the pattern applies to the SSE V-model. This document grounds every claim of the framework in a concrete, reproducible walkthrough: build an OSLC server for BMM, populate it with the EU-Rent example from the spec, and activate it for AI-assisted analysis. Every step can be replayed against the `bmm-server` in this repository.
+**Companion to [`AAKI.md`](AAKI.md).** That document lays out the abstract framework for AAKI — why the Define / Instantiate / Activate / Govern stages need each other, why AI and governed knowledge graphs are complementary, why RDF/Turtle is a deliberate fit with AI authoring, and how the pattern applies to the SSE V-model. This document grounds every claim of the framework in a concrete, reproducible walkthrough: build an OSLC server for BMM, populate it with the EU-Rent example from the spec, and activate it for AI-assisted analysis. Every step can be replayed against the `bmm-server` in this repository.
 
 **Where this fits in the digital thread.** The [AAKI Overview](AAKI-Overview.md) frames the digital thread as OSLC-connected tool and domain *nodes* linked across the V-model, and names two primary gaps: missing links between nodes, and *missing domain nodes* — most often business motivation, the "why" the thread cannot otherwise trace. This walkthrough is a concrete instance of closing that **data gap**: `bmm-server` is *one node* of a broader digital thread — the business-motivation domain that was previously a missing node — stood up from a spec and made linkable, populatable, and queryable. The same Define / Instantiate / Activate moves shown here for one node scale to the whole thread.
 
-![AAKI OverviewC](AAKI-Overview.png)
+![AAKI OverviewC](images/AAKI-Overview.png)
 
 
 ---
@@ -27,13 +27,13 @@ The goal of having a BMM OSLC server is not academic. The goal is that a Strateg
 
 ---
 
-## 2. The three AAKI stages (summary)
+## 2. The four AAKI stages (summary)
 
-The three stages — Define (schema / vocabulary), Instantiate (instance authoring), Activate (outcomes and value) — are defined in detail in the companion [`AAKI.md`](AAKI.md). The short version: without Define, instances are semantically incoherent across tools; without Instantiate governance, Activate cannot answer versioned questions; without Activate, the governed graph is beautiful and unused.
+The four stages — Define (schema / vocabulary), Instantiate (instance authoring), Activate (outcomes and value), and Govern (continuous conformance and improvement over the governed thread) — are defined in detail in the companion [`AAKI.md`](AAKI.md). The short version: without Define, instances are semantically incoherent across tools; without Instantiate governance, Activate cannot answer versioned questions; without Activate, the governed graph is beautiful and unused; and without Govern, conformance is an episodic audit rather than a continuously-held state. Govern is regime-agnostic — ASPICE and ISO 26262 are examples, not the definition (IEC 61508, DO-178C, ISO 9001, and internal gates fit the same stage). This walkthrough concretely demonstrates the first three stages against `bmm-server`; Govern applies the same machinery continuously over the populated thread.
 
-![AAKI summary — Define, Instantiate, Activate stages over OSLC](DIA-Stages.png)
+![AAKI summary — Define, Instantiate, Activate stages over OSLC](images/DIA-Stages.png)
 
-Historically, Stage 2 was the slow bottleneck — subject matter experts captured knowledge in documents, integrators translated documents into OSLC instances. AI assistants change this. They participate as first-class actors in all three stages, and they're particularly fluent in RDF/Turtle — the format AAKI uses to capture meaning rather than just data structure. The rest of this document shows how, using BMM as the worked example.
+Historically, Stage 2 was the slow bottleneck — subject matter experts captured knowledge in documents, integrators translated documents into OSLC instances. AI assistants change this. They participate as first-class actors in all four stages, and they're particularly fluent in RDF/Turtle — the format AAKI uses to capture meaning rather than just data structure. The rest of this document shows how, using BMM as the worked example.
 
 ---
 
@@ -326,7 +326,7 @@ not require a expert to carefully craft a query and report from which a user wou
 
 ### "Integrated architecture, annotated with example content"
 
-**Framework claim:** The three AAKI stages form a feedback loop; AI creates in Stage 2, the server governs in Stage 1, AI analyzes in Stage 3, findings flow back into new Stage 2 resources.
+**Framework claim:** The four AAKI stages form a feedback loop; AI creates in Stage 2, the server governs in Stage 1, AI analyzes in Stage 3, findings flow back into new Stage 2 resources, and Stage 4 (Govern) continuously assesses conformance across the loop and drives its improvement.
 
 **Demonstrated:** In the BMM walkthrough:
 

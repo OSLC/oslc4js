@@ -5,7 +5,7 @@ description: Use when extracting value from a populated OSLC server — gap anal
 
 # AAKI — Activate stage: deriving value from a governed OSLC graph
 
-Stage 3 of AI Assisted Knowledge Integration. With governed instances in place, the AI traverses the cross-resource link graph to surface gaps, impacts, coverage metrics, compliance violations, and proposed actions. Output is auditable and grounded in resource URIs the user can verify.
+Stage 3 of AI Assisted Knowledge Integration — a four-stage framework (Define, Instantiate, Activate, Govern). With governed instances in place, the AI traverses the cross-resource link graph to surface gaps, impacts, coverage metrics, compliance violations, and proposed actions. Output is auditable and grounded in resource URIs the user can verify. Govern, the fourth stage, adds continuous conformance assessment and process improvement over the governed thread (AI drafts findings and ratings under Observe-Propose-Execute; humans own the official rating), and a dedicated `aaki-govern` skill may follow.
 
 Activate is the stage that makes the thread **actionable**: the AI navigates and interprets a thread — a collection of linked domains and tools — far too large for any human to hold, running gap/impact/coverage analysis, traceability, and compliance reporting over governed, linked data rather than a stale copy. See [`docs/AAKI-Overview.md`](../../../docs/AAKI-Overview.md) for the framing.
 

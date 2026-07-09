@@ -44,7 +44,7 @@ aaki:
 aaki:Stage a rdfs:Class ;
     rdfs:subClassOf oslc_am:Resource ;
     rdfs:label "Stage" ;
-    rdfs:comment "One of the three realization stages of AAKI: Define (vocabulary and shape authoring), Instantiate (population of governed artifacts and links), or Activate (extraction of value through queries, analytics, and AI-assisted decisions). Canonical instances live in the AAKI server's repository, not in this vocabulary." ;
+    rdfs:comment "One of the four realization stages of AAKI: Define (vocabulary and shape authoring), Instantiate (population of governed artifacts and links), Activate (extraction of value through queries, analytics, and AI-assisted decisions), or Govern (continuous conformance assessment and process improvement over the governed thread). Canonical instances live in the AAKI server's repository, not in this vocabulary." ;
     rdfs:isDefinedBy aaki: .
 
 aaki:Facet a rdfs:Class ;

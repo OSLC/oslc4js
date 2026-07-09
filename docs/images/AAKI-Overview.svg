@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1215" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
   <title>AAKI: AI Assisted Knowledge Integration across existing and new OSLC domains</title>
-  <desc>One-page summary of the AAKI Define / Instantiate / Activate stages, showing how an AI assistant connects via MCP and OSLC discovery to existing OSLC servers (Architecture Management, Requirements Management, Quality Management, Change Management) and new domains (BMM), and what the AI contributes at each stage.</desc>
+  <desc>One-page summary of the AAKI Define / Instantiate / Activate / Govern stages, showing how an AI assistant connects via MCP and OSLC discovery to existing OSLC servers (Architecture Management, Requirements Management, Quality Management, Change Management) and new domains (BMM), what the AI contributes at each stage, and how Stage 4 Govern continuously assesses conformance (regime-agnostic; ASPICE and ISO 26262 as examples).</desc>
 
   <defs>
     <marker id="dot" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6">
@@ -8,11 +8,11 @@
     </marker>
   </defs>
 
-  <rect width="1400" height="1000" fill="#0e0d10"/>
+  <rect width="1400" height="1215" fill="#0e0d10"/>
 
   <!-- ── Header ───────────────────────────────────────────────── -->
   <text x="700" y="50" fill="#ffffff" font-size="32" font-weight="700" text-anchor="middle">AI Assisted Knowledge Integration (AAKI)</text>
-  <text x="700" y="82" fill="#bcb6cf" font-size="17" text-anchor="middle">Define. Instantiate. Activate. Across every OSLC domain — existing and new.</text>
+  <text x="700" y="82" fill="#bcb6cf" font-size="17" text-anchor="middle">Define. Instantiate. Activate. Govern. Across every OSLC domain — existing and new.</text>
 
   <!-- ── Domain row ───────────────────────────────────────────── -->
   <!-- 5 domains: BMM (new), AM, RM, QM, CM -->
@@ -170,8 +170,31 @@
     <text x="24" y="455" fill="#bfa195" font-size="12" font-style="italic">Same OSLC links humans use; same governance trail.</text>
   </g>
 
+  <!-- ── Stage 4 — Govern (full-width band under the three cards) ── -->
+  <text x="700" y="912" fill="#8fa2b8" font-size="13" text-anchor="middle" font-style="italic">Govern — continuously assesses &amp; improves everything above</text>
+  <g transform="translate(40, 930)">
+    <rect width="1320" height="185" rx="14" fill="#1f3a4d"/>
+    <text x="24" y="37" fill="#ffffff" font-size="24" font-weight="700">Stage 4 — Govern</text>
+    <text x="24" y="62" fill="#accadd" font-size="14">Govern the thread's evolution — continuous conformance &amp; improvement. Regime-agnostic: ASPICE, ISO 26262, IEC 61508, DO-178C, … are examples, not the definition.</text>
+
+    <text x="24" y="97" fill="#ffffff" font-size="15" font-weight="700">What the AI does</text>
+    <text x="24" y="120" fill="#cfe0ea" font-size="13">• Reads a regime's criteria + the linked evidence</text>
+    <text x="24" y="141" fill="#cfe0ea" font-size="13">• Drafts findings, ratings, remediation</text>
+    <text x="24" y="162" fill="#cfe0ea" font-size="13">• Observe → Propose → Execute; human owns the rating</text>
+
+    <text x="470" y="97" fill="#ffffff" font-size="15" font-weight="700">Criteria as governed data</text>
+    <text x="470" y="120" fill="#cfe0ea" font-size="13">• Regime ontology authored via Define</text>
+    <text x="470" y="141" fill="#cfe0ea" font-size="13">• Each criterion linked to its evidence artifacts</text>
+    <text x="470" y="162" fill="#cfe0ea" font-size="13">• Assessed continuously over the live thread</text>
+
+    <text x="910" y="97" fill="#ffffff" font-size="15" font-weight="700">Output</text>
+    <text x="910" y="120" fill="#cfe0ea" font-size="13">• Conformance as a continuously-held state</text>
+    <text x="910" y="141" fill="#cfe0ea" font-size="13">  — not an episodic audit</text>
+    <text x="910" y="162" fill="#cfe0ea" font-size="13">• Improvement signals loop to Define / Instantiate</text>
+  </g>
+
   <!-- ── Bottom banner ────────────────────────────────────────── -->
-  <rect x="40" y="920" width="1320" height="60" rx="12" fill="#171419" stroke="#272328" stroke-width="1.5"/>
-  <text x="700" y="950" fill="#ffffff" font-size="17" font-weight="700" text-anchor="middle">From <tspan fill="#9d7ed8">tool integration</tspan> to <tspan fill="#f4d35e">knowledge integration</tspan> — same OSLC contract, same MCP integration, every domain.</text>
-  <text x="700" y="971" fill="#9a9a9a" font-size="13" text-anchor="middle" font-style="italic">Existing tools (ELM, MID's genOSLC connectors) and new domains (BMM) participate identically — no client-side per-domain adapters.</text>
+  <rect x="40" y="1135" width="1320" height="60" rx="12" fill="#171419" stroke="#272328" stroke-width="1.5"/>
+  <text x="700" y="1165" fill="#ffffff" font-size="17" font-weight="700" text-anchor="middle">From <tspan fill="#9d7ed8">tool integration</tspan> to <tspan fill="#f4d35e">knowledge integration</tspan> — same OSLC contract, same MCP integration, every domain.</text>
+  <text x="700" y="1186" fill="#9a9a9a" font-size="13" text-anchor="middle" font-style="italic">Existing tools (ELM, MID's genOSLC connectors) and new domains (BMM) participate identically — no client-side per-domain adapters.</text>
 </svg>

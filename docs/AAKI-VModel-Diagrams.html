@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AAKI &times; V-Model — Define · Instantiate · Activate</title>
+<title>AAKI &times; V-Model — Define · Instantiate · Activate · Govern</title>
 <style>
   :root{
     --ink:#1c2733; --muted:#5b6b7b; --line:#d7dee6; --bg:#ffffff;
@@ -37,7 +37,7 @@
 <div class="wrap">
 
   <h1>AAKI in the Systems &amp; Software Engineering V-Model</h1>
-  <p class="sub">AI Assisted Knowledge Integration — <b>Define</b>, <b>Instantiate</b>, <b>Activate</b> — over a governed, versioned, configuration-aware OSLC system of record.</p>
+  <p class="sub">AI Assisted Knowledge Integration — <b>Define</b>, <b>Instantiate</b>, <b>Activate</b>, <b>Govern</b> — over a governed, versioned, configuration-aware OSLC system of record.</p>
 
   <div class="legend">
     <span><i class="dot" style="background:var(--define)"></i> Define (vocabulary + shapes)</span>
@@ -48,7 +48,7 @@
 
   <!-- ============================================================= -->
   <h2>1 &nbsp;The AAKI pipeline — from documents to a governed knowledge graph</h2>
-  <p class="lead">The three stages turn source knowledge into a system of record. The AI assistant collaborates at every stage but never owns a decision — outputs land in a <span class="pill" style="color:var(--gov)">Propose</span> state for a named human to approve. Inputs that <b>define meaning</b> (left) are deliberately separated from inputs that <b>populate instances</b> (right of the server).</p>
+  <p class="lead">The four AAKI stages turn source knowledge into a system of record — the three shown here (Define, Instantiate, Activate) plus <b>Govern</b>, the continuous conformance-and-improvement stage over the governed thread (AI drafts findings and ratings under Observe-Propose-Execute; a named human owns the official rating; regime-agnostic — ASPICE and ISO&nbsp;26262 are examples, not the definition). The AI assistant collaborates at every stage but never owns a decision — outputs land in a <span class="pill" style="color:var(--gov)">Propose</span> state for a named human to approve. Inputs that <b>define meaning</b> (left) are deliberately separated from inputs that <b>populate instances</b> (right of the server).</p>
   <div class="card">
     <pre class="mermaid">
 flowchart LR
@@ -157,7 +157,7 @@ flowchart LR
 
   <!-- ============================================================= -->
   <h2>3 &nbsp;AAKI mapped onto the V-model — the traceability graph</h2>
-  <p class="lead">In the V-model every left-side artifact carries a verification obligation to a right-side artifact. In OSLC terms each <b>&#8596;</b> is a <i>typed link</i> (<code>oslc_rm:validatedBy</code>, <code>oslc_qm:validatesRequirement</code>…). The V is not a document — it is a live link graph. AAKI's three stages <b>define</b> what valid traceability looks like, <b>instantiate</b> the artifacts and links, and <b>activate</b> the graph for decisions.</p>
+  <p class="lead">In the V-model every left-side artifact carries a verification obligation to a right-side artifact. In OSLC terms each <b>&#8596;</b> is a <i>typed link</i> (<code>oslc_rm:validatedBy</code>, <code>oslc_qm:validatesRequirement</code>…). The V is not a document — it is a live link graph. AAKI's four stages <b>define</b> what valid traceability looks like, <b>instantiate</b> the artifacts and links, <b>activate</b> the graph for decisions, and <b>govern</b> the thread's evolution through continuous conformance assessment.</p>
   <div class="card">
     <pre class="mermaid">
 flowchart TB
@@ -240,8 +240,8 @@ flowchart TB
   <p class="key"><b>Mapping to AAKI:</b> Layer 1 &asymp; Activate within one tool silo; Layer 2 &asymp; Instantiate + Activate across tools; Layer 3 &asymp; Activate across the enterprise. Same governance, same provenance, same RDF substrate — different cost and scope per layer.</p>
 
   <!-- ============================================================= -->
-  <h2>5 &nbsp;Governing the assistant: skills, rules &amp; agents per ASPICE</h2>
-  <p class="lead">The workspace ships three Claude skills (one per AAKI stage) plus governance rules that keep the AI a <b>collaborator, not an agent on the RACI chart</b>. Authority is graded Observe &rarr; Propose &rarr; Execute, and every AI action is attributed to a named human via provenance — which is exactly what an ASPICE / ISO&nbsp;26262 audit needs to see.</p>
+  <h2>5 &nbsp;Governing the assistant: skills, rules &amp; agents for your compliance regime</h2>
+  <p class="lead">This is the cross-cutting governance <i>discipline</i> — RACI, Observe-Propose-Execute, provenance — that runs through all four stages, distinct from the <b>Govern</b> stage it underpins. The workspace ships Claude skills (one per AAKI stage) plus governance rules that keep the AI a <b>collaborator, not an agent on the RACI chart</b>. Authority is graded Observe &rarr; Propose &rarr; Execute, and every AI action is attributed to a named human via provenance — which is exactly what a compliance audit needs to see. The regime is optional and plural: ASPICE and ISO&nbsp;26262 are examples, not the definition (IEC&nbsp;61508, DO-178C, ISO&nbsp;9001, and internal gates fit the same provenance).</p>
   <div class="card">
     <pre class="mermaid">
 flowchart LR
@@ -267,7 +267,7 @@ flowchart LR
   end
 
   AIA(["AI assistant"]):::gov
-  ASPICE["ASPICE / ISO 26262<br/><i>process &amp; safety compliance</i>"]:::act
+  ASPICE["Compliance regime (examples)<br/><i>ASPICE &middot; ISO 26262 &middot; IEC 61508 &middot; DO-178C &hellip;</i>"]:::act
   PROV["Provenance: dcterms:creator,<br/>created, approval state, config context"]:::ins
 
   SKILLS --> AIA
@@ -283,7 +283,7 @@ flowchart LR
   class SK1,SK2,SK3,RC,RR,RX,OBS,PRO,EXE sk;
     </pre>
   </div>
-  <p class="key"><b>The point:</b> skills tell the assistant <i>how</i> to do each stage the same way every time; rules and authority levels keep a human Responsible and Accountable; provenance makes the AI's contribution itself auditable and queryable — so the lifecycle stays ASPICE-conformant rather than "the AI said so."</p>
+  <p class="key"><b>The point:</b> skills tell the assistant <i>how</i> to do each stage the same way every time; rules and authority levels keep a human Responsible and Accountable; provenance makes the AI's contribution itself auditable and queryable — so the lifecycle stays conformant to whatever regime applies (ASPICE, ISO&nbsp;26262, and others are examples) rather than "the AI said so."</p>
 
   <footer>
     Generated from the AAKI material in <code>docs/AAKI.md</code>, <code>docs/AAKI-Overview.md</code>,

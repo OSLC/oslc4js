@@ -80,8 +80,8 @@
 
   <!-- ===== OVERARCHING AI ROLE across Instantiate & Activate ===== -->
   <g>
-    <rect x="205" y="498" width="650" height="34" rx="17" fill="#eef7f4" stroke="#1a7f6b" stroke-width="1.5"/>
-    <text x="530" y="519" text-anchor="middle" font-size="12" fill="#12604f">AI assists across Instantiate &amp; Activate — explore → propose → execute, under human governance</text>
+    <rect x="180" y="498" width="700" height="34" rx="17" fill="#eef7f4" stroke="#1a7f6b" stroke-width="1.5"/>
+    <text x="530" y="519" text-anchor="middle" font-size="12" fill="#12604f">AI assists across Instantiate, Activate &amp; Govern — explore → propose → execute, under human governance</text>
   </g>
 
   <!-- ===== LEGEND ===== -->

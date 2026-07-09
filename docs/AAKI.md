@@ -1,6 +1,6 @@
-# AI Assisted Knowledge Integration: Define, Instantiate, Activate
+# AI Assisted Knowledge Integration: Define, Instantiate, Activate, Govern
 
-**AI Assisted Knowledge Integration (AAKI)** is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI assisted authoring and analysis, and linked-data infrastructure. AAKI is realized in three stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions) — over OSLC linked data and AI-addressable knowledge stores via MCP.
+**AI Assisted Knowledge Integration (AAKI)** is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI assisted authoring and analysis, and linked-data infrastructure. AAKI is realized in four stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions), and **Govern** (continuous conformance and improvement of the thread against whatever governance regimes apply) — over OSLC linked data and AI-addressable knowledge stores via MCP.
 
 Framed at lifecycle scale, AAKI's purpose is to **close the gaps in the digital thread**. Picture the Systems & Software Engineering / PLM lifecycle as the classic OSLC diagram: tool and domain **nodes** — business motivation, requirements, architecture, design, implementation, test and verification, change and configuration management — connected by **links** that let data be exchanged and traced across the whole V-model. That connected, traceable, queryable record of the product across its lifecycle is the digital thread, and it has underdelivered for years for reasons that come into focus once it is viewed as a graph. Two of those reasons are AAKI's primary target — **missing links between nodes** (the connectivity/traceability gap) and **missing domain nodes** (the domain-data gap) — with **access** (federation, provenance) and **actionability** (populating and querying the thread) following once those two are closed. Define, Instantiate, and Activate are the moves that close them. The [`AAKI-Overview.md`](AAKI-Overview.md) narrative develops this digital-thread framing for stakeholders; this document is the deep treatment.
 
@@ -13,12 +13,14 @@ For additional information on how oslc4js helps address the three ontology barri
 
 ### The customer challenge
 
-The promise of the digital thread — a connected, traceable, queryable definition of the product across the whole V-model — has underdelivered for years. Viewed as a graph of nodes and links, the reasons resolve into four gaps; the first two are AAKI's primary target.
+The promise of the digital thread — a connected, traceable, queryable definition of the product across the whole V-model — has underdelivered for years. Viewed as a graph of nodes and links, the reasons resolve into three gaps:
 
 - **Missing links between nodes — the connectivity/traceability gap.** The tools covering the V-model are islands. Even where a link is *possible*, creating it is manual, slow, expensive, and error-prone, so it mostly doesn't happen; and when links do exist they decay as their endpoints change, while without configuration context "which version?" is ambiguous. The result is a thread you cannot reliably exchange data over or trace across.
 - **Missing domain nodes — the data gap.** Some information the organization needs has no node at all. **Business motivation and portfolio management** — *Doing the Right Things Right* — are frequently absent entirely, so the thread can trace *how* something was built but not *why it was the right thing to build*. Standing up a new domain and a tool to support it has historically been slow and specialized.
-- **Access — the connected data is hard to reach and hard to trust.** Data is scattered across servers with no federation, so organizations copy it into lossy data marts — or push everything into one tool that tries to do everything and does each thing poorly. And people act only on data whose provenance — author, currency, system-of-record vs. copy — they can see.
-- **Actionability — a complete, connected thread is still inert.** Populating the thread and extracting value from it have been manual, and the *author* pays the linking cost while the *analyst* reaps the benefit — so the thread stays sparse and unused.
+- **Ungoverned, un-improving evolution — the governance & continuous-improvement gap.** Even once the nodes and links exist, the thread delivers value only if it can be reached, acted on, and governed as it evolves — and this is where the value is ultimately realized. Three things typically block it:
+  - **Hard to reach.** Data is scattered across servers with no federation, so organizations copy it into lossy data marts — or push everything into one over-broad tool that does each thing poorly — and people act only on data whose provenance (author, currency, system-of-record vs. copy) they can see.
+  - **Inert.** Populating the thread and extracting value from it have been manual, and the *author* pays the linking cost while the *analyst* reaps the benefit, so the thread stays sparse and unused.
+  - **Ungoverned.** Conformance to the process and safety regimes the work is held to lives *outside* the thread — in documents and spreadsheets, reconstructed in episodic audits — with no feedback loop, so the thread never drives the continuous conformance and improvement that turns a connected record into sustained value.
 
 Underneath the thread, each individual domain node carries its own long-standing challenges — the reason building out even a *single* node has been costly. These are the same gaps seen from the practitioner's side:
 
@@ -28,13 +30,13 @@ Underneath the thread, each individual domain node carries its own long-standing
 
 3. **Extracting value from captured information is mostly manual.** Stakeholder views and reports help, but the impact analyses, gap detection, traceability assessments, and decision support the data should enable still get done by hand — slowly, inconsistently, and often not at all.
 
-These node-level challenges map cleanly onto AAKI's three stages at a single node — Define, Instantiate, Activate. The digital-thread lens adds the *between-node* dimension — connecting the nodes and reaching across them — that no single tool addresses.
+These node-level challenges map cleanly onto AAKI's stages at a single node — Define, Instantiate, Activate. The digital-thread lens adds the *between-node* dimension — connecting the nodes and reaching across them, then governing how the whole evolves (Govern) — that no single tool addresses.
 
 ### The proposed solution
 
-**AAKI closes these gaps with AI assistants over an OSLC substrate.** OSLC connectors expose otherwise-unintegrated tools through a standardized, discoverable interface — supplying the missing links, with clear ownership, validity, and configuration context — while the three stages build and fill the thread: **Define** adds a missing node (authoring, or more often reusing, a shared vocabulary and shapes and standing up an OSLC server for it), **Instantiate** populates nodes and the typed links between them (moving the linking cost off the author), and **Activate** turns the governed graph into decisions, queries, traceability, and agent actions. AI assistants participate as first-class collaborators at every stage: drafting vocabulary and shapes from source documents, translating SME intent into shape-conformant resources, and analyzing the populated graph to surface gaps and propose actions. The same three moves apply at both scales — building and filling a single domain node, and connecting, populating, and querying the whole thread of domains and tools. The OSLC server is the system of record that makes this auditable, versionable, and interoperable; the AI is the most capable authoring and analysis tool that system of record has ever had.
+**AAKI closes these gaps with AI assistants over an OSLC substrate.** OSLC connectors expose otherwise-unintegrated tools through a standardized, discoverable interface — supplying the missing links, with clear ownership, validity, and configuration context — while the four stages build, fill, use, and govern the thread: **Define** adds a missing node (authoring, or more often reusing, a shared vocabulary and shapes and standing up an OSLC server for it), **Instantiate** populates nodes and the typed links between them (moving the linking cost off the author), **Activate** turns the governed graph into decisions, queries, traceability, and agent actions, and **Govern** holds the thread conformant to whatever governance regimes apply (e.g. ASPICE, ISO 26262) and drives improvement. AI assistants participate as first-class collaborators at every stage: drafting vocabulary and shapes from source documents, translating SME intent into shape-conformant resources, and analyzing the populated graph to surface gaps and propose actions. The same moves apply at both scales — building, filling, and using a single domain node, and connecting, populating, querying, and governing the whole thread of domains and tools. The OSLC server is the system of record that makes this auditable, versionable, and interoperable; the AI is the most capable authoring and analysis tool that system of record has ever had.
 
-![AAKI Overview](AAKI-Overview.png)
+![AAKI Overview](images/AAKI-Overview.png)
 
 **oslc4js** is a concrete reference implementation of AAKI. The `bmm-server` (OMG Business Motivation Model) and `mrm-server` (MISA Municipal Reference Model) demonstrate every AAKI stage end-to-end against real domain ontologies — proving the framework works in practice.
 
@@ -43,17 +45,18 @@ These node-level challenges map cleanly onto AAKI's three stages at a single nod
 When integration is framed as AAKI, the conversation moves up the abstraction stack. We are no longer focused on the low-level topics — tool adaptors, selection dialogs, link creation, RDF resource representations — that have historically dominated lifecycle-tool integration. Instead the discussion is about a governed, semantic digital thread: shared vocabularies and shapes serving as the contract; AI and humans authoring, integrating, and analyzing information across the connected nodes; the governed graph providing versioning, traceability, and provenance as architectural side effects. The thread becomes something people *act on*, not just something they maintain. And because both criteria and evidence can live in the thread as linked data, compliance frameworks such as **ASPICE** and **ISO 26262** attach from the side — each with its own OSLC vocabulary, linking into the artifacts it governs — so conformance can be held continuously rather than reconstructed in an episodic audit. This reduces the effort required to Define, Instantiate, and Activate domain knowledge across the thread and lets a much wider set of stakeholders use that knowledge to drive effective, timely action.
 
 
-## The Define, Instantiate and Activate Strategic Framework
+## The Define, Instantiate, Activate, Govern Strategic Framework
 
-To make shared meaning actionable across an enterprise, AAKI proposes three realization stages:
+To make shared meaning actionable across an enterprise — and keep it that way — AAKI proposes four realization stages:
 
 1. **Define** shared meaning (vocabulary governance)
-2. **Instantiate** governed artifacts that embody that meaning (instances)
+2. **Instantiate** governed artifacts that embody that meaning (instances and links)
 3. **Activate** those artifacts to achieve outcomes (value delivery)
+4. **Govern** the thread's evolution (continuous conformance and improvement)
 
-These three stages map almost perfectly onto a well-understood problem in information systems architecture — the classic schema / instance / use distinction — but applied specifically to the OSLC linked data ecosystem and extended with AI as a first-class collaborator. Each stage has a distinct technical character and distinct failure modes when it's missing.
+The first three map almost perfectly onto a well-understood problem in information systems architecture — the classic schema / instance / use distinction — applied to the OSLC linked data ecosystem and extended with AI as a first-class collaborator. **Govern** adds the fourth dimension the digital thread demands: not just building and using the thread, but governing how it evolves against whatever governance regimes apply — process, safety, quality, or regulatory (ASPICE and ISO 26262 are common examples, but the model is regime-agnostic). Each stage has a distinct technical character and distinct failure modes when it's missing. (The Govern *stage* — the conformance-and-improvement activity — is distinct from the governance *discipline* of RACI, Observe-Propose-Execute, and provenance, which is cross-cutting and keeps all four stages accountable.)
 
-![AAKI summary — Define, Instantiate, Activate stages over OSLC](DIA-Stages.png)
+![AAKI summary — Define, Instantiate, Activate, Govern stages over OSLC](images/DIA-Stages.png)
 
 
 ## Stage 1 — Define (schema / vocabulary)
@@ -105,6 +108,14 @@ LQE / LQE rs reporting tools handle **analytical use** — cross-domain SPARQL o
 The MCP endpoint handles **agentic use** — AI tools consuming live structured data to reason, draft, propose changes, or execute multi-step workflows. This closes a loop: AI helps create instances in Stage 2, and then AI consumes the resulting data graph in Stage 3 to derive insight and propose further action. That's a feedback loop that didn't exist before MCP.
 
 Tool integrations handle **operational use** — engineers in DOORS Next, Rhapsody, EWM, or Polarion seeing linked data from other tools inline in their native environment. The V-model traceability (left side requirements → right side verification) is realized here through the OSLC link ecosystem and OSLC-OP LDM-based incoming link discovery.
+
+## Stage 4 — Govern (conformance and continuous improvement)
+
+This is the governance layer over the thread's *evolution*. It answers: is the thread — and the product it describes — conformant to the governance regimes we are held to, and where should we improve? Process, safety, quality, and regulatory regimes define how the work must be performed and evidenced — Automotive SPICE (ASPICE) and ISO 26262 are common examples, but the model is regime-agnostic and fits any such standard (IEC 61508, DO-178C, ISO 9001, …) or an organization's own governance policy. Govern captures the applicable regime's criteria as **governed OSLC data**, links each criterion to the thread artifacts that are its evidence, and runs **continuous conformance assessment** over the live thread rather than reconstructing it in an episodic audit.
+
+The AI + MCP dimension applies here too, under the same collaboration model: an MCP-connected AI reads the criteria and the linked evidence and drafts findings, ratings, and remediation — under Observe-Propose-Execute, with the official assessment rating reserved for an accountable human. Because criteria *and* evidence are both linked data, conformance shifts from a periodic crisis to a continuously-held state; and the same governed thread surfaces systemic process-improvement signals over time (capability trends, recurring gap types, time-to-close), closing the improvement loop back into Define and Instantiate.
+
+Govern reuses Stage 3's query and analysis capabilities but is aimed at a different outcome — governing the thread's evolution against external criteria and feeding improvement back, rather than answering ad-hoc questions. Keep it distinct from the governance *discipline* (RACI, Observe-Propose-Execute, provenance), which is not a stage but the cross-cutting way every stage stays accountable. The **Continuous ASPICE** initiative is one worked realization of Stage 4 — for the ASPICE regime specifically: a Define-authored ASPICE ontology holds the conformance criteria as governed data, the existing engineering artifacts serve as linked evidence, and a specialized assessment plugin performs the evaluation under Observe-Propose-Execute. Any other regime plugs in the same way — Define its criteria ontology, link the evidence, assess continuously.
 
 ## What makes AAKI architecturally significant
 
@@ -208,7 +219,7 @@ The V-model is *what is in the thread* — the connected, versioned record of th
 
 ### Three layers of AI assistance
 
-> **Note on terminology.** This section uses "Layer 1/2/3" in a *different* sense than AAKI's Stage 1/2/3 above. AAKI's stages describe the practice (Define, Instantiate, Activate). The layers below describe AI tiers within an integrated tool chain (Tool-local, Integration, Analytics). Both numbering schemes are kept because each is a familiar idiom in its own community; the table at the end of this section maps between them.
+> **Note on terminology.** This section uses "Layer 1/2/3" in a *different* sense than AAKI's Stage 1/2/3 above. AAKI's stages describe the practice (Define, Instantiate, Activate, Govern). The layers below describe AI tiers within an integrated tool chain (Tool-local, Integration, Analytics). Both numbering schemes are kept because each is a familiar idiom in its own community; the table at the end of this section maps between them.
 
 An AI assistant connected via MCP to an integrated tool chain has access to three distinct layers, each corresponding to a different scope of concern and level of authority.
 

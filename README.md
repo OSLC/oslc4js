@@ -6,7 +6,7 @@ oslc4js is a concrete implementation of **AI Assisted Knowledge Integration (AAK
 
 ## AI Assisted Knowledge Integration (AAKI)
 
-**AI Assisted Knowledge Integration (AAKI)** is the practice of using AI assistants over an OSLC linked-data substrate to close the gaps in an organization's **digital thread** — the connected, traceable, queryable definition of a product across its whole lifecycle, modeled as tool and domain **nodes** joined by typed **links** across the V-model. AAKI is realized in three stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions) — over OSLC linked data and AI-addressable knowledge stores via MCP, and it applies at two scales: building and filling a single domain node, and connecting, populating, and querying the whole collection of nodes that make up the thread.
+**AI Assisted Knowledge Integration (AAKI)** is the practice of using AI assistants over an OSLC linked-data substrate to close the gaps in an organization's **digital thread** — the connected, traceable, queryable definition of a product across its whole lifecycle, modeled as tool and domain **nodes** joined by typed **links** across the V-model. AAKI is realized in four stages — **Define** (vocabulary and shapes), **Instantiate** (governed artifacts and links), **Activate** (decisions, queries, and agent actions), and **Govern** (govern the thread's evolution — continuous conformance assessment and process improvement against whatever governance regimes apply, e.g. ASPICE, ISO 26262, IEC 61508, or internal quality gates) — over OSLC linked data and AI-addressable knowledge stores via MCP, and it applies at two scales: building and filling a single domain node, and connecting, populating, and querying the whole collection of nodes that make up the thread.
 
 ### The customer challenge
 
@@ -25,19 +25,19 @@ Underneath the thread, each individual domain node carries its own long-standing
 
 3. **Extracting value from captured information is mostly manual.** Stakeholder views and reports help, but the impact analyses, gap detection, traceability assessments, and decision support the data should enable still get done by hand — slowly, inconsistently, and often not at all.
 
-These domain-level challenges are real and map cleanly onto AAKI's three stages at a single node. The digital-thread lens adds the *between-node* dimension — connecting the nodes and reaching across them — that no single tool addresses.
+These domain-level challenges are real and map cleanly onto AAKI's first three stages at a single node. The digital-thread lens adds the *between-node* dimension — connecting the nodes and reaching across them — that no single tool addresses; and a fourth stage, **Govern**, holds the assembled thread to whatever governance regimes apply as it evolves.
 
 ### The proposed solution
 
-**AAKI** closes these gaps with AI assistants over an OSLC substrate. OSLC connectors expose otherwise-unintegrated tools through a standardized, discoverable interface — supplying the missing links with clear ownership, validity, and configuration context — while the three AAKI stages build and fill the thread: **Define** adds a missing node (authoring, or more often reusing, a shared vocabulary and shapes and standing up an OSLC server for it), **Instantiate** populates nodes and the typed links between them (moving the linking cost off the author), and **Activate** turns the governed graph into decisions, queries, traceability, and agent actions. AI assistants participate as first-class collaborators at every stage: drafting vocabulary and shapes from source documents, translating SME intent into shape-conformant resources, and analyzing the populated graph to surface gaps and propose actions. The same three moves apply to one node and to the whole thread of connected domains and tools. The OSLC server is the system of record that makes this auditable, versionable, and interoperable; the AI is the most capable authoring and analysis tool that system of record has ever had.
+**AAKI** closes these gaps with AI assistants over an OSLC substrate. OSLC connectors expose otherwise-unintegrated tools through a standardized, discoverable interface — supplying the missing links with clear ownership, validity, and configuration context — while the four AAKI stages build, fill, use, and govern the thread: **Define** adds a missing node (authoring, or more often reusing, a shared vocabulary and shapes and standing up an OSLC server for it), **Instantiate** populates nodes and the typed links between them (moving the linking cost off the author), **Activate** turns the governed graph into decisions, queries, traceability, and agent actions, and **Govern** governs the thread's *evolution* — capturing an applicable governance regime's criteria as governed OSLC data, linking each criterion to the thread artifacts that are its evidence, and running continuous conformance assessment so conformance becomes a continuously-held state rather than an episodic audit, while the same thread surfaces process-improvement signals. Governance regimes are optional and plural — ASPICE, ISO 26262, IEC 61508, DO-178C, ISO 9001, internal quality gates — and the model is regime-agnostic. AI assistants participate as first-class collaborators at every stage: drafting vocabulary and shapes from source documents, translating SME intent into shape-conformant resources, analyzing the populated graph to surface gaps and propose actions, and drafting conformance findings, ratings, and remediation under Observe-Propose-Execute (the official rating stays with an accountable human). The same four moves apply to one node and to the whole thread of connected domains and tools. The OSLC server is the system of record that makes this auditable, versionable, and interoperable; the AI is the most capable authoring and analysis tool that system of record has ever had.
 
-![AAKI Overview](docs/AAKI-Overview.png)
+![AAKI Overview](docs/images/AAKI-Overview.png)
 
 **oslc4js** is a concrete reference implementation of AAKI. The [`bmm-server`](bmm-server/) (OMG Business Motivation Model) and [`mrm-server`](mrm-server/) (MISA Municipal Reference Model) demonstrate every AAKI stage end-to-end against real domain ontologies.
 
 ### The business value
 
-When integration is framed as AAKI, the conversation moves up the abstraction stack. We are no longer focused on the low-level topics — tool adaptors, selection dialogs, link creation, RDF resource representations — that have historically dominated lifecycle-tool integration. Instead the discussion is about a governed, semantic digital thread: shared vocabularies and shapes serving as the contract; AI and humans authoring, integrating, and analyzing information across the connected nodes; the governed graph providing versioning, traceability, and provenance as architectural side effects. The thread becomes something people *act on*, not just something they maintain. And because both criteria and evidence can live in the thread as linked data, compliance frameworks such as **ASPICE** and **ISO 26262** attach from the side — each with its own OSLC vocabulary, linking into the artifacts it governs — so conformance can be held continuously rather than reconstructed in an episodic audit. This reduces the effort required to Define, Instantiate, and Activate domain knowledge across the thread — and, more importantly, it lets a much wider set of stakeholders use that knowledge to drive effective, timely action.
+When integration is framed as AAKI, the conversation moves up the abstraction stack. We are no longer focused on the low-level topics — tool adaptors, selection dialogs, link creation, RDF resource representations — that have historically dominated lifecycle-tool integration. Instead the discussion is about a governed, semantic digital thread: shared vocabularies and shapes serving as the contract; AI and humans authoring, integrating, and analyzing information across the connected nodes; the governed graph providing versioning, traceability, and provenance as architectural side effects. The thread becomes something people *act on*, not just something they maintain. And because both criteria and evidence can live in the thread as linked data, the **Govern** stage holds the thread to whatever governance regimes apply — common examples are **ASPICE** and **ISO 26262**, but the model is regime-agnostic (IEC 61508, DO-178C, ISO 9001, internal quality gates, …) — each regime with its own OSLC vocabulary, linking into the artifacts it governs, so conformance is held continuously rather than reconstructed in an episodic audit. This reduces the effort required to Define, Instantiate, Activate, and Govern domain knowledge across the thread — and, more importantly, it lets a much wider set of stakeholders use that knowledge to drive effective, timely action.
 
 ## Documentation
 
@@ -45,8 +45,8 @@ The architectural framework, walkthroughs, and presentations live in [`docs/`](d
 
 | Document | What it covers |
 |----------|----------------|
-| [docs/AAKI-Overview.md](docs/AAKI-Overview.md) | **Start here — AAKI overview** — the digital thread and why it underdelivers (missing links, missing nodes), how AI assistants + Define/Instantiate/Activate + OSLC close the gaps, and where ASPICE / ISO 26262 attach to govern; sets context for the demo |
-| [docs/AAKI.md](docs/AAKI.md) | **AAKI framework** — Define, Instantiate, Activate stages; why ontologies and OSLC matter in the age of AI; RDF/Turtle as a knowledge representation; applying AAKI to an AI-Assisted V-Model |
+| [docs/AAKI-Overview.md](docs/AAKI-Overview.md) | **Start here — AAKI overview** — the digital thread and why it underdelivers (missing links, missing nodes), how AI assistants + Define/Instantiate/Activate/Govern + OSLC close the gaps and govern the thread's evolution (ASPICE / ISO 26262 as example regimes); sets context for the demo |
+| [docs/AAKI.md](docs/AAKI.md) | **AAKI framework** — Define, Instantiate, Activate, Govern stages; why ontologies and OSLC matter in the age of AI; RDF/Turtle as a knowledge representation; applying AAKI to an AI-Assisted V-Model |
 | [docs/AAKI-Example.md](docs/AAKI-Example.md) | **End-to-end BMM walkthrough** — building `bmm-server` from the OMG Business Motivation Model, populating it with the EU-Rent example via MCP, running gap-analysis prompts; every step is reproducible |
 | [docs/AAKI-demo-script.md](docs/AAKI-demo-script.md) | **10-minute live demo script** — Define, Instantiate, and Activate run live against the running `bmm-server` |
 | [docs/AAKI-vs-GraphRAG.md](docs/AAKI-vs-GraphRAG.md) | **AAKI vs. GraphRAG** — governed system of record + digital thread vs. a derived retrieval index; side-by-side comparison, a critical look at AAKI's gaps, and why the two are complementary |
@@ -60,7 +60,7 @@ The architectural framework, walkthroughs, and presentations live in [`docs/`](d
 
 ## Authoring skills
 
-This workspace ships three Claude Code skills under `.claude/skills/` (linked individually below) — one per AAKI stage — so AI assistants helping with this codebase use the same conventions consistently.
+This workspace ships three Claude Code skills under `.claude/skills/` (linked individually below) — one for each of the first three AAKI stages — so AI assistants helping with this codebase use the same conventions consistently.
 
 | Skill | Use when... |
 |---|---|
@@ -69,6 +69,8 @@ This workspace ships three Claude Code skills under `.claude/skills/` (linked in
 | [aaki-activate](.claude/skills/aaki-activate/SKILL.md) | extracting value from a populated server (gap/impact/coverage analysis, Observe-Propose-Execute proposals) |
 
 Claude Code picks these up automatically when the description matches your request. To invoke one explicitly, say *"use the aaki-define / aaki-instantiate / aaki-activate skill"*.
+
+**Govern** is AAKI's fourth stage — continuous conformance assessment and process improvement over the thread's evolution against whatever governance regimes apply. It is not yet backed by a dedicated skill; one may follow.
 
 ## Modules
 

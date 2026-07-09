@@ -5,7 +5,7 @@ description: Use when populating an OSLC server with instances via MCP — trans
 
 # AAKI — Instantiate stage: populating an OSLC server via MCP
 
-Stage 2 of AI Assisted Knowledge Integration. The AI reads a source document and creates governed, linked artifacts directly through the OSLC server's MCP endpoint. The server validates against the shapes defined in Stage 1; the typed link graph that emerges is the system of record.
+Stage 2 of AI Assisted Knowledge Integration — a four-stage framework (Define, Instantiate, Activate, Govern). The AI reads a source document and creates governed, linked artifacts directly through the OSLC server's MCP endpoint. The server validates against the shapes defined in Stage 1; the typed link graph that emerges is the system of record.
 
 Instantiate is the stage that **closes the connectivity gap and populates the nodes** of the digital thread: the AI adds both the resources and the typed cross-resource/cross-tool **links** the thread was missing, removing the linking cost from the author who otherwise pays it. It operates at both scales — filling a single domain node, and weaving the links across the whole collection of domains and tools that make up the thread. See [`docs/AAKI-Overview.md`](../../../docs/AAKI-Overview.md) for the framing.
 

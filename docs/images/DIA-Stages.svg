@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
-  <title>AAKI — Define, Instantiate, Activate</title>
-  <desc>The three AAKI realization stages over OSLC linked-data infrastructure: Stage 1 Define (vocabulary/shapes/domain vocabs), Stage 2 Instantiate (OSLC server, AI+MCP authoring, configuration management), Stage 3 Activate (LQE analytics, MCP endpoint, tool integrations), with OSLC as the cross-cutting integration layer spanning all three.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title>AAKI — Define, Instantiate, Activate, Govern</title>
+  <desc>The four AAKI realization stages over OSLC linked-data infrastructure: Stage 1 Define (vocabulary/shapes/domain vocabs), Stage 2 Instantiate (OSLC server, AI+MCP authoring, configuration management), Stage 3 Activate (LQE analytics, MCP endpoint, tool integrations), Stage 4 Govern (conformance criteria as OSLC data, continuous assessment, process improvement — regime-agnostic, ASPICE/ISO 26262 as examples), with OSLC as the cross-cutting integration layer spanning all four.</desc>
 
-  <rect width="800" height="900" fill="#0e0d10"/>
+  <rect width="800" height="1150" fill="#0e0d10"/>
 
   <!-- ── Stage 1 — Define ─────────────────────────────────────── -->
   <rect x="20" y="20" width="760" height="200" rx="14" fill="#332758"/>
@@ -77,8 +77,34 @@
     <text x="16" y="58" fill="#e6cdc0" font-size="13">ELM, Polarion, Rhapsody</text>
   </g>
 
+  <!-- governs & improves → -->
+  <text x="400" y="775" fill="#888" font-size="14" text-anchor="middle" font-style="italic">governs &amp; improves</text>
+  <path d="M 400 782 L 400 802" stroke="#888" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 392 794 L 400 804 L 408 794" stroke="#888" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ── Stage 4 — Govern ─────────────────────────────────────── -->
+  <rect x="20" y="815" width="760" height="200" rx="14" fill="#1f3a4d"/>
+  <text x="40" y="850" fill="#ffffff" font-size="24" font-weight="700">Stage 4 — govern evolution</text>
+  <text x="40" y="875" fill="#accadd" font-size="14">Continuous conformance &amp; improvement — regime-agnostic (ASPICE, ISO 26262, …)</text>
+
+  <g transform="translate(40, 900)">
+    <rect width="230" height="100" rx="8" fill="#2b5570"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">Conformance criteria</text>
+    <text x="16" y="58" fill="#cfe0ea" font-size="13">Regime ontology as OSLC data</text>
+  </g>
+  <g transform="translate(285, 900)">
+    <rect width="230" height="100" rx="8" fill="#2b5570"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">Continuous assessment</text>
+    <text x="16" y="58" fill="#cfe0ea" font-size="13">AI drafts findings; human rates</text>
+  </g>
+  <g transform="translate(530, 900)">
+    <rect width="230" height="100" rx="8" fill="#2b5570"/>
+    <text x="16" y="30" fill="#ffffff" font-size="16" font-weight="700">Process improvement</text>
+    <text x="16" y="58" fill="#cfe0ea" font-size="13">Trends, gaps, time-to-close</text>
+  </g>
+
   <!-- ── Bottom strip — OSLC integration layer ────────────────── -->
-  <rect x="20" y="780" width="760" height="100" rx="14" fill="#171419" stroke="#272328" stroke-width="1.5"/>
-  <text x="400" y="820" fill="#ffffff" font-size="18" font-weight="700" text-anchor="middle">OSLC — the integration layer spanning all three</text>
-  <text x="400" y="850" fill="#9a9a9a" font-size="14" text-anchor="middle">LDP · ResourceShapes · TRS · Config · Link Discovery · SPARQL</text>
+  <rect x="20" y="1045" width="760" height="90" rx="14" fill="#171419" stroke="#272328" stroke-width="1.5"/>
+  <text x="400" y="1082" fill="#ffffff" font-size="18" font-weight="700" text-anchor="middle">OSLC — the integration layer spanning all four</text>
+  <text x="400" y="1110" fill="#9a9a9a" font-size="14" text-anchor="middle">LDP · ResourceShapes · TRS · Config · Link Discovery · SPARQL</text>
 </svg>

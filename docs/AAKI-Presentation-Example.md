@@ -66,7 +66,7 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 - AAKI at a glance
 - The Problem BMM Lets Us Tell
 - Why BMM Is the Right Lens
-- The Three AAKI Stages
+- The Four AAKI Stages
 - Define — Authoring with AI
 - Define — Our Shape Extensions
 - Define — `create-oslc-server.ts`
@@ -87,7 +87,7 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 
 # AAKI at a glance
 
-![h:580](AAKI-Overview.png)
+![h:580](images/AAKI-Overview.png)
 
 ---
 
@@ -115,15 +115,16 @@ The detailed worked example for this deck — every shape fragment, prompt, and 
 
 ---
 
-# The Three AAKI Stages
+# The Four AAKI Stages
 
 | Stage | Answers | What's new with AI |
 |---|---|---|
 | **Define** — schema | What kinds of things exist, how they relate, what UI metadata drives authoring | AI authors vocabulary + shapes (in Turtle, fluently) from spec documents |
 | **Instantiate** — artifacts | What are the actual Visions, Goals, Strategies in this organization | AI populates through MCP, translating SME intent into shape-conformant resources |
 | **Activate** — value | What decisions, reports, analyses, and agent actions the data enables | AI queries the governed graph for gaps, summaries, proposed actions — with humans in the governance loop |
+| **Govern** — evolution | Whether the thread stays conformant to the governance regimes we're held to (e.g. ASPICE, ISO 26262 — regime-agnostic), and where to improve | AI drafts findings, ratings, and remediation under Observe-Propose-Execute; humans own the official rating |
 
-![h:200px](DIA-Stages.png)
+![h:200px](images/DIA-Stages.png)
 
 > *RDF/Turtle is unusually well-suited to AI workflows — it captures meaning, not structure. AI assistants produce and consume Turtle as fluently as prose.*
 
@@ -453,7 +454,7 @@ None of these changed OSLC Core or the RDF model. Each earns its place by removi
 
 # AAKI Stages — BMM Annotated
 
-![h:240px](DIA-Stages.png)
+![h:240px](images/DIA-Stages.png)
 
 - **Define** — Claude authored `BMM.ttl` (25 classes, 49 properties), `BMM-Shapes.ttl` (14 shapes, 38 link properties with inverse metadata), `BMM-Shapes.html` — from the OMG spec. Zero domain code.
 - **Instantiate** — Claude populated **72 linked EU-Rent resources** via MCP in a single session: 1 Vision, 4 Goals, 1 Mission, 3 Strategies, 5 Tactics, 5 Policies, 6 Rules, 20 Influencers, 6 Assessments, …
@@ -480,7 +481,7 @@ Full V-model scenario is beyond this walkthrough — a natural extension of the 
 # Key Takeaways
 
 1. **The shape is the constraining contract.** Define it with AI help. Every operational surface — REST, UI, LDM, MCP — follows.
-2. **AI participates in all three AAKI stages.** Authoring (Define), population (Instantiate), analysis (Activate). Humans stay in the governance loop where it matters.
+2. **AI participates in all four AAKI stages.** Authoring (Define), population (Instantiate), analysis (Activate), and continuous conformance + improvement (Govern). Humans stay in the governance loop where it matters.
 3. **Small extensions, large consequences.** Embedded MCP + LDM `/discover-links` + shape inverse metadata together make OSLC an AI-addressable knowledge integration substrate — the technical realization of AAKI.
 4. **Structure and AI are complementary.** The system of record supplies auditability, persistence, interoperability, governance. The AI supplies authoring speed and analytical depth.
 5. **BMM is the demo; the pattern generalizes.** Any ontology expressible as RDF + shapes works the same way.

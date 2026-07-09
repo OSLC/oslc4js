@@ -40,7 +40,7 @@ style: |
 
 ## Making Domain Knowledge Accessible with OSLC and AI
 
-A platform for defining, instantiating, and activating standard domain models
+A platform for defining, instantiating, activating, and governing standard domain models
 
 ---
 
@@ -79,15 +79,16 @@ The people who **can build ontologies** don't have the domain expertise.
 
 # AI Assisted Knowledge Integration
 
-AI Assisted Knowledge Integration (AAKI) is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI assisted authoring and analysis, and linked-data infrastructure. AAKI is realized in three stages over OSLC linked data and AI-addressable knowledge stores via MCP.
+AI Assisted Knowledge Integration (AAKI) is the practice of making domain knowledge actionable across an enterprise by combining governed ontologies, AI assisted authoring and analysis, and linked-data infrastructure. AAKI is realized in four stages over OSLC linked data and AI-addressable knowledge stores via MCP.
 
 | Stage | Question it answers | Character |
 |---|---|---|
 | **1. Define** | What kinds of things exist? What properties and relationships do they have? | Schema / vocabulary governance |
 | **2. Instantiate** | What are the actual artifacts — requirements, services, processes — their content, links, and governance state? | Instance creation and management |
 | **3. Activate** | What decisions, compliance evidence, analyses, and actions can we derive from the governed data? | Value delivery and outcomes |
+| **4. Govern** | Is the thread still conformant as it evolves, and how do we improve it? | Continuous conformance and process improvement |
 
-This maps onto the classic *schema / instance / use* distinction from information architecture — applied to **AAKI: realized over OSLC linked data and AI-addressable knowledge stores via MCP.**
+The first three map onto the classic *schema / instance / use* distinction from information architecture, with **Govern** adding continuous oversight of the whole — applied to **AAKI: realized over OSLC linked data and AI-addressable knowledge stores via MCP.** Govern is regime-agnostic: ASPICE and ISO 26262 are examples, not the definition.
 
 ---
 
@@ -100,6 +101,8 @@ Most OSLC deployments invest heavily in Stage 2 (tools, adapters, data migration
 - **Without Stage 2 governance** (versioning, configuration management) — Stage 3 can't answer versioned questions. All you get is a snapshot of today's state.
 
 - **Without Stage 3** (Activate) — Stages 1 and 2 produce a beautifully governed but *unused* knowledge graph. The classic ontology project failure mode.
+
+- **Without Stage 4** (Govern) — conformance is assessed only in episodic audits, so the thread drifts out of conformance between reviews instead of being held conformant continuously as it evolves.
 
 > The three barriers that follow are concrete manifestations of gaps in these stages.
 
@@ -115,6 +118,8 @@ Most OSLC deployments invest heavily in Stage 2 (tools, adapters, data migration
 - *Analytical* — SPARQL/LQE queries and reports for traceability, compliance, coverage
 - *Agentic* — MCP endpoint lets AI reason over live data and propose actions
 - *Operational* — Tool integrations surface linked data inline in native environments
+
+**Stage 4 — Govern:** Continuous conformance assessment and process improvement over the governed thread. The AI drafts findings and ratings under Observe → Propose → Execute; a named human owns the official rating. Regime-agnostic — ASPICE, ISO 26262, IEC 61508, DO-178C, ISO 9001, or internal gates.
 
 ---
 
@@ -144,7 +149,7 @@ This requires a **rare combination** of ontology expertise + full-stack developm
 
 OMG defined the Business Motivation Model:
 
-![BMM Overview w:400 h:350](BMM-overview.png)
+![BMM Overview w:400 h:350](images/BMM-overview.png)
 
 with rich relationships between them. But building a **tool** to manage them? That was a separate, expensive project.
 
@@ -371,7 +376,7 @@ Each layer is reusable. Swap storage, add a domain, connect a new consumer — t
 
 ---
 
-# The Pattern: Define — Instantiate — Activate
+# The Pattern: Define — Instantiate — Activate — Govern
 
 **Define** your domain:
 1. Write a vocabulary (the terms and relationships of your domain)
@@ -389,6 +394,10 @@ Each layer is reusable. Swap storage, add a domain, connect a new consumer — t
 7. Point oslc-mcp-server at it — AI queries and reasons over live data
 8. Connect other tools — linked data across the enterprise
 
+**Govern** its evolution:
+
+9. Continuously assess conformance and drive improvement over the governed thread — AI drafts findings and ratings; a human owns the official rating (ASPICE, ISO 26262, and other regimes are examples)
+
 Other domains this fits: systems and software engineering, IT service management, regulatory compliance, ISO 26262 safety, healthcare workflows, engineering lifecycle, enterprise architecture...
 
 ---
@@ -400,6 +409,8 @@ Other domains this fits: systems and software engineering, IT service management
 | **Define** | Creating models is too hard | Declarative vocabularies, shapes, and catalog templates | Domain experts describe, platform builds |
 | **Instantiate** | Connecting domains requires subject matter expertise across domains | OSLC linked data + discovery protocol + AI via MCP | Link by URI, discover automatically, AI creates and links |
 | **Activate** | Consuming requires specialized skills | oslc-browser + MCP + SPARQL/LQE | Anyone browses; AI populates and answers; tools integrate |
+
+> **Govern** — continuous conformance over the governed thread — is AAKI's fourth stage; it spans all three layers rather than mapping to a single barrier.
 
 ---
 
