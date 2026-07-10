@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bmm-server" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/fs-storage-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/github-server" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/jena-storage-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ldp-app" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ldp-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/mongodb-storage-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/mrm-server" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/oslc-browser" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/oslc-client" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/oslc-mcp-server" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/oslc-server" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/oslc-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/storage-service" vcs="Git" />
+  </component>
+</project>
