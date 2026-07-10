@@ -4,18 +4,47 @@
 
 Framed at lifecycle scale, AAKI's purpose is to **close the gaps in the digital thread**. Picture the Systems & Software Engineering / PLM lifecycle as the classic OSLC diagram: tool and domain **nodes** — business motivation, requirements, architecture, design, implementation, test and verification, change and configuration management — connected by **links** that let data be exchanged and traced across the whole V-model. That connected, traceable, queryable record of the product across its lifecycle is the digital thread, and it has underdelivered for years for reasons that come into focus once it is viewed as a graph. Two of those reasons are AAKI's primary target — **missing links between nodes** (the connectivity/traceability gap) and **missing domain nodes** (the domain-data gap) — with **access** (federation, provenance) and **actionability** (populating and querying the thread) following once those two are closed. Define, Instantiate, and Activate are the moves that close them. The [`AAKI-Overview.md`](AAKI-Overview.md) narrative develops this digital-thread framing for stakeholders; this document is the deep treatment.
 
+![The digital thread as OSLC-connected nodes across the V-model — with missing links (connectivity gap), a missing domain node (data gap), and governance regimes (e.g. ASPICE, ISO 26262) linking in from the side](images/AAKI-Digital-Thread.svg)
+
+## Contents
+
+- [Challenge Brief](#challenge-brief)
+  - [The customer challenge](#the-customer-challenge)
+  - [The proposed solution](#the-proposed-solution)
+  - [The business value](#the-business-value)
+- [The Define, Instantiate, Activate, Govern Strategic Framework](#the-define-instantiate-activate-govern-strategic-framework)
+- [Stage 1 — Define](#stage-1--define-schema--vocabulary)
+  - [Reuse first; create only for genuine gaps](#reuse-first-create-only-for-genuine-gaps)
+  - [RDF as knowledge representation in the age of AI](#rdf-as-knowledge-representation-in-the-age-of-ai)
+  - [Meaning without the reasoning overhead — OWL-compatible, not OWL-required](#meaning-without-the-reasoning-overhead--owl-compatible-not-owl-required)
+- [Stage 2 — Instantiate](#stage-2--instantiate-instance-creation-and-governance)
+- [Stage 3 — Activate](#stage-3--activate-outcomes-and-value)
+  - [Three facets of activation](#three-facets-of-activation)
+  - [The V-model as the link graph Activate reasons over](#the-v-model-as-the-link-graph-activate-reasons-over)
+  - [A worked example: a requirements change, end to end](#a-worked-example-a-requirements-change-end-to-end)
+- [Stage 4 — Govern](#stage-4--govern-conformance-and-continuous-improvement)
+- [What makes AAKI architecturally significant](#what-makes-aaki-architecturally-significant)
+- [Why ontologies and OSLC servers still matter in the age of AI](#why-ontologies-and-oslc-servers-still-matter-in-the-age-of-ai)
+  - [AI needs structure to be reliable](#ai-needs-structure-to-be-reliable)
+  - [The system of record problem](#the-system-of-record-problem)
+  - [What AI brings to the system of record](#what-ai-brings-to-the-system-of-record)
+  - [Precision where it matters](#precision-where-it-matters)
+  - [Collaborators, not agents on the RACI chart](#collaborators-not-agents-on-the-raci-chart)
+  - [The integrated architecture](#the-integrated-architecture)
+- [Authoring skills for AAKI](#authoring-skills-for-aaki)
+
 ## Challenge Brief
 
-The following sections summarize challenges around establishing an  d using shared information, how AAKI addresses these challenges, and what value users could expect to achieve using AAKI.
+The following sections summarize challenges around establishing and using shared information, how AAKI addresses these challenges, and what value users could expect to achieve using AAKI.
 
-For additional information on how oslc4js helps address the three ontology barriers (creating ontology-based models, connecting domains, and creating/consuming model data) — see [`oslc4js-stakeholder-presentation.md`](oslc4js-stakeholder-presentation.md). The [`AAKI-Example.md`](AAKI-Example.md) companion grounds the framework in a concrete walkthrough using the OMG Business Motivation Model (BMM).
+For additional information on how oslc4js helps address three common ontology barriers (creating ontology-based models, connecting domains, and creating/consuming model data) — see [`oslc4js-stakeholder-presentation.md`](oslc4js-stakeholder-presentation.md). The [`AAKI-Example.md`](AAKI-Example.md) companion grounds the framework in a concrete walkthrough using the OMG Business Motivation Model (BMM).
 
 
 ### The customer challenge
 
-The promise of the digital thread — a connected, traceable, queryable definition of the product across the whole V-model — has underdelivered for years. Viewed as a graph of nodes and links, the reasons resolve into three gaps:
+Organizations understand the digital thread — a connected, traceable, queryable definition of the product across the whole V-model — but experience challenges in realizing that value. Viewed as a graph of nodes and links as shown above, the reasons resolve into three primary gaps:
 
-- **Missing links between nodes — the connectivity/traceability gap.** The tools covering the V-model are islands. Even where a link is *possible*, creating it is manual, slow, expensive, and error-prone, so it mostly doesn't happen; and when links do exist they decay as their endpoints change, while without configuration context "which version?" is ambiguous. The result is a thread you cannot reliably exchange data over or trace across.
+- **Missing links between nodes — the connectivity/traceability gap.** The tools covering the V-model are often islands. Even where a link is *possible*, creating it is manual, slow, expensive, and error-prone, so it often doesn't happen; and when links do exist they decay as their endpoints change, while without configuration context "which version?" is ambiguous. The result is a thread you cannot reliably exchange data over or trace across.
 - **Missing domain nodes — the data gap.** Some information the organization needs has no node at all. **Business motivation and portfolio management** — *Doing the Right Things Right* — are frequently absent entirely, so the thread can trace *how* something was built but not *why it was the right thing to build*. Standing up a new domain and a tool to support it has historically been slow and specialized.
 - **Ungoverned, un-improving evolution — the governance & continuous-improvement gap.** Even once the nodes and links exist, the thread delivers value only if it can be reached, acted on, and governed as it evolves — and this is where the value is ultimately realized. Three things typically block it:
   - **Hard to reach.** Data is scattered across servers with no federation, so organizations copy it into lossy data marts — or push everything into one over-broad tool that does each thing poorly — and people act only on data whose provenance (author, currency, system-of-record vs. copy) they can see.
@@ -34,7 +63,14 @@ These node-level challenges map cleanly onto AAKI's stages at a single node — 
 
 ### The proposed solution
 
-**AAKI closes these gaps with AI assistants over an OSLC substrate.** OSLC connectors expose otherwise-unintegrated tools through a standardized, discoverable interface — supplying the missing links, with clear ownership, validity, and configuration context — while the four stages build, fill, use, and govern the thread: **Define** adds a missing node (authoring, or more often reusing, a shared vocabulary and shapes and standing up an OSLC server for it), **Instantiate** populates nodes and the typed links between them (moving the linking cost off the author), **Activate** turns the governed graph into decisions, queries, traceability, and agent actions, and **Govern** holds the thread conformant to whatever governance regimes apply (e.g. ASPICE, ISO 26262) and drives improvement. AI assistants participate as first-class collaborators at every stage: drafting vocabulary and shapes from source documents, translating SME intent into shape-conformant resources, and analyzing the populated graph to surface gaps and propose actions. The same moves apply at both scales — building, filling, and using a single domain node, and connecting, populating, querying, and governing the whole thread of domains and tools. The OSLC server is the system of record that makes this auditable, versionable, and interoperable; the AI is the most capable authoring and analysis tool that system of record has ever had.
+**AAKI closes these gaps with AI assistants over an OSLC substrate.** OSLC connectors expose otherwise-unintegrated tools through a standardized, discoverable interface — supplying the missing links with clear ownership, validity, and configuration context — while the four stages build, fill, use, and govern the thread:
+
+1. **Define** adds a missing node — authoring, or more often reusing, a shared vocabulary and shapes, and standing up an OSLC server for it.
+2. **Instantiate** populates nodes and the typed links between them, moving the linking cost off the author.
+3. **Activate** turns the governed graph into decisions, queries, traceability, and agent actions.
+4. **Govern** holds the thread conformant to whatever governance regimes apply (e.g. ASPICE, ISO 26262) and drives improvement.
+
+AI assistants participate as first-class collaborators at every stage: drafting vocabulary and shapes from source documents, translating SME intent into shape-conformant resources, analyzing the populated graph to surface gaps and propose actions, and drafting conformance findings under Observe-Propose-Execute. The same moves apply at both scales — building, filling, and using a single domain node, and connecting, populating, querying, and governing the whole thread of domains and tools. The OSLC server is the system of record that makes this auditable, versionable, and interoperable; the AI is the most capable authoring and analysis tool that system of record has ever had.
 
 ![AAKI Overview](images/AAKI-Overview.png)
 
@@ -49,14 +85,15 @@ When integration is framed as AAKI, the conversation moves up the abstraction st
 
 To make shared meaning actionable across an enterprise — and keep it that way — AAKI proposes four realization stages:
 
-1. **Define** shared meaning (vocabulary governance)
-2. **Instantiate** governed artifacts that embody that meaning (instances and links)
+1. **Define** shared meaning (vocabulary governance) where information is missinig
+2. **Instantiate** create and update governed artifacts that embody that meaning (instances and links)
 3. **Activate** those artifacts to achieve outcomes (value delivery)
 4. **Govern** the thread's evolution (continuous conformance and improvement)
 
 The first three map almost perfectly onto a well-understood problem in information systems architecture — the classic schema / instance / use distinction — applied to the OSLC linked data ecosystem and extended with AI as a first-class collaborator. **Govern** adds the fourth dimension the digital thread demands: not just building and using the thread, but governing how it evolves against whatever governance regimes apply — process, safety, quality, or regulatory (ASPICE and ISO 26262 are common examples, but the model is regime-agnostic). Each stage has a distinct technical character and distinct failure modes when it's missing. (The Govern *stage* — the conformance-and-improvement activity — is distinct from the governance *discipline* of RACI, Observe-Propose-Execute, and provenance, which is cross-cutting and keeps all four stages accountable.)
 
-![AAKI summary — Define, Instantiate, Activate, Govern stages over OSLC](images/DIA-Stages.png)
+<img src="images/DIA-Stages.png" alt="AAKI summary — Define, Instantiate, Activate, Govern stages over OSLC" width="450">
+
 
 
 ## Stage 1 — Define (schema / vocabulary)
@@ -99,15 +136,53 @@ Configuration management (GCM, streams, baselines) is what gives Stage 2 its tem
 
 ## Stage 3 — Activate (outcomes and value)
 
-This is the value layer. It answers: what decisions can we make, what compliance evidence can we generate, what analyses can we run, and what actions can AI agents take — all based on the governed, versioned, linked data that Stages 1 and 2 have built up.
+This is the value layer. It answers: what decisions can we make, what compliance evidence can we generate, what analyses can we run, and what actions can AI agents take — all over the governed, versioned, linked data that Define and Instantiate have built up. Without Activate, the first two stages produce a beautifully governed but unused graph.
 
-The three mechanisms cover the full spectrum of how this stage manifests:
+### Three facets of activation
 
-LQE / LQE rs reporting tools handle **analytical use** — cross-domain SPARQL or SQL queries that answer traceability questions, compliance reports, coverage metrics, impact analysis, and SHACL that assesses data validation. This is fundamentally a read-only, human-interpreted output.
+An AI assistant connected through MCP operates at three facets — different lenses on the same governed graph, each suited to a different scope and level of authority. (These are facets *of Activate*; the fourth stage, Govern, is a stage, not a fourth facet.)
 
-The MCP endpoint handles **agentic use** — AI tools consuming live structured data to reason, draft, propose changes, or execute multi-step workflows. This closes a loop: AI helps create instances in Stage 2, and then AI consumes the resulting data graph in Stage 3 to derive insight and propose further action. That's a feedback loop that didn't exist before MCP.
+- **Tool-local** — AI assistance within a single tool's own vocabulary: a requirements tool like DOORS Next improving requirement quality against authoring guidelines, or a test tool like ETM improving test-case authoring. Efficient, but semantically bounded by what one tool knows.
+- **Integration** — the cross-tool link graph, where OSLC's value meets AI most directly. An OSLC server (oslc4js, or MID's genOSLC connectors) exposes an MCP endpoint giving the AI read/write access to the typed links spanning tools, so it can answer questions no single tool can: *"Which requirements lack test cases?"*, *"What is the impact of changing this interface on downstream verification?"*, *"Are all hazards traced to mitigations?"* Without typed, governed links the AI has only text similarity — unreliable for engineering decisions.
+- **Analytics** — a materialized, indexed view of the whole lifecycle (e.g., ELM Lifecycle Query Engine replicating many tools via OSLC Tracked Resource Sets). The AI queries a pre-replicated dataset with SPARQL/SQL rather than chasing live links, making compliance reporting, gap analysis, and broad impact analysis practical at scale.
 
-Tool integrations handle **operational use** — engineers in DOORS Next, Rhapsody, EWM, or Polarion seeing linked data from other tools inline in their native environment. The V-model traceability (left side requirements → right side verification) is realized here through the OSLC link ecosystem and OSLC-OP LDM-based incoming link discovery.
+### The V-model as the link graph Activate reasons over
+
+The systems-engineering V-model makes this concrete: every left-side artifact carries a traceability obligation to a right-side artifact.
+
+```
+Stakeholder Needs ←————————————→ Acceptance Tests
+  System Requirements ←——————————→ System Tests
+    Subsystem Requirements ←————→ Integration Tests
+      Component Requirements ←——→ Unit Tests
+              Detailed Design
+                   ↓
+              Implementation
+```
+
+In OSLC terms, each `←→` is a typed link — `oslc_rm:validatedBy`, `oslc_qm:validatesRequirement`, and so on. The V-model's traceability is not a document or a report; it is a **live link graph** spanning DOORS Next, ETM, EWM, Rhapsody, and whatever other tools participate — the system of record for traceability, and exactly the substrate Activate queries and reasons over.
+
+### A worked example: a requirements change, end to end
+
+Activate is easiest to see in motion. A **systems engineer receives a change request** and uses an AAKI assistant to analyze and respond to it: a performance threshold on a safety-critical interface must tighten from 100 ms to 50 ms. The assistant works across the three facets.
+
+**Phase 1 — Impact discovery (analytics).** The AI queries the materialized graph (LQE) for the full downstream impact — expensive as live traversals, cheap over the replicated dataset:
+
+- which subsystem and component requirements decompose from this system requirement (downward trace);
+- which system, integration, and unit tests validate it and its decompositions (left-to-right trace);
+- which design elements and implementation components realize it (left-to-bottom trace);
+- which other requirements share dependencies with the affected components (lateral impact);
+- the current verification status of every affected test case.
+
+It produces a structured impact report — artifact URIs with typed relationships and states — and quantifies it: *"3 subsystem requirements, 12 component requirements, 8 test cases (2 passing, 3 draft, 3 not yet created), and 4 EWM work items affected."*
+
+**Phase 2 — Triage and planning (integration).** The AI shifts to the live link graph. For each affected artifact it traverses OSLC links to assess what must happen: reading each existing test case via ETM and flagging which need updating for the new threshold; checking whether performance allocations must change at subsystem and component level; and surfacing pre-existing coverage gaps (a subsystem requirement with no integration test, say) that the change makes urgent. It proposes an action plan — specific cross-tool changes, each linked to the originating change request, with rationale.
+
+**Phase 3 — Assisted authoring (tool-local).** For each approved action the AI uses the tool-specific endpoints: ETM drafts updated test procedures incorporating the 50 ms threshold; DOORS Next proposes revised subsystem requirements with new performance allocations; EWM creates change-request work items linked to the originating change. Every draft lands in a reviewable state for a human to approve.
+
+**Phase 4 — Verification (back to analytics).** After the reviewed changes are made, the AI re-queries LQE to confirm structural integrity: are all affected requirements now traced to updated tests, were any new gaps introduced, what is the updated coverage ratio? That closes the loop — and feeds the Govern stage, which re-assesses conformance over the now-updated thread.
+
+> Every step lands as a governed, attributed artifact — not a chat message — so the engineer's response to the change request is auditable end to end.
 
 ## Stage 4 — Govern (conformance and continuous improvement)
 
@@ -117,19 +192,30 @@ The AI + MCP dimension applies here too, under the same collaboration model: an 
 
 Govern reuses Stage 3's query and analysis capabilities but is aimed at a different outcome — governing the thread's evolution against external criteria and feeding improvement back, rather than answering ad-hoc questions. Keep it distinct from the governance *discipline* (RACI, Observe-Propose-Execute, provenance), which is not a stage but the cross-cutting way every stage stays accountable. The **Continuous ASPICE** initiative is one worked realization of Stage 4 — for the ASPICE regime specifically: a Define-authored ASPICE ontology holds the conformance criteria as governed data, the existing engineering artifacts serve as linked evidence, and a specialized assessment plugin performs the evaluation under Observe-Propose-Execute. Any other regime plugs in the same way — Define its criteria ontology, link the evidence, assess continuously.
 
+Because criteria and evidence are versioned linked data, Govern also makes improvement **measurable over time** — the analytics facet computes before-and-after metrics that gauge the *engineering process*, not the AI:
+
+- **Coverage ratio** — requirement-to-test traceability before and after a change.
+- **Gap-closure rate** — gaps resolved per cycle.
+- **Change-propagation completeness** — share of downstream artifacts updated within a window after an upstream change.
+- **Consistency scores** — SHACL validation of the link graph against the V-model's structural rules (e.g., every system requirement has at least one system test).
+- **Cycle time** — requirement change to verified traceability closure, versus the manual baseline.
+
+Governance sets targets on these (for example, "traceability coverage must exceed 95% at each V-model level before milestone review") and the analytics facet measures against them continuously.
+
 ## What makes AAKI architecturally significant
 
-The reason this is worth articulating carefully is that it exposes where many OSLC deployments struggle in practice. They typically invest heavily in Stage 2 (tool procurement, OSLC adapters, data migration) without adequately investing in Stage 1 (limited shared vocabulary governance — each tool team defines their own property URIs ad hoc) and without a coherent Stage 3 strategy (reports exist but don't directly address business questions).
+The reason this is worth articulating carefully is that it exposes where many OSLC deployments struggle in practice. They typically over-invest in **Instantiate** (tool procurement, OSLC adapters, data migration) while under-investing in **Define** (limited shared-vocabulary governance — each tool team defines its own property URIs ad hoc), lacking a coherent **Activate** strategy (reports exist but don't directly address business questions), and having no **Govern** capability at all (conformance to process and safety regimes lives in documents and episodic audits, disconnected from the thread).
 
-The oslc4js architecture attempts to address the missing pieces explicitly:
+The AAKI architecture addresses the missing pieces explicitly, stage by stage:
 
-* Stage 1 and Stage 2 produces a connected, semantically incoherent graph — links mean the same thing across different tools.
-* Stage 2 governance (config management, versioning) enables Stage 3 to answer versioned questions about how information changes over time.
-* Stage 3 activation (LQE, MCP, integrations) enables Stages 1 and 2 produce a beautifully governed and efficiently and effectively unused knowledge graph — addressing the classic ontology project failure mode.
+* **Define** makes the graph *semantically coherent* — without a shared vocabulary the same link means different things across tools; with one, a link means the same thing everywhere.
+* **Instantiate** adds the temporal dimension through OSLC Configuration Management (streams, baselines, change sets), so the thread can answer *"as of which baseline?"* rather than only "as it exists today."
+* **Activate** turns the governed graph into decisions, queries, and agent actions — the step whose absence leaves Define and Instantiate as a beautifully governed but *unused* graph, the classic ontology-project failure mode.
+* **Govern** holds the evolving thread to whatever regimes apply, assessing conformance continuously over the live data and feeding process improvement back — so the value is *sustained*, not just built once.
 
-For the MRM mrm-server specifically, the OSLC server sits at the Stage 1/2 boundary — it both serves the vocabulary (ResourceShapes, service provider catalog) and hosts the instances (municipal resource records, plans, regulations). The MCP endpoint then directly activates Stage 3 by making all of that live data available to AI agents operating in the context of municipal decision-making. That's a genuinely coherent and complete architecture.
+For the MRM mrm-server specifically, the OSLC server sits at the Define/Instantiate boundary — it both serves the vocabulary (ResourceShapes, service provider catalog) and hosts the instances (municipal resource records, plans, regulations). The MCP endpoint then activates that live data for AI agents operating in the context of municipal decision-making, and the same governed thread is where conformance and continuous improvement are tracked. That's a coherent, complete architecture.
 
-In this case, the MRM vocabulary already existed, having been developed for many years by KPMG and managed by MISA. However, the instance creation at Stage 2, and the data use at Stage 3 to deliver value, have struggled to be realized. The oslc4js mrm-server can help close this gap.
+In this case, the MRM vocabulary already existed, developed over many years by KPMG and managed by MISA. However, instance creation (Instantiate) and data use to deliver value (Activate) have struggled to be realized. The oslc4js mrm-server can help close that gap.
 
 ## Why ontologies and OSLC servers still matter in the age of AI
 
@@ -159,9 +245,11 @@ Where AI transforms this architecture is in collapsing the authoring and analysi
 
 **Authoring acceleration.** Through MCP, AI agents can create, link, and validate OSLC resources directly through the server API. Subject matter experts who could never learn RDF or navigate complex tool UIs can now contribute their knowledge conversationally, with the AI translating their intent into properly structured, ontology-conformant resources. This is critical because much domain knowledge lives in SMEs' heads and isn't captured in documents — the AI lowers the barrier to externalizing that knowledge into the system of record.
 
+**Tool and editing normalization.** The digital thread is authored across many heterogeneous tools — requirements, architecture, test, change and configuration management — each with its own UI, conventions, and learning curve. Because every one is reachable through the same MCP + OSLC interface, the AI presents them to people as a *single, uniform prompt-and-response surface*. A stakeholder or SME who could never become expert in all of these tools can still contribute effectively — asking, authoring, and linking across the whole thread in natural language, while the AI normalizes their intent into each tool's native operations. The interaction model no longer varies tool by tool; it is the same conversation everywhere.
+
 **Analytical depth.** AI can consume the entire linked data graph through MCP endpoints and perform analysis that would be impractical for humans working with SPARQL or SQL queries and reports alone — identifying gaps, contradictions, and inconsistencies across hundreds of interconnected resources, suggesting actions, and drafting new resources to address findings. The ontology ensures these analyses are grounded in precise, governed data rather than hallucinated from thin air.
 
-**The feedback loop.** This creates a virtuous cycle that didn't exist before: AI helps create instances in Stage 2, the OSLC server governs and persists them, and then AI consumes the resulting data graph in Stage 3 to derive insight and propose further action — which flows back into Stage 2 as new or updated resources. The ontology at Stage 1 keeps this loop coherent across iterations.
+**The feedback loop.** This creates a virtuous cycle that didn't exist before: AI helps create instances during **Instantiate**, the OSLC server governs and persists them, and AI then consumes the resulting graph during **Activate** to derive insight and propose further action — which flows back into Instantiate as new or updated resources. **Govern** closes the wider loop: assessing the evolving thread against the applicable regimes surfaces conformance gaps and process-improvement signals that feed back into Define and Instantiate. The vocabulary established by **Define** keeps every turn of the loop coherent across iterations.
 
 ### Precision where it matters
 
@@ -190,143 +278,3 @@ This workspace ships three Claude Code skills under `.claude/skills/` (linked in
 | [aaki-activate](../.claude/skills/aaki-activate/SKILL.md) | extracting value from a populated server — gap, impact, coverage, multi-hop, compliance, and AI-drafted proposals — with citation discipline and a paraphrase guard |
 
 Claude Code picks these up automatically when the description matches the user's request; to invoke explicitly, the user says *"use the aaki-define / aaki-instantiate / aaki-activate skill"*. Each skill is self-contained with reusable prompt templates that work for any OSLC domain — the BMM artifacts in this workspace are one realized example, not a dependency.
-
-## Applying AAKI to an AI-Assisted V-Model
-
-AAKI applies not just to individual OSLC servers, but to the entire systems and software engineering lifecycle. This is a deliberate scale-up in ambition. The original frame was a **single domain and the single OSLC server that supports it** — `bmm-server` is exactly one such node, the business-motivation domain stood up end to end. The lifecycle frame is a **collection of domains and integrated tools**: many nodes, each a governed OSLC server (some newly Defined, most existing tools exposed through OSLC connectors), woven together by the cross-domain links that make a digital thread. Define, Instantiate, and Activate apply at **both scales** — to build and fill one node, and to connect, populate, and query the whole thread of many domains and tools.
-
-When viewed through the lens of the V-model — the standard framework for systems engineering that traces requirements decomposition on the left side to verification activities on the right — AI assistants operating through MCP endpoints can transform how organizations manage traceability, impact analysis, and compliance across integrated tool chains.
-
-### The V-model as an OSLC link graph
-
-The V-model's power is that every left-side artifact has a traceability obligation to a right-side artifact:
-
-```
-Stakeholder Needs ←————————————→ Acceptance Tests
-  System Requirements ←——————————→ System Tests
-    Subsystem Requirements ←————→ Integration Tests
-      Component Requirements ←——→ Unit Tests
-              Detailed Design
-                   ↓
-              Implementation
-```
-
-In OSLC terms, each `←→` is a typed link — `oslc_rm:validatedBy`, `oslc_qm:validatesRequirement`, and so on. The V-model's traceability is not a document or a report; it is a live link graph spanning DOORS Next, ETM, EWM, Rhapsody, and whatever other tools participate. The graph is the system of record for traceability.
-
-### Where compliance frameworks attach — ASPICE and ISO 26262 off to the side
-
-The V-model is *what is in the thread* — the connected, versioned record of the product's descent and ascent. Its evolution is not unmanaged: process and safety regimes prescribe how the work must be performed and evidenced. In the AAKI picture, **Automotive SPICE (ASPICE)** and **ISO 26262** sit **off to the side of the thread, each with its own OSLC vocabulary, linking *into* the thread's artifacts** rather than living among them. An ASPICE process outcome or an ISO 26262 safety requirement is itself a governed resource that links to the requirements, designs, and tests it attests to. Because both the criteria and the evidence are linked data, conformance can be **assessed continuously over the live thread** rather than reconstructed in an episodic audit — turning compliance from a periodic crisis into an ongoing confirmation. (This is the basis of a Continuous ASPICE assessment design; ISO 26262 follows the same pattern on the safety axis.) The positioning is the point: AAKI's job is to close the thread's connectivity and data gaps; ASPICE and ISO 26262 are important consumers that attach to the closed thread to govern its evolution.
-
-### Three layers of AI assistance
-
-> **Note on terminology.** This section uses "Layer 1/2/3" in a *different* sense than AAKI's Stage 1/2/3 above. AAKI's stages describe the practice (Define, Instantiate, Activate, Govern). The layers below describe AI tiers within an integrated tool chain (Tool-local, Integration, Analytics). Both numbering schemes are kept because each is a familiar idiom in its own community; the table at the end of this section maps between them.
-
-An AI assistant connected via MCP to an integrated tool chain has access to three distinct layers, each corresponding to a different scope of concern and level of authority.
-
-**Layer 1 — Tool-local AI (authoring assistance).** Each tool (eventually) exposes an MCP endpoint that provides AI assistance within its own domain vocabulary. A requirements management tool like DOORS Next uses AI to improve requirement quality against authoring guidelines. A quality management tool like ELM ETM uses AI to improve test case authoring, or to find test cases relevant to a feature being changed. These individual tool MCP endpoints improve user experience and efficiency within each tool, but they are semantically bounded by what a single tool knows. In AAKI terms, this is Stage 3 activation within a single tool silo.
-
-**Layer 2 — Integration AI (cross-tool reasoning).** This is where OSLC's value proposition intersects with AI most powerfully. An OSLC server — such as those built with oslc4js, or MID's genOSLC-based connectors — exposes an MCP endpoint that gives the AI read/write access to the cross-tool link graph. The AI can answer questions no single tool can: "Which requirements lack test cases?" "What is the impact of changing this interface on downstream verification?" "Are all hazards traced to mitigations?" The OSLC link graph is the AI's reasoning substrate — without typed, governed links between artifacts, the AI has nothing to reason over except text similarity, which is unreliable for engineering decisions. The implications for ASPICE process and ISO 26262 safety audits are significant.
-
-**Layer 3 — Analytics AI (cross-tool intelligence).** Datamart tools like ELM Lifecycle Query Engine (LQE) collect information from multiple tools using OSLC Tracked Resource Sets (TRS) to efficiently replicate data from multiple TRS providers into a single TRS consumer that supports SPARQL or SQL queries on read-only information across the tools. An MCP endpoint on LQE could give the AI access to a materialized view of the entire lifecycle graph. The AI does not need to chase links across live tool APIs; it queries a pre-replicated, indexed dataset. This is where compliance reporting, gap analysis, and broad impact analysis become practical at scale.
-
-| AI tier (this section) | AAKI stage | What the AI sees |
-|------------------------|------------|------------------|
-| Layer 1 — Tool-local   | Stage 3 (within one tool) | One tool's vocabulary and content |
-| Layer 2 — Integration  | Stage 2 + Stage 3 across tools | Live link graph spanning tools |
-| Layer 3 — Analytics    | Stage 3 across the enterprise | Materialized read-only view (LQE) |
-
-### A concrete scenario: requirements change impact
-
-To see all three AI layers working together, consider a realistic scenario. An engineer modifies a system requirement in DOORS Next — a performance threshold changes from 100ms to 50ms response time for a safety-critical interface.
-
-**Phase 1 — Impact discovery (Layer 3, LQE).** The AI queries LQE to answer: "What is the full downstream impact of this requirement change?" LQE has the materialized graph, so the AI can efficiently run queries that would be expensive as live cross-tool traversals:
-
-- Which subsystem and component requirements decompose from this system requirement? (left-side downward trace)
-- Which system tests, integration tests, and unit tests validate this requirement and its decompositions? (left-to-right trace)
-- Which design elements and implementation components realize this requirement? (left-to-bottom trace)
-- Which other requirements share dependencies with the affected components? (lateral impact)
-- What is the current verification status of all affected test cases? (right-side state)
-
-This produces a structured impact report — a set of artifact URIs with typed relationships and current states. The AI can quantify: "This change affects 3 subsystem requirements, 12 component requirements, 8 test cases (2 currently passing, 3 draft, 3 not yet created), and 4 EWM work items."
-
-**Phase 2 — Triage and planning (Layer 2, OSLC integration).** The AI shifts to the live integration layer. For each affected artifact, it traverses OSLC links to assess what needs to happen:
-
-- For test cases that exist and are passing: the AI reads the test case via ETM's MCP endpoint, compares the test procedure against the new 50ms threshold, and flags which ones need updating versus which are already threshold-parameterized.
-- For requirements that decompose from the changed system requirement: the AI checks whether the performance allocation needs to change at the subsystem and component level.
-- For gaps — subsystem requirements with no corresponding integration test: the AI flags these as pre-existing coverage gaps that the change makes more urgent.
-
-The AI proposes an action plan: a set of specific changes across tools, each linked to the originating requirement change, with rationale.
-
-**Phase 3 — Assisted authoring (Layer 1, individual tools).** For each approved action, the AI uses tool-specific MCP endpoints:
-
-- In ETM: drafts updated test procedures that incorporate the new 50ms threshold, using ETM's vocabulary and test case structure.
-- In DOORS Next: proposes updated subsystem requirements with revised performance allocations, maintaining requirement quality patterns.
-- In EWM: creates change request work items linked to the originating requirement change, with appropriate priority based on the impact analysis.
-
-**Phase 4 — Verification of the change (back to Layer 3).** After the changes are made and reviewed, the AI queries LQE again to verify the structural integrity of the result: Are all affected requirements now traced to updated test cases? Are there any new gaps introduced by the changes? What is the updated coverage ratio? This closes the feedback loop.
-
-### The feedback loop as architecture
-
-The pattern generalizes beyond this scenario. The feedback loop has a consistent structure:
-
-```
-Layer 3 (LQE Analytics)
-  │ Detects structural properties:
-  │   gaps, coverage ratios, inconsistencies,
-  │   impact propagation, compliance state
-  │
-  ▼ Produces: structured findings (artifact URIs + relationships + metrics)
-
-Layer 2 (OSLC Integration)
-  │ Proposes cross-tool actions:
-  │   create/update links, identify affected artifacts,
-  │   plan coordinated changes across tools
-  │
-  ▼ Produces: action plan (specific changes per tool, with rationale)
-
-Layer 1 (Individual Tools)
-  │ Executes tool-specific authoring:
-  │   draft requirements, test cases, design elements,
-  │   work items — each in the tool's native vocabulary
-  │
-  ▼ Produces: new/updated artifacts in governed repositories
-
-Layer 2 (OSLC Integration)
-  │ Establishes/updates cross-tool links:
-  │   connects new artifacts into the traceability graph
-  │
-  ▼ Produces: updated link graph
-
-Layer 3 (LQE Analytics)
-  │ Verifies structural integrity:
-  │   confirms gaps are closed, coverage improved,
-  │   no new inconsistencies introduced
-  │
-  ▼ Produces: verification report with quantified outcomes
-```
-
-This is AAKI applied to the lifecycle as a whole: the OSLC vocabularies and ResourceShapes **define** what valid traceability looks like, the tools **instantiate** artifacts and links, and the analytics layer **activates** the data for decision-making — which feeds back into new instantiation.
-
-### Governance: predictable, quantifiable, efficient outcomes
-
-The feedback loop structure must be governed to produce reliable engineering outcomes. Three dimensions of governance apply.
-
-**Authority and approval.** Not all AI actions are equal. A governance model must distinguish:
-
-- *Observe* — The AI queries LQE and produces reports. No approval needed. Anyone with read access can ask the AI to analyze the graph. This is pure Layer 3 activation.
-- *Propose* — The AI drafts artifacts and suggests links, but everything lands in a "proposed" state requiring human review. The AI creates a requirement in Draft status or a test case marked as AI-generated. The human reviews, edits, and promotes to Approved. This is Layer 1 authoring with a human gate.
-- *Execute* — The AI creates links and updates artifacts with pre-authorized approval. This might apply to mechanical operations like linking every test case to the requirement it names in its description field. The approval is granted by policy, not per-action. This is Layer 2 integration with policy-based governance.
-
-The OSLC server enforces this through access controls on creation factories and update operations. The AI's MCP access is mediated by the same OSLC service provider that governs human access — the AI does not bypass governance, it operates within it.
-
-**Traceability of AI actions.** Every AI action must itself be traceable. When the AI creates a test case or establishes a link, the provenance must record what triggered the action (the originating requirement change), what analysis justified it (the LQE impact report), what policy authorized it (the governance rule that permitted AI-proposed test cases), and what human approved it (the reviewer who promoted from Draft to Approved). OSLC resources already support `dcterms:creator`, `dcterms:created`, and custom provenance properties. The AI assistant populates these consistently. TRS then propagates these provenance records to LQE, making the AI's contribution to the lifecycle itself auditable and queryable.
-
-**Quantifiable outcomes.** The feedback loop structure makes outcomes naturally quantifiable because Layer 3 can measure the before-and-after state:
-
-- *Coverage metrics* — requirement-to-test traceability ratio before and after the AI's intervention
-- *Gap closure rate* — how many identified gaps the AI helped resolve per cycle
-- *Change propagation completeness* — percentage of downstream artifacts updated within a time window after an upstream change
-- *Consistency scores* — SHACL validation of the link graph against the V-model's structural rules (every system requirement must have at least one system test, etc.)
-- *Cycle time* — elapsed time from requirement change to verified traceability closure, compared to manual baseline
-
-These metrics are not AI-specific — they measure the engineering process. The AI makes the process faster and more complete. The governance framework sets targets for these metrics (for example, "traceability coverage must exceed 95% at each V-model level before milestone review") and the Layer 3 analytics continuously measure against them.
