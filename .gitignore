@@ -16,3 +16,22 @@ node_modules/
 
 # Draft pending review/placement — keep untracked for now
 /docs/AAKI-and-the-Digital-Thread.md
+
+# Workspace member packages — each is its own git repo under the OSLC org,
+# cloned here for npm-workspace development. The parent oslc4js repo is the
+# umbrella (docs, workspace config, .idea); package source is owned by its
+# own repo, not double-tracked here.
+/bmm-server/
+/fs-storage-service/
+/github-server/
+/jena-storage-service/
+/ldp-app/
+/ldp-service/
+/mongodb-storage-service/
+/mrm-server/
+/oslc-browser/
+/oslc-client/
+/oslc-mcp-server/
+/oslc-server/
+/oslc-service/
+/storage-service/

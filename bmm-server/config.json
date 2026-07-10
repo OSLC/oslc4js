@@ -1,7 +1,0 @@
-{
-  "scheme": "http",
-  "host": "localhost",
-  "port": 3005,
-  "context": "/",
-  "jenaURL": "http://localhost:3030/bmm/"
-}
