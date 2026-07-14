@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1215" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 770" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
   <title>AAKI: AI Assisted Knowledge Integration across existing and new OSLC domains</title>
-  <desc>One-page summary of the AAKI Define / Instantiate / Activate / Govern stages, showing how an AI assistant connects via MCP and OSLC discovery to existing OSLC servers (Architecture Management, Requirements Management, Quality Management, Change Management) and new domains (BMM), what the AI contributes at each stage, and how Stage 4 Govern continuously assesses conformance (regime-agnostic; ASPICE and ISO 26262 as examples).</desc>
+  <desc>One-page summary of the AAKI Define / Instantiate / Activate / Govern stages, showing how an AI assistant connects via MCP and OSLC discovery to existing OSLC servers (Architecture Management, Requirements Management, Quality Management, Change Management) and new domains (BMM), and what the AI contributes at each stage, including Stage 4 Govern's continuous conformance assessment.</desc>
 
   <defs>
     <marker id="dot" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6">
@@ -8,7 +8,7 @@
     </marker>
   </defs>
 
-  <rect width="1400" height="1215" fill="#0e0d10"/>
+  <rect width="1400" height="770" fill="#0e0d10"/>
 
   <!-- ── Header ───────────────────────────────────────────────── -->
   <text x="700" y="50" fill="#ffffff" font-size="32" font-weight="700" text-anchor="middle">AI Assisted Knowledge Integration (AAKI)</text>
@@ -93,108 +93,82 @@
     <text x="250" y="80" fill="#8cb0d2" font-size="12" text-anchor="middle">Discovers servers via OSLC catalogs · authors and queries via MCP tools</text>
   </g>
 
-  <!-- ── Stage cards ──────────────────────────────────────────── -->
+  <!-- ── Stage cards — four equal vertical columns ────────────── -->
 
-  <!-- Stage 1 - Define (purple) -->
-  <g transform="translate(40, 420)">
-    <rect width="430" height="475" rx="14" fill="#332758"/>
-    <text x="24" y="40" fill="#ffffff" font-size="24" font-weight="700">Stage 1 — Define</text>
-    <text x="24" y="68" fill="#bcb6cf" font-size="14">Vocabulary, shapes, link types</text>
+  <!-- Stage 1 — Define (purple) -->
+  <g transform="translate(24, 410)">
+    <rect width="328" height="340" rx="14" fill="#332758"/>
+    <text x="20" y="36" fill="#ffffff" font-size="22" font-weight="700">Stage 1 — Define</text>
+    <text x="20" y="57" fill="#bcb6cf" font-size="13">Vocabulary, shapes, link types</text>
 
-    <rect x="24" y="90" width="382" height="145" rx="8" fill="#43356d"/>
-    <text x="40" y="118" fill="#ffffff" font-size="15" font-weight="700">What the AI does</text>
-    <text x="40" y="142" fill="#d2cfe3" font-size="13">• Reads spec PDFs (BMM 1.3, OSLC RM/QM/CM/AM)</text>
-    <text x="40" y="164" fill="#d2cfe3" font-size="13">• Authors RDF vocabularies in Turtle</text>
-    <text x="40" y="186" fill="#d2cfe3" font-size="13">• Drafts OSLC ResourceShapes — the REST</text>
-    <text x="40" y="204" fill="#d2cfe3" font-size="13">  service contract — with inverse metadata</text>
-    <text x="40" y="226" fill="#d2cfe3" font-size="13">• Reviews and revises vocabulary with humans</text>
+    <rect x="16" y="72" width="296" height="150" rx="8" fill="#43356d"/>
+    <text x="30" y="97" fill="#ffffff" font-size="14" font-weight="700">What the AI does</text>
+    <text x="30" y="121" fill="#d2cfe3" font-size="12">• Reads spec PDFs (BMM, OSLC RM/QM/CM/AM)</text>
+    <text x="30" y="141" fill="#d2cfe3" font-size="12">• Authors RDF vocabularies in Turtle</text>
+    <text x="30" y="161" fill="#d2cfe3" font-size="12">• Drafts OSLC ResourceShapes (the REST</text>
+    <text x="42" y="181" fill="#d2cfe3" font-size="12">service contract) with inverse metadata</text>
+    <text x="30" y="201" fill="#d2cfe3" font-size="12">• Reviews &amp; revises vocabulary with humans</text>
 
-    <text x="24" y="270" fill="#ffffff" font-size="15" font-weight="700">Domains in scope</text>
-    <text x="24" y="295" fill="#d2cfe3" font-size="13">• <tspan font-weight="700">BMM</tspan> — new vocabulary authored from OMG spec</text>
-    <text x="24" y="317" fill="#d2cfe3" font-size="13">• <tspan font-weight="700">OSLC AM / RM / QM / CM</tspan> — existing standards</text>
-    <text x="24" y="339" fill="#d2cfe3" font-size="13">• <tspan font-weight="700">Local extensions</tspan> per organization</text>
-
-    <text x="24" y="383" fill="#ffffff" font-size="15" font-weight="700">Output</text>
-    <text x="24" y="408" fill="#d2cfe3" font-size="13">Governed vocabulary + shapes per domain.</text>
-    <text x="24" y="428" fill="#d2cfe3" font-size="13">The shape <tspan font-style="italic">is</tspan> the contract.</text>
-    <text x="24" y="455" fill="#a99fc4" font-size="12" font-style="italic">Same RDF/Turtle the AI also reads back at runtime.</text>
+    <text x="20" y="248" fill="#ffffff" font-size="14" font-weight="700">Output</text>
+    <text x="20" y="272" fill="#d2cfe3" font-size="12">Governed vocabulary + shapes per domain.</text>
+    <text x="20" y="292" fill="#d2cfe3" font-size="12">The shape <tspan font-style="italic">is</tspan> the contract.</text>
+    <text x="20" y="313" fill="#a99fc4" font-size="11" font-style="italic">Same RDF/Turtle the AI reads back at runtime.</text>
   </g>
 
-  <!-- Stage 2 - Instantiate (green) -->
-  <g transform="translate(485, 420)">
-    <rect width="430" height="475" rx="14" fill="#1c4a3a"/>
-    <text x="24" y="40" fill="#ffffff" font-size="24" font-weight="700">Stage 2 — Instantiate</text>
-    <text x="24" y="68" fill="#b6cfc4" font-size="14">Artifacts, links, governance</text>
+  <!-- Stage 2 — Instantiate (green) -->
+  <g transform="translate(365, 410)">
+    <rect width="328" height="340" rx="14" fill="#1c4a3a"/>
+    <text x="20" y="36" fill="#ffffff" font-size="22" font-weight="700">Stage 2 — Instantiate</text>
+    <text x="20" y="57" fill="#b6cfc4" font-size="13">Artifacts, links, governance</text>
 
-    <rect x="24" y="90" width="382" height="145" rx="8" fill="#26604c"/>
-    <text x="40" y="118" fill="#ffffff" font-size="15" font-weight="700">What the AI does</text>
-    <text x="40" y="142" fill="#cfe5d9" font-size="13">• Reads source documents (specs, plans, policy)</text>
-    <text x="40" y="164" fill="#cfe5d9" font-size="13">• Calls MCP creation factories per shape</text>
-    <text x="40" y="186" fill="#cfe5d9" font-size="13">• Validates against ResourceShapes on the fly</text>
-    <text x="40" y="208" fill="#cfe5d9" font-size="13">• Establishes typed cross-tool links</text>
-    <text x="40" y="226" fill="#cfe5d9" font-size="13">• Observe → Propose → Execute (humans approve)</text>
+    <rect x="16" y="72" width="296" height="150" rx="8" fill="#26604c"/>
+    <text x="30" y="97" fill="#ffffff" font-size="14" font-weight="700">What the AI does</text>
+    <text x="30" y="121" fill="#cfe5d9" font-size="12">• Reads source docs (specs, plans, policy)</text>
+    <text x="30" y="141" fill="#cfe5d9" font-size="12">• Calls MCP creation factories per shape</text>
+    <text x="30" y="161" fill="#cfe5d9" font-size="12">• Validates against ResourceShapes live</text>
+    <text x="30" y="181" fill="#cfe5d9" font-size="12">• Establishes typed cross-tool links</text>
+    <text x="30" y="201" fill="#cfe5d9" font-size="12">• Observe → Propose → Execute; humans OK</text>
 
-    <text x="24" y="270" fill="#ffffff" font-size="15" font-weight="700">Where the artifacts live</text>
-    <text x="24" y="295" fill="#cfe5d9" font-size="13">• <tspan font-weight="700">bmm-server</tspan> (BMM) — embedded MCP</text>
-    <text x="24" y="317" fill="#cfe5d9" font-size="13">• <tspan font-weight="700">DOORS Next, ETM, EWM</tspan> (RM, QM, CM)</text>
-    <text x="24" y="339" fill="#cfe5d9" font-size="13">• <tspan font-weight="700">Rhapsody, RMM</tspan> (AM)</text>
-    <text x="24" y="361" fill="#cfe5d9" font-size="13">• <tspan font-weight="700">MID genOSLC connectors</tspan> bridge the rest</text>
-
-    <text x="24" y="403" fill="#ffffff" font-size="15" font-weight="700">Output</text>
-    <text x="24" y="428" fill="#cfe5d9" font-size="13">Cross-tool linked-data graph.</text>
-    <text x="24" y="455" fill="#9bbfae" font-size="12" font-style="italic">Provenance, versioning, baselines preserved by the host tool.</text>
+    <text x="20" y="248" fill="#ffffff" font-size="14" font-weight="700">Output</text>
+    <text x="20" y="272" fill="#cfe5d9" font-size="12">Cross-tool linked-data graph.</text>
+    <text x="20" y="292" fill="#9bbfae" font-size="11" font-style="italic">Provenance, versioning, baselines</text>
+    <text x="20" y="310" fill="#9bbfae" font-size="11" font-style="italic">preserved by the host tool.</text>
   </g>
 
-  <!-- Stage 3 - Activate (brown) -->
-  <g transform="translate(930, 420)">
-    <rect width="430" height="475" rx="14" fill="#4d2c1f"/>
-    <text x="24" y="40" fill="#ffffff" font-size="24" font-weight="700">Stage 3 — Activate</text>
-    <text x="24" y="68" fill="#cfb6ac" font-size="14">Decisions, queries, agent actions</text>
+  <!-- Stage 3 — Activate (brown) -->
+  <g transform="translate(706, 410)">
+    <rect width="328" height="340" rx="14" fill="#4d2c1f"/>
+    <text x="20" y="36" fill="#ffffff" font-size="22" font-weight="700">Stage 3 — Activate</text>
+    <text x="20" y="57" fill="#cfb6ac" font-size="13">Decisions, queries, agent actions</text>
 
-    <rect x="24" y="90" width="382" height="145" rx="8" fill="#653a29"/>
-    <text x="40" y="118" fill="#ffffff" font-size="15" font-weight="700">What the AI does</text>
-    <text x="40" y="142" fill="#e6cdc0" font-size="13">• Provides quality guidance on individual resources</text>
-    <text x="40" y="164" fill="#e6cdc0" font-size="13">• Creates and traverses cross tool/domain links</text>
-    <text x="40" y="186" fill="#e6cdc0" font-size="13">• Runs gap, impact, coverage analysis</text>
-    <text x="40" y="208" fill="#e6cdc0" font-size="13">• Validates against domain constraints</text>
-    <text x="40" y="226" fill="#e6cdc0" font-size="13">• Drafts proposed actions for human review and approval</text>
+    <rect x="16" y="72" width="296" height="150" rx="8" fill="#653a29"/>
+    <text x="30" y="97" fill="#ffffff" font-size="14" font-weight="700">What the AI does</text>
+    <text x="30" y="121" fill="#e6cdc0" font-size="12">• Quality guidance on individual resources</text>
+    <text x="30" y="141" fill="#e6cdc0" font-size="12">• Creates &amp; traverses cross-tool links</text>
+    <text x="30" y="161" fill="#e6cdc0" font-size="12">• Runs gap, impact, coverage analysis</text>
+    <text x="30" y="181" fill="#e6cdc0" font-size="12">• Validates against domain constraints</text>
+    <text x="30" y="201" fill="#e6cdc0" font-size="12">• Drafts actions for human approval</text>
 
-    <text x="24" y="270" fill="#ffffff" font-size="15" font-weight="700">Questions it can answer</text>
-    <text x="24" y="295" fill="#e6cdc0" font-size="13">• "Which Goals lack realizing Tactics?" (BMM)</text>
-    <text x="24" y="317" fill="#e6cdc0" font-size="13">• "Impact of changing requirement X?" (RM→QM/AM)</text>
-    <text x="24" y="339" fill="#e6cdc0" font-size="13">• "Test coverage of safety hazards?" (RM↔QM)</text>
-    <text x="24" y="361" fill="#e6cdc0" font-size="13">• "V-model compliance gaps?" (RM↔QM↔CM↔AM)</text>
-
-    <text x="24" y="403" fill="#ffffff" font-size="15" font-weight="700">Output</text>
-    <text x="24" y="428" fill="#e6cdc0" font-size="13">Auditable decisions, drafted artifacts.</text>
-    <text x="24" y="455" fill="#bfa195" font-size="12" font-style="italic">Same OSLC links humans use; same governance trail.</text>
+    <text x="20" y="248" fill="#ffffff" font-size="14" font-weight="700">Output</text>
+    <text x="20" y="272" fill="#e6cdc0" font-size="12">Auditable decisions, drafted artifacts.</text>
+    <text x="20" y="292" fill="#bfa195" font-size="11" font-style="italic">Same links &amp; governance trail humans use.</text>
   </g>
 
-  <!-- ── Stage 4 — Govern (full-width band under the three cards) ── -->
-  <text x="700" y="912" fill="#8fa2b8" font-size="13" text-anchor="middle" font-style="italic">Govern — continuously assesses &amp; improves everything above</text>
-  <g transform="translate(40, 930)">
-    <rect width="1320" height="185" rx="14" fill="#1f3a4d"/>
-    <text x="24" y="37" fill="#ffffff" font-size="24" font-weight="700">Stage 4 — Govern</text>
-    <text x="24" y="62" fill="#accadd" font-size="14">Govern the thread's evolution — continuous conformance &amp; improvement. Regime-agnostic: ASPICE, ISO 26262, IEC 61508, DO-178C, … are examples, not the definition.</text>
+  <!-- Stage 4 — Govern (blue) -->
+  <g transform="translate(1047, 410)">
+    <rect width="328" height="340" rx="14" fill="#1f3a4d"/>
+    <text x="20" y="36" fill="#ffffff" font-size="22" font-weight="700">Stage 4 — Govern</text>
+    <text x="20" y="57" fill="#accadd" font-size="13">Continuous conformance &amp; improvement</text>
 
-    <text x="24" y="97" fill="#ffffff" font-size="15" font-weight="700">What the AI does</text>
-    <text x="24" y="120" fill="#cfe0ea" font-size="13">• Reads a regime's criteria + the linked evidence</text>
-    <text x="24" y="141" fill="#cfe0ea" font-size="13">• Drafts findings, ratings, remediation</text>
-    <text x="24" y="162" fill="#cfe0ea" font-size="13">• Observe → Propose → Execute; human owns the rating</text>
+    <rect x="16" y="72" width="296" height="150" rx="8" fill="#2b5068"/>
+    <text x="30" y="97" fill="#ffffff" font-size="14" font-weight="700">What the AI does</text>
+    <text x="30" y="121" fill="#cfe0ea" font-size="12">• Reads a regime's criteria + evidence</text>
+    <text x="30" y="141" fill="#cfe0ea" font-size="12">• Drafts findings, ratings, remediation</text>
+    <text x="30" y="161" fill="#cfe0ea" font-size="12">• Observe → Propose → Execute; human owns</text>
 
-    <text x="470" y="97" fill="#ffffff" font-size="15" font-weight="700">Criteria as governed data</text>
-    <text x="470" y="120" fill="#cfe0ea" font-size="13">• Regime ontology authored via Define</text>
-    <text x="470" y="141" fill="#cfe0ea" font-size="13">• Each criterion linked to its evidence artifacts</text>
-    <text x="470" y="162" fill="#cfe0ea" font-size="13">• Assessed continuously over the live thread</text>
-
-    <text x="910" y="97" fill="#ffffff" font-size="15" font-weight="700">Output</text>
-    <text x="910" y="120" fill="#cfe0ea" font-size="13">• Conformance as a continuously-held state</text>
-    <text x="910" y="141" fill="#cfe0ea" font-size="13">  — not an episodic audit</text>
-    <text x="910" y="162" fill="#cfe0ea" font-size="13">• Improvement signals loop to Define / Instantiate</text>
+    <text x="20" y="248" fill="#ffffff" font-size="14" font-weight="700">Output</text>
+    <text x="20" y="272" fill="#cfe0ea" font-size="12">Conformance held continuously —</text>
+    <text x="20" y="292" fill="#cfe0ea" font-size="12">not an episodic audit.</text>
+    <text x="20" y="313" fill="#9fbccb" font-size="11" font-style="italic">Improvement loops to Define/Instantiate.</text>
   </g>
-
-  <!-- ── Bottom banner ────────────────────────────────────────── -->
-  <rect x="40" y="1135" width="1320" height="60" rx="12" fill="#171419" stroke="#272328" stroke-width="1.5"/>
-  <text x="700" y="1165" fill="#ffffff" font-size="17" font-weight="700" text-anchor="middle">From <tspan fill="#9d7ed8">tool integration</tspan> to <tspan fill="#f4d35e">knowledge integration</tspan> — same OSLC contract, same MCP integration, every domain.</text>
-  <text x="700" y="1186" fill="#9a9a9a" font-size="13" text-anchor="middle" font-style="italic">Existing tools (ELM, MID's genOSLC connectors) and new domains (BMM) participate identically — no client-side per-domain adapters.</text>
 </svg>
