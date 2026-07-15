@@ -16,6 +16,17 @@ The industry has pursued the digital thread promise for years and has experience
 
 *(For the full challenge brief — and the domain-level challenges beneath each node — see [`AAKI.md`](AAKI.md).)*
 
+## The digital thread's role in the SSE V-Model
+
+The V-Model is a *process* view of Systems & Software Engineering — it says what work happens and what should correspond to what. The digital thread is the *data* view over the same artifacts: it turns the V's implied relationships into an actual, navigable, governed graph. Its role is fourfold:
+
+- **It realizes the V's correspondences as links.** The V-Model's defining feature is the horizontal pairing between the decomposition arm (needs → requirements → architecture → design → implementation) and the integration/verification arm (unit → integration → verification → validation). On a diagram those pairings are implied; in the thread they are *typed, versioned links* — requirement ↔ validating test, architecture ↔ verification, design ↔ implementing code. Without the thread the V is a picture; with it, it is a system of record.
+- **It carries traceability along both axes.** Vertical refinement/decomposition traces run down each arm, horizontal verify/validate correspondences run across the arms, and diagonal impact relationships run between them — which is what lets the thread answer the questions the V-Model implies but cannot itself resolve: which requirements lack tests, what a change to an interface affects, what the test coverage of a hazard is.
+- **It extends the V above "requirements."** The classic V starts at requirements — *Doing Things Right*. The thread adds the missing upstream nodes (business motivation, portfolio — *Doing the Right Things*) so the connected definition spans intent → validated product, not just requirements-down.
+- **It is the attachment surface for governance.** Process and safety regimes (ASPICE, ISO 26262, …) hang their criteria as links *into* the thread, each criterion pointing at its evidence artifacts — so conformance to the V-Model's discipline becomes a continuously-assessed state over the live graph rather than an episodic audit reconstruction.
+
+In one line: **in the SSE V-Model, the digital thread is the connective tissue that makes the model's left↔right and top↔bottom correspondences into a real, typed, versioned, queryable graph — so the V stops being a lifecycle diagram and becomes something you can trace, analyze, and prove conformance against.** The V-Model says *what* links should exist; the thread is *how* they are materialized as OSLC linked data; the three gaps above are exactly what AAKI closes.
+
 ## AAKI closes the gaps — with AI assistants and OSLC
 
 AAKI — **AI Assisted Knowledge Integration** — is the practice of putting AI assistants to work over an OSLC linked-data substrate to close those three gaps while keeping the thread governed, semantic, and compliant: connect the nodes, fill the missing ones, and govern the whole as it evolves — which is where the thread's value is ultimately realized.
