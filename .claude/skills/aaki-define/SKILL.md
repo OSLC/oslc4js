@@ -127,10 +127,50 @@ This is guidance, not a requirement. The point is that absence-of-label should n
   - `oslc:propertyDefinition` (the property URI from the vocabulary)
   - `dcterms:description` describing the property's role *on this resource type*
   - `oslc:occurs` — `Zero-or-one` | `Exactly-one` | `Zero-or-many` | `One-or-many`
-  - `oslc:valueType` — `xsd:string`, `xsd:dateTime`, `oslc:Resource`, etc.
+  - `oslc:valueType` — see **"Value types for inherited OSLC properties"** below before choosing. `xsd:string` is the wrong default for rich text: OSLC defines `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` as `rdf:XMLLiteral` (XHTML content), not strings.
   - For link properties: `oslc:representation oslc:Reference`, `oslc:range` (the *shape* range — what types this server expects to see at the other end), plus the inverse metadata above when incoming-link discovery and labeling matter (recommended but optional).
   - Optional: `oslc:icon` (proposed extension) when a type-icon makes sense in UIs.
 - **Inheritance is manual.** OSLC ResourceShapes do not honor `rdfs:subClassOf` traversal — that's an inferential mechanism OSLC deliberately avoids. Each concrete shape lists every property it allows, including ones shared across types. Use named property nodes (`<#p-title>`, `<#p-creator>`, …) and reference them from each shape's `oslc:property` list so the duplication is editorial, not by copy-paste.
+
+## Value types for inherited OSLC properties
+
+Domain shapes re-declare the OSLC Core / domain (AM, RM, CM, QM) properties every
+resource carries — `dcterms:title`, `dcterms:description`, `dcterms:creator`, and
+friends. **Do not invent their `oslc:valueType`. Copy it from the normative
+shapes**, which are the authority:
+
+- Core: https://github.com/oslc-op/oslc-specs/blob/master/specs/core/core-shapes.ttl
+- AM: https://github.com/oslc-op/oslc-specs/blob/master/specs/am/architecture-management-shapes.ttl
+  (RM/CM/QM equivalents live beside it under `specs/`)
+
+The trap is rich text. `dcterms:title` and `dcterms:description` *look* like
+strings, so `xsd:string` is the intuitive guess — and it is wrong. OSLC defines
+them as XHTML content:
+
+| Property | `oslc:valueType` | Notes |
+|---|---|---|
+| `dcterms:title` | `rdf:XMLLiteral` | **not** `xsd:string` — rich text |
+| `dcterms:description` | `rdf:XMLLiteral` | **not** `xsd:string` — rich text |
+| `oslc:shortTitle` | `rdf:XMLLiteral` | **not** `xsd:string` — rich text |
+| `dcterms:identifier` | `xsd:string` | usually `oslc:readOnly true` |
+| `dcterms:created` / `dcterms:modified` | `xsd:dateTime` | usually `oslc:readOnly true` |
+| `dcterms:creator` / `dcterms:contributor` | `oslc:AnyResource` | normative pairs this with `oslc:representation oslc:Either` |
+| `dcterms:type` (`dctype`) | `xsd:string` | |
+| `dcterms:source` | `oslc:Resource` | |
+| `rdf:type` | `oslc:Resource` | |
+| `oslc:serviceProvider` / `oslc:instanceShape` | `oslc:Resource` | usually `oslc:readOnly true` |
+
+Getting these wrong is not cosmetic. Clients drive their editors off
+`oslc:valueType`: a property typed `rdf:XMLLiteral` gets a rich-text editor and
+its markup is rendered, while `xsd:string` gets a plain input and any markup is
+displayed as literal `<p>` tags. The datatype written into the literal follows
+the shape too, so the mistake propagates into stored data.
+
+Narrowing is allowed, inventing is not. A shape *may* be stricter than the
+normative one — declaring `oslc:Resource` + `oslc:representation oslc:Reference`
+where the spec says `oslc:AnyResource` + `oslc:Either` is a legitimate choice if
+the server only ever stores references. Changing `rdf:XMLLiteral` to `xsd:string`
+is not narrowing; it is a different type.
 
 ## Enumerations
 
@@ -224,6 +264,7 @@ In either style, the shapes HTML must:
 4. Every term (class, property, enumeration individual) carries `rdfs:isDefinedBy <ontology-base-URI>` plus `rdfs:label` and `rdfs:comment`. Without `isDefinedBy` + `preferredNamespaceUri`, ShapeChecker floods with "subject not part of an ontology" findings.
 5. The vocabulary file declares classes and properties as plain identifiers — no `rdfs:domain` or `rdfs:range` (those would invite reasoning the rest of the OSLC stack does not perform).
 6. Every property URI used in a shape exists in the vocabulary.
+6a. **Every inherited OSLC Core/domain property's `oslc:valueType` matches the normative shapes** (see "Value types for inherited OSLC properties"). Diff them explicitly rather than eyeballing — `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` must be `rdf:XMLLiteral`, and declaring them `xsd:string` is the single most common defect in generated shapes. It has shipped in real domains (BMM, ASPICE) and silently downgrades every client's editor for those fields.
 7. Every link property in a shape that should support incoming-link discovery declares `oslc:inversePropertyLabel` (strongly recommended; not strictly required for shape validity).
 8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
 9. Property names match camelCase; predicates are short verb phrases without target-type folding.
@@ -301,6 +342,7 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 > 4. Every term (class, property, enumeration individual) carries `rdfs:isDefinedBy <ontology-base-URI>`, `rdfs:label`, and `rdfs:comment`.
 > 5. The vocabulary file declares classes and properties as plain identifiers — no `rdfs:domain`/`rdfs:range` on properties.
 > 6. Every property URI used in a shape exists in the vocabulary.
+> 6a. Every inherited OSLC Core/domain property's `oslc:valueType` matches the normative shapes (core-shapes.ttl / the domain shapes) — in particular `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` are `rdf:XMLLiteral`, never `xsd:string`.
 > 7. Every link property whose incoming side should be discoverable declares `oslc:inversePropertyLabel` (recommended; not strictly required).
 > 8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
 > 9. Property names match camelCase; predicates are short verb phrases without target-type folding.
@@ -315,6 +357,7 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 
 - **OSLC-OP example to emulate**: https://github.com/oslc-op/oslc-specs/tree/master/specs/am — Architecture Management vocabulary and shapes published as ReSpec documents. Useful as a structural model for the HTML renderings.
 - **OSLC-OP ShapeChecker** (validation tool): https://github.com/oslc-op/oslc-specs/tree/master/tools/ShapeChecker — validates vocabulary + resource-shape Turtle files against OSLC Core. Run before declaring a domain done.
+- **Normative OSLC shapes** (authority for inherited property value types): https://github.com/oslc-op/oslc-specs/blob/master/specs/core/core-shapes.ttl and https://github.com/oslc-op/oslc-specs/blob/master/specs/am/architecture-management-shapes.ttl
 - **Link guidance** (predicate naming, link-direction): https://github.com/oslc-op/oslc-specs/blob/master/notes/link-guidance.html
 - **IBM Jazz LinkedData best practices**: https://jazz.net/wiki/bin/view/LinkedData/BestPractices
 - **Proposed shape extensions used here** (in an oslc4js workspace if available): `docs/OSLC-Shape-Extensions.md` — formal definitions for `oslc:inversePropertyLabel` and `oslc:icon` on `oslc:ResourceShape`.
@@ -327,6 +370,7 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 | Putting `rdfs:domain` / `rdfs:range` on properties in the vocabulary | Constrain at the shape level instead. The vocabulary stays open and reusable; the shape declares how the property is used on each resource type. |
 | Describing terms with `dc11:description` or `dcterms:description` | Terms use `rdfs:comment` (with `rdfs:label`). Reserve `dcterms:*` for the `owl:Ontology` document node. |
 | Missing `rdfs:label` on terms | Every class, property, and enumeration individual needs an `rdfs:label`. |
+| Typing `dcterms:title` / `dcterms:description` / `oslc:shortTitle` as `xsd:string` | They are `rdf:XMLLiteral` (XHTML rich text) in the normative OSLC shapes. Copy inherited properties' `oslc:valueType` from core-shapes.ttl / the domain shapes rather than guessing from the name. Clients pick their editor from this: `xsd:string` means a plain input and markup shown as literal tags. |
 | Modeling a fixed value set as `xsd:string` | Use the enumeration pattern: an `rdfs:Class` + individuals in the vocabulary, referenced from the shape by `oslc:range` (no `oslc:valueType`/`oslc:allowedValue` unless restricting to a subset). See "Enumerations". |
 | Declaring an enumeration as `rdfs:subClassOf rdfs:Datatype` | An enumeration is a plain `rdfs:Class` whose instances are the allowed-value individuals. |
 | Treating shapes as inferable subtypes of one another | OSLC shapes do not inherit. Enumerate every property on every concrete shape, using named property nodes to keep maintenance tractable. |
