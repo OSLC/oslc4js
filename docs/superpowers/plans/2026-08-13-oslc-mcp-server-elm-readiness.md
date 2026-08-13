@@ -27,7 +27,9 @@ This blocks the [AAKI Acme AEB-200 dataset plan](../../../../../MID/genoslc-aspi
 
 *(Every task's requirements implicitly include this section.)*
 
-**Never store credentials in the configuration file.** The file names the **environment variables** that supply them (`usernameEnv`, `passwordEnv`). A configuration file is something people commit, paste into issues and copy between machines; a password field on it will eventually leak. The file's job is to record *which* credentials are required, not to hold them. A loader that accepts a literal `password:` key must **reject it with an error naming the offending server**, not warn.
+**The real configuration file is git-ignored; the example is committed.** `oslc-mcp-server/oslc-mcp-server.yaml` names a specific deployment and never enters version control (Task 7 Step 1). `oslc-mcp-server.example.yaml` is committed and contains no real host, project area or credential.
+
+**Credentials: environment references preferred, literals accepted with a warning.** A server may supply `usernameEnv`/`passwordEnv` naming environment variables, **or** literal `username`/`password`. Prefer the former and document it first — a config file still gets pasted into issues, copied between machines, included in backups and shown on screen during demos, none of which `.gitignore` prevents. But the file being git-ignored removes the serious risk, so a literal is a legitimate local convenience and must **work**, emitting one warning at load naming the server. Do not reject it, and do not warn per request.
 
 **Backwards compatibility is not optional.** `--server`, `--catalog`, `--username` and `--password` must keep working exactly as they do today, producing a single-server configuration with an unscoped catalog walk. Existing users are not migrated by this change.
 
@@ -172,12 +174,18 @@ git commit -m "test(oslc-mcp-server): establish Jest ESM harness"
     alias?: string;
     configurationContext?: string;
   }
+  export interface CredentialsSpec {
+    usernameEnv?: string;
+    passwordEnv?: string;
+    username?: string;
+    password?: string;
+  }
   export interface ServerEntry {
     alias: string;
     baseUrl: string;
     catalogUrl?: string;
     configurationContext?: string;
-    credentials?: { usernameEnv: string; passwordEnv: string };
+    credentials?: CredentialsSpec;
     serviceProviders?: ServiceProviderEntry[];
   }
   export interface ConfigFile { servers: ServerEntry[] }
@@ -209,7 +217,7 @@ servers:
 Create `oslc-mcp-server/src/config-file.test.ts`:
 
 ```ts
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, jest } from '@jest/globals';
 import { parseConfigFile } from './config-file.js';
 
 const MINIMAL = `
@@ -257,15 +265,44 @@ servers:
     expect(sps[0].configurationContext).toBe('https://elm.example.com/gc/configuration/1');
   });
 
-  it('rejects a literal password', () => {
-    expect(() => parseConfigFile(`
+  it('accepts literal credentials and warns once, naming the server', () => {
+    const warn = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const config = parseConfigFile(`
 servers:
   - alias: dng
     baseUrl: https://elm.example.com/rm
     credentials:
       username: jim
       password: hunter2
-`)).toThrow(/dng.*credentials.*usernameEnv.*passwordEnv/s);
+`);
+    expect(config.servers[0].credentials).toEqual({ username: 'jim', password: 'hunter2' });
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toMatch(/dng/);
+    warn.mockRestore();
+  });
+
+  it('does not warn when credentials are environment references', () => {
+    const warn = jest.spyOn(console, 'error').mockImplementation(() => {});
+    parseConfigFile(`
+servers:
+  - alias: dng
+    baseUrl: https://elm.example.com/rm
+    credentials:
+      usernameEnv: ELM_USER
+      passwordEnv: ELM_PASSWORD
+`);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('rejects credentials that are neither a complete pair nor a complete reference', () => {
+    expect(() => parseConfigFile(`
+servers:
+  - alias: dng
+    baseUrl: https://elm.example.com/rm
+    credentials:
+      username: jim
+`)).toThrow(/dng.*credentials/s);
   });
 
   it('rejects duplicate server aliases', () => {
@@ -318,13 +355,24 @@ export interface ServiceProviderEntry {
   configurationContext?: string;
 }
 
+/**
+ * How a server's credentials are supplied: either references to environment
+ * variables (preferred) or literal values (accepted, warned about once).
+ */
+export interface CredentialsSpec {
+  usernameEnv?: string;
+  passwordEnv?: string;
+  username?: string;
+  password?: string;
+}
+
 /** One OSLC server. An ELM deployment needs one entry per application. */
 export interface ServerEntry {
   alias: string;
   baseUrl: string;
   catalogUrl?: string;
   configurationContext?: string;
-  credentials?: { usernameEnv: string; passwordEnv: string };
+  credentials?: CredentialsSpec;
   serviceProviders?: ServiceProviderEntry[];
 }
 
@@ -335,9 +383,11 @@ export interface ConfigFile {
 /**
  * Parse and validate configuration YAML.
  *
- * Credentials are named, never carried: the file states which environment
- * variables supply them. A literal `username`/`password` is an error rather
- * than a warning, because a configuration file is something people commit.
+ * Credentials may be environment-variable references (`usernameEnv` /
+ * `passwordEnv`, preferred) or literal values (`username` / `password`,
+ * accepted with one warning). The configuration file is git-ignored, so a
+ * literal is a reasonable local convenience — but it still travels in
+ * pastes, backups and screen shares, which is what the warning is for.
  */
 export function parseConfigFile(yamlText: string): ConfigFile {
   const raw = parseYaml(yamlText) as unknown;
@@ -370,22 +420,35 @@ export function parseConfigFile(yamlText: string): ConfigFile {
       throw new Error(`Server \`${alias}\`: \`baseUrl\` is required.`);
     }
 
-    let credentials: ServerEntry['credentials'];
+    let credentials: CredentialsSpec | undefined;
     if (s.credentials !== undefined) {
       const c = s.credentials as Record<string, unknown>;
-      if ('username' in c || 'password' in c) {
+      const hasEnvPair =
+        typeof c.usernameEnv === 'string' && typeof c.passwordEnv === 'string';
+      const hasLiteralPair =
+        typeof c.username === 'string' && typeof c.password === 'string';
+
+      if (!hasEnvPair && !hasLiteralPair) {
         throw new Error(
-          `Server \`${alias}\`: \`credentials\` must use \`usernameEnv\` and ` +
-          `\`passwordEnv\` naming environment variables. Literal credentials are ` +
-          `not accepted in a configuration file.`
+          `Server \`${alias}\`: \`credentials\` needs either both \`usernameEnv\` and ` +
+          `\`passwordEnv\`, or both \`username\` and \`password\`.`
         );
       }
-      if (typeof c.usernameEnv !== 'string' || typeof c.passwordEnv !== 'string') {
-        throw new Error(
-          `Server \`${alias}\`: \`credentials\` needs both \`usernameEnv\` and \`passwordEnv\`.`
+
+      if (hasLiteralPair && !hasEnvPair) {
+        console.error(
+          `[config] Server \`${alias}\` uses literal credentials. The configuration ` +
+          `file is git-ignored, but it still travels in pastes, backups and screen ` +
+          `shares — prefer \`usernameEnv\`/\`passwordEnv\` where you can.`
         );
       }
-      credentials = { usernameEnv: c.usernameEnv, passwordEnv: c.passwordEnv };
+
+      credentials = {
+        usernameEnv: hasEnvPair ? (c.usernameEnv as string) : undefined,
+        passwordEnv: hasEnvPair ? (c.passwordEnv as string) : undefined,
+        username: hasLiteralPair ? (c.username as string) : undefined,
+        password: hasLiteralPair ? (c.password as string) : undefined,
+      };
     }
 
     const serviceProviders = (s.serviceProviders as unknown[] | undefined)?.map((sp, j) => {
@@ -426,7 +489,7 @@ export function loadConfigFile(path: string): ConfigFile {
 cd oslc-mcp-server && npm test -- config-file
 ```
 
-Expected: PASS, 8 tests.
+Expected: PASS, 10 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -462,6 +525,28 @@ const base: ServerEntry = { alias: 'dng', baseUrl: 'https://elm.example.com/rm' 
 describe('resolveCredentials', () => {
   it('resolves from the named environment variables', () => {
     const server = { ...base, credentials: { usernameEnv: 'U', passwordEnv: 'P' } };
+    expect(resolveCredentials(server, { U: 'jim', P: 'secret' })).toEqual({
+      username: 'jim',
+      password: 'secret',
+    });
+  });
+
+  it('uses literal credentials when given', () => {
+    const server = { ...base, credentials: { username: 'jim', password: 'secret' } };
+    expect(resolveCredentials(server, {})).toEqual({
+      username: 'jim',
+      password: 'secret',
+    });
+  });
+
+  it('prefers environment references over literals when both are present', () => {
+    const server = {
+      ...base,
+      credentials: {
+        usernameEnv: 'U', passwordEnv: 'P',
+        username: 'literal', password: 'literal-secret',
+      },
+    };
     expect(resolveCredentials(server, { U: 'jim', P: 'secret' })).toEqual({
       username: 'jim',
       password: 'secret',
@@ -505,32 +590,39 @@ Create `oslc-mcp-server/src/credentials.ts`:
 import type { ServerEntry } from './config-file.js';
 
 /**
- * Resolve a server's credentials from the environment variables its
- * configuration names. Errors name the server and the missing variable
- * — never a value, since these errors are logged.
+ * Resolve a server's credentials.
+ *
+ * Environment references win over literals when a configuration carries
+ * both, so an operator can override a checked-out literal without editing
+ * the file. Errors name the server and the missing variable — never a
+ * value, since these errors are logged.
  */
 export function resolveCredentials(
   server: ServerEntry,
   env: NodeJS.ProcessEnv
 ): { username: string; password: string } {
-  if (!server.credentials) {
+  const creds = server.credentials;
+  if (!creds) {
     return { username: '', password: '' };
   }
 
-  const { usernameEnv, passwordEnv } = server.credentials;
-  const username = env[usernameEnv];
-  const password = env[passwordEnv];
+  if (creds.usernameEnv && creds.passwordEnv) {
+    const username = env[creds.usernameEnv];
+    const password = env[creds.passwordEnv];
 
-  const missing: string[] = [];
-  if (!username) missing.push(usernameEnv);
-  if (!password) missing.push(passwordEnv);
-  if (missing.length > 0) {
-    throw new Error(
-      `Server \`${server.alias}\`: environment variable(s) not set: ${missing.join(', ')}.`
-    );
+    const missing: string[] = [];
+    if (!username) missing.push(creds.usernameEnv);
+    if (!password) missing.push(creds.passwordEnv);
+    if (missing.length > 0) {
+      throw new Error(
+        `Server \`${server.alias}\`: environment variable(s) not set: ${missing.join(', ')}.`
+      );
+    }
+
+    return { username: username!, password: password! };
   }
 
-  return { username: username!, password: password! };
+  return { username: creds.username ?? '', password: creds.password ?? '' };
 }
 ```
 
@@ -540,7 +632,7 @@ export function resolveCredentials(
 cd oslc-mcp-server && npm test -- credentials
 ```
 
-Expected: PASS, 4 tests.
+Expected: PASS, 6 tests.
 
 - [ ] **Step 5: Confirm JAS Basic authentication works against the target**
 
@@ -1005,8 +1097,28 @@ git commit -m "feat(oslc-mcp-server): serve several OSLC servers from one instan
 **Files:**
 - Create: `oslc-mcp-server/oslc-mcp-server.example.yaml`
 - Modify: `oslc-mcp-server/README.md`
+- Modify: `.gitignore`
 
-- [ ] **Step 1: Write the example configuration**
+- [ ] **Step 1: Git-ignore the real configuration file**
+
+Add to the repository's `.gitignore`:
+
+```gitignore
+# Real oslc-mcp-server configuration names a specific deployment and may
+# carry literal credentials. The committed example is *.example.yaml.
+oslc-mcp-server/oslc-mcp-server.yaml
+```
+
+Then confirm it is actually ignored, rather than assuming:
+
+```bash
+cd oslc-mcp-server && cp oslc-mcp-server.example.yaml oslc-mcp-server.yaml
+git check-ignore -v oslc-mcp-server.yaml
+```
+
+Expected: the rule is printed. If nothing is printed the file is **not** ignored — fix the rule before going further, because Step 3 puts real credentials in it.
+
+- [ ] **Step 2: Write the example configuration**
 
 Create `oslc-mcp-server/oslc-mcp-server.example.yaml`:
 
@@ -1064,11 +1176,25 @@ servers:
   # /am, /dm, /rmm and /amm all returned 404 on 2026-08-13.
 ```
 
-- [ ] **Step 2: Document it in the README**
+- [ ] **Step 3: Document the configuration file in the README**
 
-Add a **Configuration file** section to `oslc-mcp-server/README.md` covering: `--config` and `OSLC_CONFIG_FILE`; the schema with every field; that credentials are named rather than carried and why; that omitting `serviceProviders` walks the catalog as before; that tool names gain an alias prefix only when more than one server is configured; and that all four original CLI flags still work.
+**The README is the only documentation of this file's schema**, because the real file is git-ignored and the example is a redacted skeleton. Someone with a fresh checkout must be able to author a working configuration from the README alone. Write it to that bar, not as a pointer to the example.
 
-- [ ] **Step 3: Probe the real ELM server**
+Add a **Configuration file** section to `oslc-mcp-server/README.md` covering:
+
+| Must cover | Detail |
+|---|---|
+| How it is supplied | `--config <path>`, or `OSLC_CONFIG_FILE` |
+| That it is git-ignored | And that `oslc-mcp-server.example.yaml` is the committed starting point to copy |
+| Every field | `alias`, `baseUrl`, `catalogUrl` (and its default `${baseUrl}/oslc/catalog`), `configurationContext`, `credentials`, `serviceProviders[].uri`, `.alias`, `.configurationContext` — each with whether it is required, and what it defaults to |
+| Both credential forms | `usernameEnv`/`passwordEnv` documented **first** as preferred, `username`/`password` second, with the warning it emits and why env references are still better in a git-ignored file |
+| Scoping behaviour | `serviceProviders` present → only those are fetched and **the catalog is never fetched**; absent → the catalog is walked as before. Say why it matters: one service provider is one ELM project area |
+| Configuration context | Required against configuration-enabled ELM project areas; per-service-provider value overrides the server-level one |
+| Tool naming | Unprefixed with one server; `${alias}_` prefixed with several |
+| CLI compatibility | All four original flags still work, plus `--configuration-context` |
+| A complete worked ELM example | Three applications, inline in the README, not only in the example file |
+
+- [ ] **Step 4: Probe the real ELM server**
 
 With `ELM_USER` and `ELM_PASSWORD` set, and `<project-area-id>` and `<gc-id>` filled in:
 
@@ -1080,14 +1206,17 @@ Expected: three servers connect; each fetches **only** its listed service provid
 
 Then exercise, per application: `list_resource_types`, one `create_<type>`, one `query_<type>`, one `update_resource` writing a link. Delete the probe resources afterwards.
 
-- [ ] **Step 4: Close out the ELM verification report**
+- [ ] **Step 5: Close out the ELM verification report**
 
 Update [the verification report](../../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md): mark the four blocked items done, record the create/query/link-write results, record the service-provider count from Task 3 Step 5, and set the **Decision** to `MCP` or `SCRIPT`.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
+
+Check first that the real configuration is not staged:
 
 ```bash
-git add oslc-mcp-server/oslc-mcp-server.example.yaml oslc-mcp-server/README.md
+git status --porcelain | grep "oslc-mcp-server.yaml$" && echo "STOP: real config is tracked" || echo "ok"
+git add .gitignore oslc-mcp-server/oslc-mcp-server.example.yaml oslc-mcp-server/README.md
 git commit -m "docs(oslc-mcp-server): example ELM configuration and configuration-file guide"
 ```
 
@@ -1100,7 +1229,7 @@ git commit -m "docs(oslc-mcp-server): example ELM configuration and configuratio
 | [AAKI Acme AEB-200 dataset plan](../../../../../MID/genoslc-aspice-server/docs/plans/2026-08-13-aaki-acme-aeb-dataset-implementation-plan.md) Part 1, Tasks 4–8 | Scoping and configuration context. Has a scripting fallback, so this is a preference |
 | The same plan's Part 2 — the AAKI thread | All of it. **No fallback**: the thread must run over MCP, so these are prerequisites rather than conveniences |
 
-`.gitignore` note: add `oslc-mcp-server/oslc-mcp-server.yaml` — the example file is committed, a real one names a specific deployment and should not be.
+The real configuration file is git-ignored (Task 7 Step 1) and documented in the README (Task 7 Step 3), which is therefore the only place its schema is written down.
 
 ---
 
