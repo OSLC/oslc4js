@@ -10,7 +10,7 @@
 
 ## Why this exists
 
-Verified against `https://trs-filter.smartfacts.com` on 2026-08-13 — findings recorded in [the ELM verification report](../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md):
+Verified against `https://trs-filter.smartfacts.com` on 2026-08-13 — findings recorded in [the ELM verification report](../../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md):
 
 | Finding | Evidence |
 |---|---|
@@ -19,7 +19,7 @@ Verified against `https://trs-filter.smartfacts.com` on 2026-08-13 — findings 
 | Never sends a configuration context | `src/index.ts:69` passes two arguments; `OSLCClient`'s third parameter is `configurationContext`, and no CLI flag exposes it |
 | JAS authentication unconfirmed | The target answers `Basic realm="JSA"` and `Bearer realm="JSA"`, not the JEE forms flow `oslc-client` handles best |
 
-This blocks the [AAKI Acme AEB-200 dataset plan](../../../../MID/genoslc-aspice-server/docs/plans/2026-08-13-aaki-acme-aeb-dataset-implementation-plan.md), whose Part 1 has a scripting fallback and whose **Part 2 does not** — the AAKI thread must run over MCP.
+This blocks the [AAKI Acme AEB-200 dataset plan](../../../../../MID/genoslc-aspice-server/docs/plans/2026-08-13-aaki-acme-aeb-dataset-implementation-plan.md), whose Part 1 has a scripting fallback and whose **Part 2 does not** — the AAKI thread must run over MCP.
 
 ---
 
@@ -1082,7 +1082,7 @@ Then exercise, per application: `list_resource_types`, one `create_<type>`, one 
 
 - [ ] **Step 4: Close out the ELM verification report**
 
-Update [the verification report](../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md): mark the four blocked items done, record the create/query/link-write results, record the service-provider count from Task 3 Step 5, and set the **Decision** to `MCP` or `SCRIPT`.
+Update [the verification report](../../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md): mark the four blocked items done, record the create/query/link-write results, record the service-provider count from Task 3 Step 5, and set the **Decision** to `MCP` or `SCRIPT`.
 
 - [ ] **Step 5: Commit**
 
@@ -1097,11 +1097,11 @@ git commit -m "docs(oslc-mcp-server): example ELM configuration and configuratio
 
 | Consumer | Needs |
 |---|---|
-| [AAKI Acme AEB-200 dataset plan](../../../../MID/genoslc-aspice-server/docs/plans/2026-08-13-aaki-acme-aeb-dataset-implementation-plan.md) Part 1, Tasks 4–8 | Scoping and configuration context. Has a scripting fallback, so this is a preference |
+| [AAKI Acme AEB-200 dataset plan](../../../../../MID/genoslc-aspice-server/docs/plans/2026-08-13-aaki-acme-aeb-dataset-implementation-plan.md) Part 1, Tasks 4–8 | Scoping and configuration context. Has a scripting fallback, so this is a preference |
 | The same plan's Part 2 — the AAKI thread | All of it. **No fallback**: the thread must run over MCP, so these are prerequisites rather than conveniences |
 
 `.gitignore` note: add `oslc-mcp-server/oslc-mcp-server.yaml` — the example file is committed, a real one names a specific deployment and should not be.
 
 ---
 
-*Raised by the [ELM verification report](../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md), 2026-08-13.*
+*Raised by the [ELM verification report](../../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md), 2026-08-13.*
