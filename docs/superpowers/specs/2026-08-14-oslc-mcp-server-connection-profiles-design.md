@@ -1,6 +1,6 @@
 # `oslc-mcp-server` Connection Profiles — High-Level Design
 
-*Design spec. Status: **approved in principle, deferred**. Date: 2026-08-14.*
+*Design spec. Status: **approved in principle, deferred** — tracked as [OSLC/oslc4js#2](https://github.com/OSLC/oslc4js/issues/2). Date: 2026-08-14.*
 
 > **One line.** The person who is about to do the work is the person who configures the tools, at the moment they need them — so `oslc-mcp-server` should start from a **named connection profile** the user can reuse, amend, refresh or create afresh, rather than from flags or a hand-edited file.
 
