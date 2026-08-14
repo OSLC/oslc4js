@@ -10,16 +10,18 @@
 
 ## Why this exists
 
-Verified against `https://trs-filter.smartfacts.com` on 2026-08-13 — findings recorded in [the ELM verification report](../../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md):
+`oslc-mcp-server` was developed against the OSLC servers in this workspace. Verified against an IBM ELM 7.x deployment on 2026-08-13, **four gaps prevent it driving ELM at all**:
 
 | Finding | Evidence |
 |---|---|
-| Cannot be scoped to project areas | `ServerConfig` has four fields; `discover()` (`src/discovery.ts:178`) walks every service provider the catalog lists. One service provider is one ELM project area, and a production server may have thousands |
-| Cannot serve more than one server | `serverURL`/`catalogURL` are scalars; one `OSLCClient` is constructed (`src/index.ts:69`). ELM needs three applications (`/rm`, `/qm`, `/ccm`) |
-| Never sends a configuration context | `src/index.ts:69` passes two arguments; `OSLCClient`'s third parameter is `configurationContext`, and no CLI flag exposes it |
-| JAS authentication unconfirmed | The target answers `Basic realm="JSA"` and `Bearer realm="JSA"`, not the JEE forms flow `oslc-client` handles best |
+| Cannot be scoped to project areas | `ServerConfig` has four fields; `discover()` (`src/discovery.ts:178`) walks every service provider the catalog lists. **One service provider is one ELM project area**, and a production server may have thousands |
+| Cannot serve more than one server | `serverURL`/`catalogURL` are scalars; one `OSLCClient` is constructed (`src/index.ts:69`). ELM needs at least three applications — `/rm`, `/qm`, `/ccm` — and four where an architecture-management application is deployed |
+| Never sends a configuration context | `src/index.ts:69` passes two arguments; `OSLCClient`'s third parameter is `configurationContext`, and no CLI flag exposes it. It is required against configuration-enabled ELM project areas |
+| JAS authentication unconfirmed | The deployment answers `Basic realm="JSA"` and `Bearer realm="JSA"` — the Jazz Authorization Server — not the JEE forms flow `oslc-client` handles best |
 
-This blocks the [AAKI Acme AEB-200 dataset plan](../../../../../MID/genoslc-aspice-server/docs/plans/2026-08-13-aaki-acme-aeb-dataset-implementation-plan.md), whose Part 1 has a scripting fallback and whose **Part 2 does not** — the AAKI thread must run over MCP.
+**`oslc-client` itself is well suited to ELM.** It already handles `j_security_check` forms authentication, the JSESSIONID cookie jar, the `X-Jazz-CSRF-Prevent` header, OIDC redirect detection, and a configuration context. All four gaps are in the thin `oslc-mcp-server` layer above it, which is why this plan is small.
+
+> **Hostnames in this plan are placeholders.** `elm.example.com` stands for whatever deployment you are working against. **Real hostnames, project area identifiers and configuration context URIs belong only in the git-ignored `oslc-mcp-server.yaml`** (Task 7 Step 1) — never in this plan, the committed example, the README, or a commit message.
 
 ---
 
@@ -200,15 +202,15 @@ git commit -m "test(oslc-mcp-server): establish Jest ESM harness"
 ```yaml
 servers:
   - alias: dng
-    baseUrl: https://trs-filter.smartfacts.com/rm
-    catalogUrl: https://trs-filter.smartfacts.com/rm/oslc_rm/catalog
+    baseUrl: https://elm.example.com/rm
+    catalogUrl: https://elm.example.com/rm/oslc_rm/catalog
     credentials:
       usernameEnv: ELM_USER
       passwordEnv: ELM_PASSWORD
     serviceProviders:
-      - uri: https://trs-filter.smartfacts.com/rm/oslc_rm/_aeb200/services.xml
-        alias: aeb200
-        configurationContext: https://trs-filter.smartfacts.com/gc/configuration/1
+      - uri: https://elm.example.com/rm/oslc_rm/_a1b2c3/services.xml
+        alias: requirements
+        configurationContext: https://elm.example.com/gc/configuration/1
 ```
 
 `configurationContext` on a service provider overrides the server's.
@@ -221,7 +223,7 @@ servers:
 | `/qm` | `oslc_qm:qmServiceProviders` | `/qm/oslc_qm/catalog` |
 | `/ccm` | `oslc_cm:cmServiceProviders` | `/ccm/oslc/workitems/catalog` |
 
-So resolve in order: **an explicit `catalogUrl` wins**; otherwise `GET ${baseUrl}/rootservices` and read the domain's `*ServiceProviders` predicate; otherwise fall back to `${baseUrl}/oslc/catalog`, which is what the genOSLC servers use and what preserves today's behaviour for them.
+So resolve in order: **an explicit `catalogUrl` wins**; otherwise `GET ${baseUrl}/rootservices` and read the domain's `*ServiceProviders` predicate; otherwise fall back to `${baseUrl}/oslc/catalog`, which is what this workspace's own OSLC servers use and what preserves today's behaviour for them.
 
 Note `/qm` advertises **four** catalogs (`oslc_qm`, `oslc_auto`, `oslc_cm`, `oslc_config`), so resolution must select by domain predicate rather than taking the first catalog it finds. Since `rootservices` resolution requires a network fetch, it belongs in Task 6's startup rather than in Task 2's pure parser — `parseConfigFile` leaves `catalogUrl` `undefined` when absent, and startup resolves it.
 
@@ -269,12 +271,12 @@ servers:
     baseUrl: https://elm.example.com/rm
     serviceProviders:
       - uri: https://elm.example.com/rm/oslc_rm/_a/services.xml
-        alias: aeb200
+        alias: requirements
         configurationContext: https://elm.example.com/gc/configuration/1
 `);
     const sps = config.servers[0].serviceProviders!;
     expect(sps).toHaveLength(1);
-    expect(sps[0].alias).toBe('aeb200');
+    expect(sps[0].alias).toBe('requirements');
     expect(sps[0].configurationContext).toBe('https://elm.example.com/gc/configuration/1');
   });
 
@@ -657,7 +659,7 @@ This is a verification, not a code change, and it decides whether a fifth task i
 curl -sk -u "$ELM_USER:$ELM_PASSWORD" \
   -H "Accept: application/rdf+xml" -H "OSLC-Core-Version: 2.0" \
   -o /tmp/jas-probe.xml -w "%{http_code}\n" \
-  "https://trs-filter.smartfacts.com/rm/oslc_rm/catalog"
+  "https://elm.example.com/rm/oslc_rm/catalog"
 ```
 
 Expected: `200` with RDF in `/tmp/jas-probe.xml`. Count the service providers:
@@ -966,7 +968,7 @@ const CATALOG_PREDICATES = [
  *   2. otherwise read ${baseUrl}/rootservices and take the first domain
  *      catalog predicate present;
  *   3. otherwise fall back to ${baseUrl}/oslc/catalog, which is the
- *      genOSLC convention and preserves the previous behaviour.
+ *      workspace convention and preserves the previous behaviour.
  */
 export async function resolveCatalogUrl(
   client: OSLCClient,
@@ -1222,36 +1224,36 @@ Create `oslc-mcp-server/oslc-mcp-server.example.yaml`:
 
 servers:
   - alias: dng
-    baseUrl: https://trs-filter.smartfacts.com/rm
-    catalogUrl: https://trs-filter.smartfacts.com/rm/oslc_rm/catalog
+    baseUrl: https://elm.example.com/rm
+    catalogUrl: https://elm.example.com/rm/oslc_rm/catalog
     credentials:
       usernameEnv: ELM_USER
       passwordEnv: ELM_PASSWORD
     serviceProviders:
-      - uri: https://trs-filter.smartfacts.com/rm/oslc_rm/<project-area-id>/services.xml
-        alias: aeb200-requirements
-        configurationContext: https://trs-filter.smartfacts.com/gc/configuration/<gc-id>
+      - uri: https://elm.example.com/rm/oslc_rm/<project-area-id>/services.xml
+        alias: requirements
+        configurationContext: https://elm.example.com/gc/configuration/<gc-id>
 
   - alias: etm
-    baseUrl: https://trs-filter.smartfacts.com/qm
-    catalogUrl: https://trs-filter.smartfacts.com/qm/oslc_qm/catalog
+    baseUrl: https://elm.example.com/qm
+    catalogUrl: https://elm.example.com/qm/oslc_qm/catalog
     credentials:
       usernameEnv: ELM_USER
       passwordEnv: ELM_PASSWORD
     serviceProviders:
-      - uri: https://trs-filter.smartfacts.com/qm/oslc_qm/<project-area-id>/services.xml
-        alias: aeb200-test
-        configurationContext: https://trs-filter.smartfacts.com/gc/configuration/<gc-id>
+      - uri: https://elm.example.com/qm/oslc_qm/<project-area-id>/services.xml
+        alias: test
+        configurationContext: https://elm.example.com/gc/configuration/<gc-id>
 
   - alias: ewm
-    baseUrl: https://trs-filter.smartfacts.com/ccm
-    catalogUrl: https://trs-filter.smartfacts.com/ccm/oslc/workitems/catalog
+    baseUrl: https://elm.example.com/ccm
+    catalogUrl: https://elm.example.com/ccm/oslc/workitems/catalog
     credentials:
       usernameEnv: ELM_USER
       passwordEnv: ELM_PASSWORD
     serviceProviders:
-      - uri: https://trs-filter.smartfacts.com/ccm/oslc/contexts/<project-area-id>/workitems/services.xml
-        alias: aeb200-change
+      - uri: https://elm.example.com/ccm/oslc/contexts/<project-area-id>/workitems/services.xml
+        alias: change
     # EWM work items are not versioned, so no configuration context applies.
 
   # An AM entry belongs here once Rhapsody Model Manager is deployed —
@@ -1290,7 +1292,9 @@ Then exercise, per application: `list_resource_types`, one `create_<type>`, one 
 
 - [ ] **Step 5: Close out the ELM verification report**
 
-Update [the verification report](../../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md): mark the four blocked items done, record the create/query/link-write results, record the service-provider count from Task 3 Step 5, and set the **Decision** to `MCP` or `SCRIPT`.
+Record the outcome where the verification was raised: mark the four gaps in *Why this exists* as closed or still open, the create / query / link-write results per application, the service-provider count from Task 3 Step 5, and a verdict of `USABLE` or `NOT USABLE` per application.
+
+If this plan was raised by a downstream consumer with its own verification report, update that too — it is the consumer that has a decision waiting on the verdict, not this repository.
 
 - [ ] **Step 6: Commit**
 
@@ -1306,13 +1310,15 @@ git commit -m "docs(oslc-mcp-server): example ELM configuration and configuratio
 
 ## What this unblocks
 
-| Consumer | Needs |
+Any use of `oslc-mcp-server` against ELM — which is to say, any AI assistant reading or writing requirements, test artifacts, work items or model elements through OSLC in an ELM deployment. Two distinctions are worth keeping in mind while choosing how far to take the work:
+
+| Use | What it needs |
 |---|---|
-| [AAKI Acme AEB-200 dataset plan](../../../../../MID/genoslc-aspice-server/docs/plans/2026-08-13-aaki-acme-aeb-dataset-implementation-plan.md) Part 1, Tasks 4–8 | Scoping and configuration context. Has a scripting fallback, so this is a preference |
-| The same plan's Part 2 — the AAKI thread | All of it. **No fallback**: the thread must run over MCP, so these are prerequisites rather than conveniences |
+| **Populating or reading ELM content**, where a script over `oslc-client` is an acceptable alternative | Scoping and the configuration context. Valuable, but a preference — the same content can be created another way |
+| **An assistant working through MCP as the point of the exercise** — anything where "the AI reached the tools through MCP" is part of what is being demonstrated or relied on | All of it. **There is no fallback**: a script proves the data model and proves nothing about the MCP surface, so these become prerequisites rather than conveniences |
 
 The real configuration file is git-ignored (Task 7 Step 1) and documented in the README (Task 7 Step 3), which is therefore the only place its schema is written down.
 
 ---
 
-*Raised by the [ELM verification report](../../../../../MID/genoslc-aspice-server/docs/example/acme-aeb/mcp-verification-report.md), 2026-08-13.*
+*Raised by verification against an IBM ELM 7.x deployment, 2026-08-13. See §"Why this exists".*

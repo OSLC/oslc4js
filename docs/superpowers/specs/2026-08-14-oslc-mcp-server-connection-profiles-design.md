@@ -4,7 +4,7 @@
 
 > **One line.** The person who is about to do the work is the person who configures the tools, at the moment they need them — so `oslc-mcp-server` should start from a **named connection profile** the user can reuse, amend, refresh or create afresh, rather than from flags or a hand-edited file.
 
-**Deferred deliberately.** For `oslc-mcp-server` testing and the AAKI demo, [the YAML configuration file](../plans/2026-08-13-oslc-mcp-server-elm-readiness.md) is sufficient and is what gets built now. This document records the shape of the fuller feature so the YAML does not have to be thrown away when it arrives — §6 shows it is the same payload.
+**Deferred deliberately.** For testing `oslc-mcp-server` and for current use against ELM, [the YAML configuration file](../plans/2026-08-13-oslc-mcp-server-elm-readiness.md) is sufficient and is what gets built now. This document records the shape of the fuller feature so the YAML does not have to be thrown away when it arrives — §6 shows it is the same payload. Tracked as [OSLC/oslc4js#2](https://github.com/OSLC/oslc4js/issues/2).
 
 ---
 
@@ -14,7 +14,7 @@ The [ELM readiness plan](../plans/2026-08-13-oslc-mcp-server-elm-readiness.md) t
 
 1. **The configurer is the consumer.** `oslc-mcp-server` turns a set of OSLC service providers into MCP tools so that *somebody can do work with an AI assistant*. That somebody knows which project areas they need, and knows it **when they sit down to work** — not at deployment time, and not as a separate operator role. Configuration is part of starting work, not part of installing software.
 2. **Service providers change.** Project areas are created, renamed, archived and handed over. A configuration correct in March is stale by September, and the failure is quiet — a `404` on one service provider at startup, or worse, a project area the user needed that was never listed.
-3. **One user, several servers, several groupings.** A user may run one `oslc-mcp-server` against an ELM application group for one product and another against a different group — or against `genoslc-bmm-server` and `genoslc-aspice-server` for governance work. These are distinct working sets that coexist, not successive edits of one file.
+3. **One user, several servers, several groupings.** A user may run one `oslc-mcp-server` against an ELM application group for one product and another against a different group — or against `bmm-server` and `mrm-server` in this workspace for domain work unrelated to either. These are distinct working sets that coexist, not successive edits of one file.
 
 So the unit of configuration is not *a file*. It is a **named thing the user selects at startup**, which has a lifecycle.
 
@@ -37,7 +37,7 @@ The central design requirement: starting the server should **reuse** by default,
 
 | Mode | Invocation | Behaviour |
 |---|---|---|
-| **Reuse** | `--profile aeb-200` | Load, connect, discover the listed service providers, serve. No prompts. **The overwhelmingly common case, and it must stay silent and fast** |
+| **Reuse** | `--profile <name>` | Load, connect, discover the listed service providers, serve. No prompts. **The overwhelmingly common case, and it must stay silent and fast** |
 | **Choose** | no arguments | List the user's profiles, let them pick one, then reuse it. The natural entry point when the user has several |
 | **Create** | `--new-profile <name>` | Interactive: base URL → catalog discovered from `rootservices` → credentials → select project areas by name → optional configuration context → repeat per server → write → serve |
 | **Amend** | `--profile <name> --edit` | The create flow, pre-filled from the existing profile |
@@ -52,11 +52,11 @@ The central design requirement: starting the server should **reuse** by default,
 Two things the current plan makes the user find by hand are discoverable:
 
 - **The catalog.** `GET ${baseUrl}/rootservices` and read the domain's service-providers predicate. Verified against ELM on 2026-08-13: `/rm` → `oslc_rm:rmServiceProviders`, `/qm` → `oslc_qm:qmServiceProviders`, `/ccm` → `oslc_cm:cmServiceProviders`. **None of these matches the `${baseUrl}/oslc/catalog` convention**, so the default in the current plan is wrong for every ELM application — and `/qm` advertises four catalogs, so discovery must select the domain's rather than the first.
-- **The project areas.** Walk the catalog once, list `dcterms:title` per service provider, present them by **name**. The user recognises "AEB-200 Requirements"; they do not recognise `_kQm2ARJgEfG7jp9OGpGnmg`.
+- **The project areas.** Walk the catalog once, list `dcterms:title` per service provider, present them by **name**. A user recognises a project area by its title; nobody recognises `_kQm2ARJgEfG7jp9OGpGnmg`.
 
 This is the one moment a full catalog walk is *wanted*. It is a deliberate, interactive, occasional act — which is precisely what makes it acceptable here and unacceptable at every startup.
 
-**Fallback:** servers without `rootservices` — the genOSLC servers among them — keep the `${baseUrl}/oslc/catalog` convention, and an explicit catalog URL always overrides both.
+**Fallback:** servers without `rootservices` — this workspace’s own OSLC servers among them — keep the `${baseUrl}/oslc/catalog` convention, and an explicit catalog URL always overrides both.
 
 ## 5. Where the interface lives
 
@@ -65,7 +65,7 @@ Deferred with the rest, but the criterion is worth recording now, because it is 
 | If | Then |
 |---|---|
 | The configurer **is** the person running the AI assistant — the case described in §1 | A **terminal wizard** (`gh auth login`, `aws configure`). They are already at a terminal; adding an HTTP server, persistence and an SPA buys nothing |
-| The configurer is **not** that person — a customer staging a demo at a hosted site, a non-developer | A **browser UI**, in the manner of `smartfacts-trs-filter`'s Angular admin over its Spring Boot service |
+| The configurer is **not** that person — someone staging a deployment for others, a non-developer | A **browser UI**, in the manner of a deployed service with an SPA admin over a REST backend |
 
 **Today the first holds**, so a terminal wizard is the presumption. The second becomes real if `oslc-mcp-server` gains an HTTP or SSE MCP transport and is deployed for others — at which point it stops being a per-user subprocess, the HTTP surface and persistence are already being paid for, and a browser UI is nearly free. **The trigger to revisit is the transport, not the demand for a UI.**
 
