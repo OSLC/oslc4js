@@ -29,7 +29,7 @@ A **connection profile** is a named, persistent set of:
 
 A user has several. One is selected at startup.
 
-> **On the name.** The user called this a *context*, which is the right idea, but `Configuration-Context` is already an OSLC Configuration Management term meaning something quite different — and it appears in this very feature as a **field** (the stream or baseline a request resolves against). Two senses of "context" one nesting level apart would be a lasting source of confusion in code, logs and documentation. **Profile** is proposed instead. If a better word emerges, the concept is what matters.
+> **On the name — settled 2026-08-14.** The concept was first described as a *context*, which is the right idea but the wrong word here: `Configuration-Context` is already an OSLC Configuration Management term meaning something quite different, and it appears **inside this very feature** as a field — the stream or baseline a request resolves against. Two senses of "context" one nesting level apart would not survive contact with code, logs and documentation. **The name is `profile`.** Use it consistently: `--profile`, `~/.oslc-mcp/profiles/`, "connection profile"; and reserve "configuration context" for the OSLC CM sense alone.
 
 ## 3. Startup modes
 
