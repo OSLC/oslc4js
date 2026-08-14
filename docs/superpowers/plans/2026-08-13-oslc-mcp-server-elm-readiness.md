@@ -51,6 +51,7 @@ This blocks the [AAKI Acme AEB-200 dataset plan](../../../../../MID/genoslc-aspi
 | `oslc-mcp-server/src/credentials.ts` | **New.** Resolving `usernameEnv`/`passwordEnv` against the environment |
 | `oslc-mcp-server/src/credentials.test.ts` | **New.** Credential resolution tests |
 | `oslc-mcp-server/src/server-config.ts` | Modified. `ServerConfig` gains a configuration context; a new `ResolvedServer` type carries one server's fully-resolved settings |
+| `oslc-mcp-server/src/catalog-resolution.ts` | **New.** Resolving a server's catalog URL from `rootservices`, with the `${baseUrl}/oslc/catalog` convention as fallback |
 | `oslc-mcp-server/src/discovery.ts` | Modified. `discoverFromServiceProviders()` added; `discover()` delegates to it when scoped |
 | `oslc-mcp-server/src/discovery.test.ts` | **New.** Scoped-discovery tests with a stub client |
 | `oslc-mcp-server/src/index.ts` | Modified. Loads the config file, constructs one client per server, starts one MCP server over all of them |
@@ -210,7 +211,19 @@ servers:
         configurationContext: https://trs-filter.smartfacts.com/gc/configuration/1
 ```
 
-`catalogUrl` defaults to `${baseUrl}/oslc/catalog`, matching today's behaviour. `configurationContext` on a service provider overrides the server's.
+`configurationContext` on a service provider overrides the server's.
+
+**`catalogUrl` is resolved in three steps, because the old default is wrong for ELM.** Today's `${baseUrl}/oslc/catalog` convention matches **no** ELM application — verified 2026-08-13:
+
+| Server | `rootservices` predicate | Actual catalog |
+|---|---|---|
+| `/rm` | `oslc_rm:rmServiceProviders` | `/rm/oslc_rm/catalog` |
+| `/qm` | `oslc_qm:qmServiceProviders` | `/qm/oslc_qm/catalog` |
+| `/ccm` | `oslc_cm:cmServiceProviders` | `/ccm/oslc/workitems/catalog` |
+
+So resolve in order: **an explicit `catalogUrl` wins**; otherwise `GET ${baseUrl}/rootservices` and read the domain's `*ServiceProviders` predicate; otherwise fall back to `${baseUrl}/oslc/catalog`, which is what the genOSLC servers use and what preserves today's behaviour for them.
+
+Note `/qm` advertises **four** catalogs (`oslc_qm`, `oslc_auto`, `oslc_cm`, `oslc_config`), so resolution must select by domain predicate rather than taking the first catalog it finds. Since `rootservices` resolution requires a network fetch, it belongs in Task 6's startup rather than in Task 2's pure parser — `parseConfigFile` leaves `catalogUrl` `undefined` when absent, and startup resolves it.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -234,9 +247,9 @@ describe('parseConfigFile', () => {
     expect(config.servers[0].baseUrl).toBe('https://elm.example.com/rm');
   });
 
-  it('defaults catalogUrl from baseUrl', () => {
+  it('leaves catalogUrl undefined when absent, for startup to resolve', () => {
     const config = parseConfigFile(MINIMAL);
-    expect(config.servers[0].catalogUrl).toBe('https://elm.example.com/rm/oslc/catalog');
+    expect(config.servers[0].catalogUrl).toBeUndefined();
   });
 
   it('keeps an explicit catalogUrl', () => {
@@ -467,7 +480,9 @@ export function parseConfigFile(yamlText: string): ConfigFile {
     return {
       alias,
       baseUrl,
-      catalogUrl: typeof s.catalogUrl === 'string' ? s.catalogUrl : `${baseUrl}/oslc/catalog`,
+      // Left undefined when absent: resolving it needs a rootservices fetch,
+      // which belongs at startup, not in a pure parser.
+      catalogUrl: typeof s.catalogUrl === 'string' ? s.catalogUrl : undefined,
       configurationContext:
         typeof s.configurationContext === 'string' ? s.configurationContext : undefined,
       credentials,
@@ -923,7 +938,65 @@ git commit -m "feat(oslc-mcp-server): carry an OSLC configuration context in Ser
 
 **Tool naming.** With one server, tool names are unchanged — `create_requirement`. With several, they are prefixed with the server alias — `dng_create_requirement`, `etm_create_testcase`. Unprefixed names for the single-server case keep every existing configuration working.
 
-- [ ] **Step 1: Resolve the configuration in `index.ts`**
+- [ ] **Step 1: Add catalog resolution from `rootservices`**
+
+Create `oslc-mcp-server/src/catalog-resolution.ts`:
+
+```ts
+import { Namespace } from 'rdflib';
+import type { OSLCClient } from 'oslc-client';
+import { ACCEPT_RDF } from './discovery.js';
+
+/**
+ * Predicates ELM applications use in rootservices to advertise their
+ * domain's service provider catalog. An application may advertise several
+ * catalogs — /qm advertises four — so selection is by domain predicate,
+ * never by taking the first one found.
+ */
+const CATALOG_PREDICATES = [
+  'http://open-services.net/xmlns/rm/1.0/rmServiceProviders',
+  'http://open-services.net/xmlns/qm/1.0/qmServiceProviders',
+  'http://open-services.net/xmlns/cm/1.0/cmServiceProviders',
+  'http://open-services.net/xmlns/am/1.0/amServiceProviders',
+];
+
+/**
+ * Resolve a server's catalog URL:
+ *   1. an explicit value always wins;
+ *   2. otherwise read ${baseUrl}/rootservices and take the first domain
+ *      catalog predicate present;
+ *   3. otherwise fall back to ${baseUrl}/oslc/catalog, which is the
+ *      genOSLC convention and preserves the previous behaviour.
+ */
+export async function resolveCatalogUrl(
+  client: OSLCClient,
+  baseUrl: string,
+  explicit?: string
+): Promise<string> {
+  if (explicit) return explicit;
+
+  const rootservices = `${baseUrl.replace(/\/$/, '')}/rootservices`;
+  try {
+    const resource = await client.getResource(rootservices, '2.0', ACCEPT_RDF);
+    const store = resource.store;
+    const subject = store.sym(rootservices);
+    for (const predicate of CATALOG_PREDICATES) {
+      const value = store.any(subject, store.sym(predicate), null);
+      if (value?.value) {
+        console.error(`[startup] catalog from rootservices: ${value.value}`);
+        return value.value;
+      }
+    }
+    console.error(`[startup] ${rootservices} advertised no catalog predicate; using convention`);
+  } catch {
+    console.error(`[startup] no rootservices at ${rootservices}; using convention`);
+  }
+
+  return `${baseUrl.replace(/\/$/, '')}/oslc/catalog`;
+}
+```
+
+- [ ] **Step 2: Resolve the configuration in `index.ts`**
 
 Replace `parseArgs`/`buildConfig`/`main` in `oslc-mcp-server/src/index.ts`:
 
@@ -934,6 +1007,7 @@ import { OSLCClient } from 'oslc-client';
 import { discover, discoverFromServiceProviders } from './discovery.js';
 import { startServer } from './server.js';
 import { loadConfigFile } from './config-file.js';
+import { resolveCatalogUrl } from './catalog-resolution.js';
 import { resolveCredentials } from './credentials.js';
 import type { ResolvedServer } from './server-config.js';
 
@@ -976,7 +1050,8 @@ function resolveServers(args: CliArgs): ResolvedServer[] {
         alias: entry.alias,
         config: {
           serverURL: entry.baseUrl,
-          catalogURL: entry.catalogUrl!,
+          // Resolved at startup — may be undefined here (see main()).
+          catalogURL: entry.catalogUrl ?? '',
           username,
           password,
           configurationContext: entry.configurationContext,
@@ -1031,6 +1106,12 @@ async function main(): Promise<void> {
       config.configurationContext ?? null
     );
 
+    // Resolve the catalog now that a client exists: explicit value, else
+    // rootservices, else the ${baseUrl}/oslc/catalog convention.
+    config.catalogURL = await resolveCatalogUrl(
+      client, config.serverURL, config.catalogURL || undefined
+    );
+
     const discovery = serviceProviderURIs.length > 0
       ? await discoverFromServiceProviders(client, serviceProviderURIs, config.catalogURL)
       : await discover(client, config);
@@ -1047,7 +1128,7 @@ main().catch((err) => {
 });
 ```
 
-- [ ] **Step 2: Widen `startServer` to take several servers**
+- [ ] **Step 3: Widen `startServer` to take several servers**
 
 Change `startServer`'s signature in `oslc-mcp-server/src/server.ts:269` from
 `(client, discovery, serverURL, catalogURL, config)` to a single array parameter:
@@ -1067,7 +1148,7 @@ export async function startServer(servers: StartedServer[]): Promise<void> {
 
 Inside, iterate `servers`, building the client adapter and registering tools per server as it does today for one, and **prefix every registered tool name with `server.prefix`**. Keep the generic tools (`get_resource`, `query_resources`, `update_resource`, `delete_resource`, `list_resource_types`, `read_service_provider`) prefixed the same way, so a call is unambiguous about which server it reaches.
 
-- [ ] **Step 3: Build and run the full test suite**
+- [ ] **Step 4: Build and run the full test suite**
 
 ```bash
 cd oslc-mcp-server && npm run build && npm test
@@ -1075,7 +1156,7 @@ cd oslc-mcp-server && npm run build && npm test
 
 Expected: build clean, all tests pass.
 
-- [ ] **Step 4: Confirm backwards compatibility by hand**
+- [ ] **Step 5: Confirm backwards compatibility by hand**
 
 ```bash
 node dist/index.js --server http://localhost:8080 --catalog http://localhost:8080/oslc/catalog
@@ -1083,10 +1164,11 @@ node dist/index.js --server http://localhost:8080 --catalog http://localhost:808
 
 against a running `bmm-server`. Expected: discovery completes and tool names are **unprefixed**, exactly as before this plan.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add oslc-mcp-server/src/index.ts oslc-mcp-server/src/server.ts
+git add oslc-mcp-server/src/index.ts oslc-mcp-server/src/server.ts \
+        oslc-mcp-server/src/catalog-resolution.ts
 git commit -m "feat(oslc-mcp-server): serve several OSLC servers from one instance"
 ```
 
