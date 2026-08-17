@@ -80,23 +80,48 @@ POST https://<host>/<app>/<query-base>
   OSLC-Core-Version: 2.0
   Accept: application/rdf+xml
   Content-Type: application/x-www-form-urlencoded
-  body (decoded):  oslc.where=dcterms:identifier="__nomatch__"&oslc.select=dcterms:title
-  body (encoded):  oslc.where=dcterms%3Aidentifier%3D%22__nomatch__%22&oslc.select=…
+
+  body (decoded) — paste into parameter FIELDS, not a URL bar: '#' truncates
+    oslc.prefix   oslc=<http://open-services.net/ns/core#>
+    oslc.where    dcterms:identifier="__nomatch__"
+    oslc.select   dcterms:title
+
+  body (encoded) — what actually went on the wire
+    oslc.prefix=oslc%3D%3Chttp%3A%2F%2Fopen-services.net%2Fns%2Fcore%23%3E&oslc.where=…
+
 → 400  application/rdf+xml  (412 bytes)
   oslc:Error … "Unknown prefix: dcterms"
 ```
 
 **Decoded first**, because that is what goes into an HTTP client's parameter fields when someone reproduces it by hand; **encoded alongside**, because that is what went on the wire and the difference is occasionally the bug.
 
-### 5.2 Requests are POSTed, not GETted
+The decoded form is printed **one parameter per line, name and value separated by whitespace** rather than joined with `=` and `&`. That is deliberate: it cannot be pasted into a URL bar as a unit, so the `#` trap in §5.2 becomes awkward to fall into rather than merely warned about.
+
+### 5.2 Encoding — `#` must always be escaped
+
+**Percent-encode `#` as `%23`, without exception.** RDF namespace URIs end in `#` far more often than not — `http://open-services.net/ns/core#`, `http://www.w3.org/1999/02/22-rdf-syntax-ns#` — and they appear throughout OSLC query parameters, most obviously in `oslc.prefix` declarations and in any filter that names a full URI.
+
+An unescaped `#` in a request URI is a **fragment identifier**, and a fragment is never transmitted to the server. So this:
+
+```
+oslc.prefix=oslc=<http://open-services.net/ns/core#>
+```
+
+reaches the server as `oslc.prefix=oslc=<http://open-services.net/ns/core` — truncated, with the closing bracket and every parameter after it silently discarded. The server then reports a malformed prefix, or an unknown one, and the cause is invisible in the query you think you sent.
+
+`encodeURIComponent` escapes `#` correctly. The rule is therefore **never hand-assemble a parameter string**; encode every value through it, including values that look harmless.
+
+**This creates one trap in the transcript (§5.1), which must be labelled.** The decoded form exists to be pasted into an HTTP client — but it is safe only in a client's **parameter-value field**, where the client re-encodes it. Pasted into a URL bar, a decoded `#` truncates the request exactly as above, and the reproduction fails in a way that looks like the server behaving differently from the probe. The transcript must say so where it prints the decoded body, not in a footnote.
+
+### 5.3 Requests are POSTed, not GETted
 
 OSLC query parameters go in a form-encoded body against the query base, not in the request URI. Query strings grow past URL length limits quickly once `oslc.where` and `oslc.select` are both populated.
 
 The query base's **own** parameters stay in the request URI — some servers advertise bases like `…/query?componentURI=…`, and those belong to the base, not to the query.
 
-**Whether POST-query works at all is itself variable**, so it is a probe case (5.3, case 2) with GET as the fallback rather than an assumption.
+**Whether POST-query works at all is itself variable**, so it is a probe case (§5.4, case 2) with GET as the fallback rather than an assumption.
 
-### 5.3 The cases
+### 5.4 The cases
 
 Each yields `supported` / `unsupported` (with status and the server's own message) / **`ignored`** / `error` / `inconclusive`.
 
@@ -115,7 +140,7 @@ Each yields `supported` / `unsupported` (with status and the server's own messag
 
 **Case 3 is a discovery mechanism, not a control.** Default prefix sets are undocumented and differ between servers, so probing *without* declarations and reading the error is how the set is recovered. Declaring prefixes up front would conceal exactly what is being learned.
 
-### 5.4 Effect, not acceptance
+### 5.5 Effect, not acceptance
 
 A `200` means the parameter parsed. It says nothing about whether the server did anything with it — and a capability that parses cleanly but does nothing is **more dangerous than one that errors**, because a developer will build on it. So every case names the observation that proves it took effect:
 
@@ -130,7 +155,7 @@ A `200` means the parameter parsed. It says nothing about whether the server did
 
 Anything accepted without its evidence is recorded **`ignored`**.
 
-### 5.5 When the baseline is unavailable
+### 5.6 When the baseline is unavailable
 
 Cases 6–10 compare against case 1. If case 1 is unsupported, or returns zero members, those comparisons cannot be made. The probe must then obtain a baseline another way — a filter known to match everything, or a large page size — or record the affected cases as **`inconclusive`**.
 
