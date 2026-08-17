@@ -2,15 +2,23 @@
 
 *Design spec. Status: approved, pre-implementation. Date: 2026-08-17.*
 
-> **One line.** OSLC servers vary in what they actually implement, and the variability is not discoverable from what they advertise — so give `oslc-mcp-server` the means to **measure** a server's real behaviour, record the evidence, and separate what works from what needs a workaround and what needs the vendor.
+> **One line.** OSLC permits wide variation in what a server implements — especially in Query — and provides no way for a client to discover which choices were made, so give `oslc-mcp-server` the means to **measure** a server's real behaviour, record the evidence, and separate what can be relied on from what is conformantly absent, what needs a workaround, and what is genuinely broken.
 
 ---
 
 ## 1. Purpose and scope
 
-An MCP tool generated from OSLC discovery promises whatever the service provider advertises. Against real servers that promise is frequently wrong, and — the difficult part — **wrong silently**: a query parameter accepted and ignored, a property accepted and dropped, a document returned in place of the one requested. A `400` is recoverable, because the caller sees it. A `200` that did nothing is not.
+An MCP tool generated from OSLC discovery promises whatever the service provider advertises. Against real servers that promise is frequently more than the server delivers — for two quite different reasons, which matter to keep apart.
 
-This design adds the ability to find out, as MCP tools the assistant can call.
+**The specifications are deliberately permissive.** OSLC is written with many **MAY**s and **SHOULD**s and comparatively few **MUST**s, leaving a great deal to the implementor's judgement. That is a reasonable design choice for a family of specifications meant to be adopted across very different products. **OSLC Query is where it bites hardest**: which comparison operators exist, whether `oslc.select` nests, whether `oslc.orderBy` is honoured, whether paging or full-text search are offered at all, which prefixes are predefined — nearly all of it is optional, and a server that implements none of it is **still conformant**.
+
+**And the specifications provide no way to discover which choices were made.** A `oslc:QueryCapability` advertises its `queryBase` and `resourceType`. It does not advertise the operators it supports, the parameters it honours, or the prefixes it predefines. So a client cannot tell a deliberate, conformant omission from a defect — and cannot tell either of those from a feature that works. The gap is not only in any one product; it is in the absence of a discovery mechanism for choices the specification explicitly permits.
+
+**Separately, some implementations are simply wrong.** Those exist too, and are worth reporting — but they are the smaller category and must not be conflated with the larger one.
+
+For a client the two are indistinguishable, and both present the same way: **silently**. A query parameter accepted and ignored, a property accepted and dropped, a document returned in place of the one requested. A `400` is recoverable, because the caller sees it. A `200` that did nothing is not.
+
+This design supplies the missing discovery mechanism empirically — by measurement, since it cannot be had by asking — as MCP tools the assistant can call.
 
 **In scope**
 
@@ -37,7 +45,7 @@ This design adds the ability to find out, as MCP tools the assistant can call.
 | D4 | Evidence | **Every probe records its full HTTP exchange, always — not behind a debug flag** | A probe result without the request that produced it is unfalsifiable. For normal tool operation the same transcript sits behind a debug flag |
 | D5 | Verdicts | **Verify effect, never acceptance** | A `200` means the parameter parsed, not that it did anything. `ignored` is a verdict available to every case |
 | D6 | Reference server | **Probe a server we control first** | A case failing there is a bug in the probe until proven otherwise. It also finds our own gaps |
-| D7 | Triage | **The probe records mechanical facts; a person assigns categories** | "Needs the vendor" is a judgement. Emitting it automatically would make the report an opinion rather than evidence |
+| D7 | Triage | **The probe records mechanical facts; a person assigns categories** | Whether an absence is a conformant choice or a defect is a judgement about the specification, not an observation. Emitting it automatically would make the report an opinion rather than evidence |
 
 ## 3. Prerequisite
 
@@ -174,11 +182,17 @@ Structure: per server, per capability, a table of cases with verdicts; then the 
 | Category | Meaning | Outcome |
 |---|---|---|
 | **Works** | Rely on it | Nothing to do |
+| **Not implemented, and that is conformant** | The specification made it optional and this server declined it | **Nothing to ask anyone.** Record it so nobody relies on it, and so the follow-on spec can decide whether to work around it |
 | **Needs a special case** | Workable around in `oslc-mcp-server` | The follow-on spec |
-| **Ask the vendor** | A conformance gap or defect that should not be papered over | An issue, with the transcript as evidence |
+| **Defect — ask the vendor** | Advertised and broken, or non-conformant where the specification does say **MUST** | An issue, with the transcript as evidence |
 | **Ours to fix** | A defect in our own code | An issue in the right repository |
+| **The specification's gap** | Behaviour the specification permits to vary, with no way for a client to discover which way | Feedback to OSLC-OP, not to a product vendor |
 
-The last row is why a server we control is probed first (D6), and the transcripts are what make the third row a credible report rather than an assertion.
+**The second and fourth rows are the distinction that matters most**, and conflating them is the easy mistake. A server that does not implement `oslc.orderBy` has done nothing wrong — the specification allows it — and raising that as a defect wastes everyone's time and damages the credibility of the reports that *are* defects. What is legitimately wrong in that case is that a client had to discover it by experiment.
+
+**The last row is what makes this more than a compatibility exercise.** Every entry there is evidence for a concrete proposal: that OSLC should let a server advertise which optional capabilities it implements. This work produces exactly the data that argument needs.
+
+The **Ours to fix** row is why a server we control is probed first (D6), and the transcripts are what make **Defect** a credible report rather than an assertion.
 
 ## 9. Order of work
 
