@@ -155,6 +155,22 @@ The last two are listed separately on purpose. They are **not** in the query syn
 
 **Case 3 is a discovery mechanism, not a control.** Default prefix sets are undocumented and differ between servers, so probing *without* declarations and reading the error is how the set is recovered. Declaring prefixes up front would conceal exactly what is being learned.
 
+**But it only works if the prefix is actually used in an `oslc.where` or `oslc.select` clause.** A prefix that is undeclared and unexercised is not an error — the server has no occasion to resolve it, and says nothing. So silence proves nothing unless the probe forced the question. Three consequences for how case 3 is built:
+
+- **One prefix per request.** Exercise a single prefix in each probe, so an error is attributable to that prefix rather than to whichever of several the server happened to reject first.
+- **The rest of the term must be otherwise valid.** If the property does not exist on the resource type, the server may fail for that reason instead, and the result says nothing about the prefix. Take the property from the query capability's own `oslc:resourceShape` where one is advertised.
+- **Probe `oslc.where` and `oslc.select` separately.** A server may resolve prefixes when evaluating a filter but not when projecting properties, or validate one and ignore the other. They are different code paths and should not be assumed to agree.
+
+**Interpreting the outcome**, given the above holds:
+
+| Result | Means |
+|---|---|
+| `400` naming the prefix | Not predefined. Recorded, and case 4 then confirms an explicit declaration fixes it |
+| Success, and the clause took effect (§5.5) | Predefined |
+| Success, but the clause was **ignored** | Nothing about prefixes. The parameter was not honoured at all, so the prefix was never resolved either — record `inconclusive` for the prefix question and pursue the ignored parameter instead |
+
+That last row is the one to watch: a server that ignores `oslc.where` will also appear to accept every prefix, and reading that as "all prefixes predefined" would be exactly backwards.
+
 ### 5.5 Effect, not acceptance
 
 A `200` means the parameter parsed. It says nothing about whether the server did anything with it — and a capability that parses cleanly but does nothing is **more dangerous than one that errors**, because a developer will build on it. So every case names the observation that proves it took effect:
