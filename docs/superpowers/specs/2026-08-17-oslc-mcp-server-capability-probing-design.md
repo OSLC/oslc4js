@@ -131,12 +131,27 @@ Each yields `supported` / `unsupported` (with status and the server's own messag
 | 2 | POST form-encoded versus GET | Whether POST-query works, and therefore whether long queries are possible at all |
 | 3 | `oslc.where` using a prefix, **no `oslc.prefix` declared** | The server's **undocumented default prefix set**, by elimination: a `400` naming the prefix says it is not predefined; success says it is |
 | 4 | The same filter **with `oslc.prefix`** | Whether case 3's failure was purely prefixes, or something real |
-| 5 | `oslc.where` operators — `=`, `!=`, comparison, `in`, wildcard, `and` | Which of the syntax is actually implemented |
+| 5 | `oslc.where` syntax, one request per construct — enumerated below | Which of the query syntax is implemented, and which vendor extensions exist |
 | 6 | `oslc.where` that **cannot match anything** | Compared against case 1 |
 | 7 | `oslc.select`, flat and nested `a{b}` | Whether the response narrows, and whether nesting is honoured |
 | 8 | `oslc.orderBy` ascending and descending | Whether ordering is applied |
 | 9 | `oslc.paging` with `oslc.pageSize` | Whether paging works and `oslc:nextPage` is returned |
 | 10 | `oslc.searchTerms` | Whether full-text search is implemented at all |
+
+**Case 5 in full.** Each construct is a separate request with its own verdict, since a server may implement some and not others — and an unsupported construct usually fails the whole filter, so they cannot be combined into one probe.
+
+| Construct | Example | In the query syntax? |
+|---|---|---|
+| Equality | `dcterms:identifier="PROBE-1"` | Yes |
+| Inequality | `dcterms:identifier!="PROBE-1"` | Yes |
+| Comparison | `dcterms:modified>"2020-01-01T00:00:00Z"` — and `<`, `<=`, `>=` | Yes |
+| Set membership | `oslc:status in ["a","b"]` | Yes |
+| Conjunction | `a="x" and b="y"` | Yes |
+| Scoped terms | `dcterms:creator{foaf:name="x"}` | Yes |
+| **Disjunction** | `a="x" or b="y"` | **No** — probing it reveals a vendor extension, not a conformance gap |
+| **Wildcard** | `dcterms:title="Prob*"` | **No** — likewise an extension if it works |
+
+The last two are listed separately on purpose. They are **not** in the query syntax, so a server rejecting them is entirely correct and must never be triaged as a defect. They are probed because a server that *does* support them offers capability worth knowing about — and worth deciding, deliberately, whether to depend on.
 
 **Case 3 is a discovery mechanism, not a control.** Default prefix sets are undocumented and differ between servers, so probing *without* declarations and reading the error is how the set is recovered. Declaring prefixes up front would conceal exactly what is being learned.
 
