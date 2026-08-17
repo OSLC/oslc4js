@@ -6,6 +6,8 @@
 
 **Architecture:** A YAML configuration file becomes the primary input, listing servers, the service providers to scope each to, the configuration context to use, and *which environment variables* supply credentials. One `OSLCClient` is constructed per configured server. Startup discovery seeds from the listed service providers and skips the catalog walk entirely when they are given. The existing four CLI flags keep working unchanged for the single-server case.
 
+> **Execution status (2026-08-17).** `- [x]` done · `- [~]` partially done. All seven tasks are implemented, merged to `master` and pushed. Outstanding: **Task 7 Steps 4–5** — the create/update/delete pass, and the `MCP`/`SCRIPT` decision. Discovery, `list_resource_types` and unfiltered query are verified against a live ELM deployment; filtered query results are confounded and are being re-run against non-configuration-enabled project areas.
+
 **Tech Stack:** TypeScript 5.8, ESM, Node 22+, `@modelcontextprotocol/sdk`, `oslc-client`, `yaml`, Jest with `ts-jest` ESM.
 
 ## Why this exists
@@ -75,7 +77,7 @@ This module has no tests. Nothing else in this plan can follow the workspace's t
 **Interfaces:**
 - Produces: `npm test` in `oslc-mcp-server`, running TypeScript ESM tests. Consumed by every later task.
 
-- [ ] **Step 1: Write a failing test**
+- [x] **Step 1: Write a failing test**
 
 Create `oslc-mcp-server/src/harness.test.ts`:
 
@@ -89,7 +91,7 @@ describe('test harness', () => {
 });
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [x] **Step 2: Run it to confirm it fails**
 
 ```bash
 cd oslc-mcp-server && npm test
@@ -97,7 +99,7 @@ cd oslc-mcp-server && npm test
 
 Expected: FAIL — `npm error Missing script: "test"`.
 
-- [ ] **Step 3: Add the harness**
+- [x] **Step 3: Add the harness**
 
 Create `oslc-mcp-server/jest.config.js`:
 
@@ -136,7 +138,7 @@ Then:
 cd oslc-mcp-server && npm install
 ```
 
-- [ ] **Step 4: Run it to confirm it passes**
+- [x] **Step 4: Run it to confirm it passes**
 
 ```bash
 cd oslc-mcp-server && npm test
@@ -144,7 +146,7 @@ cd oslc-mcp-server && npm test
 
 Expected: PASS, 1 test.
 
-- [ ] **Step 5: Confirm the build still works**
+- [x] **Step 5: Confirm the build still works**
 
 ```bash
 cd oslc-mcp-server && npm run build
@@ -152,7 +154,7 @@ cd oslc-mcp-server && npm run build
 
 Expected: `tsc` exits 0. If it now tries to compile `*.test.ts` into `dist/`, add `"exclude": ["src/**/*.test.ts"]` to `tsconfig.json`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add oslc-mcp-server/jest.config.js oslc-mcp-server/package.json \
@@ -227,7 +229,7 @@ So resolve in order: **an explicit `catalogUrl` wins**; otherwise `GET ${baseUrl
 
 Note `/qm` advertises **four** catalogs (`oslc_qm`, `oslc_auto`, `oslc_cm`, `oslc_config`), so resolution must select by domain predicate rather than taking the first catalog it finds. Since `rootservices` resolution requires a network fetch, it belongs in Task 6's startup rather than in Task 2's pure parser — `parseConfigFile` leaves `catalogUrl` `undefined` when absent, and startup resolves it.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `oslc-mcp-server/src/config-file.test.ts`:
 
@@ -343,7 +345,7 @@ servers:
 });
 ```
 
-- [ ] **Step 2: Run to confirm they fail**
+- [x] **Step 2: Run to confirm they fail**
 
 ```bash
 cd oslc-mcp-server && npm test -- config-file
@@ -351,7 +353,7 @@ cd oslc-mcp-server && npm test -- config-file
 
 Expected: FAIL — `Cannot find module './config-file.js'`.
 
-- [ ] **Step 3: Implement the loader**
+- [x] **Step 3: Implement the loader**
 
 ```bash
 cd oslc-mcp-server && npm install yaml
@@ -500,7 +502,7 @@ export function loadConfigFile(path: string): ConfigFile {
 }
 ```
 
-- [ ] **Step 4: Run to confirm they pass**
+- [x] **Step 4: Run to confirm they pass**
 
 ```bash
 cd oslc-mcp-server && npm test -- config-file
@@ -508,7 +510,7 @@ cd oslc-mcp-server && npm test -- config-file
 
 Expected: PASS, 10 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add oslc-mcp-server/src/config-file.ts oslc-mcp-server/src/config-file.test.ts \
@@ -528,7 +530,7 @@ git commit -m "feat(oslc-mcp-server): configuration file schema and loader"
 - Consumes: `ServerEntry` from Task 2.
 - Produces: `export function resolveCredentials(server: ServerEntry, env: NodeJS.ProcessEnv): { username: string; password: string }`. Consumed by Task 6.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `oslc-mcp-server/src/credentials.test.ts`:
 
@@ -591,7 +593,7 @@ describe('resolveCredentials', () => {
 });
 ```
 
-- [ ] **Step 2: Run to confirm they fail**
+- [x] **Step 2: Run to confirm they fail**
 
 ```bash
 cd oslc-mcp-server && npm test -- credentials
@@ -599,7 +601,7 @@ cd oslc-mcp-server && npm test -- credentials
 
 Expected: FAIL — `Cannot find module './credentials.js'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `oslc-mcp-server/src/credentials.ts`:
 
@@ -643,7 +645,7 @@ export function resolveCredentials(
 }
 ```
 
-- [ ] **Step 4: Run to confirm they pass**
+- [x] **Step 4: Run to confirm they pass**
 
 ```bash
 cd oslc-mcp-server && npm test -- credentials
@@ -651,7 +653,7 @@ cd oslc-mcp-server && npm test -- credentials
 
 Expected: PASS, 6 tests.
 
-- [ ] **Step 5: Confirm JAS Basic authentication works against the target**
+- [x] **Step 5: Confirm JAS Basic authentication works against the target**
 
 This is a verification, not a code change, and it decides whether a fifth task is needed.
 
@@ -672,7 +674,7 @@ grep -c "oslc:serviceProvider\|ServiceProvider rdf:about" /tmp/jas-probe.xml
 
 If the result is `401` or a redirect to `/oidc/endpoint/jazzop`, Basic is not sufficient and Bearer-token support is required. In that case **stop and add a task** for it rather than working around it: `oslc-client` would need an option to obtain and attach a bearer token from the `x-jsa-authorization-url` endpoint.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add oslc-mcp-server/src/credentials.ts oslc-mcp-server/src/credentials.test.ts
@@ -693,7 +695,7 @@ git commit -m "feat(oslc-mcp-server): resolve credentials from named environment
 
 The point of this task: when service providers are listed, **the catalog is never fetched at all**. `discoverServiceProvider()` already does the per-provider work, so this is a second entry point to existing code.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `oslc-mcp-server/src/discovery.test.ts`:
 
@@ -772,7 +774,7 @@ describe('discoverFromServiceProviders', () => {
 });
 ```
 
-- [ ] **Step 2: Run to confirm they fail**
+- [x] **Step 2: Run to confirm they fail**
 
 ```bash
 cd oslc-mcp-server && npm test -- discovery
@@ -780,7 +782,7 @@ cd oslc-mcp-server && npm test -- discovery
 
 Expected: FAIL — `discoverFromServiceProviders is not a function`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `oslc-mcp-server/src/discovery.ts`, after `discoverServiceProvider`:
 
@@ -830,7 +832,7 @@ export async function discoverFromServiceProviders(
 }
 ```
 
-- [ ] **Step 4: Run to confirm they pass**
+- [x] **Step 4: Run to confirm they pass**
 
 ```bash
 cd oslc-mcp-server && npm test -- discovery
@@ -838,7 +840,7 @@ cd oslc-mcp-server && npm test -- discovery
 
 Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Confirm the unscoped path is unchanged**
+- [x] **Step 5: Confirm the unscoped path is unchanged**
 
 ```bash
 cd oslc-mcp-server && npm run build && npm test
@@ -846,7 +848,7 @@ cd oslc-mcp-server && npm run build && npm test
 
 Expected: build clean, all tests pass. `discover()` is untouched by this task.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add oslc-mcp-server/src/discovery.ts oslc-mcp-server/src/discovery.test.ts
@@ -880,7 +882,7 @@ git commit -m "feat(oslc-mcp-server): scoped discovery that skips the catalog wa
 
 `OSLCClient`'s constructor is `(user?, password?, configurationContext?)` and its third parameter sets the `Configuration-Context` header (`oslc-client/OSLCClient.js:173, 216–218`). Today `src/index.ts:69` passes two arguments. This task widens the type; Task 6 passes the value.
 
-- [ ] **Step 1: Widen `ServerConfig`**
+- [x] **Step 1: Widen `ServerConfig`**
 
 Replace `oslc-mcp-server/src/server-config.ts`:
 
@@ -911,7 +913,7 @@ export interface ResolvedServer {
 }
 ```
 
-- [ ] **Step 2: Confirm the build still passes**
+- [x] **Step 2: Confirm the build still passes**
 
 ```bash
 cd oslc-mcp-server && npm run build && npm test
@@ -919,7 +921,7 @@ cd oslc-mcp-server && npm run build && npm test
 
 Expected: clean. `configurationContext` is optional, so nothing existing breaks.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add oslc-mcp-server/src/server-config.ts
@@ -940,7 +942,7 @@ git commit -m "feat(oslc-mcp-server): carry an OSLC configuration context in Ser
 
 **Tool naming.** With one server, tool names are unchanged — `create_requirement`. With several, they are prefixed with the server alias — `dng_create_requirement`, `etm_create_testcase`. Unprefixed names for the single-server case keep every existing configuration working.
 
-- [ ] **Step 1: Add catalog resolution from `rootservices`**
+- [x] **Step 1: Add catalog resolution from `rootservices`**
 
 Create `oslc-mcp-server/src/catalog-resolution.ts`:
 
@@ -998,7 +1000,7 @@ export async function resolveCatalogUrl(
 }
 ```
 
-- [ ] **Step 2: Resolve the configuration in `index.ts`**
+- [x] **Step 2: Resolve the configuration in `index.ts`**
 
 Replace `parseArgs`/`buildConfig`/`main` in `oslc-mcp-server/src/index.ts`:
 
@@ -1130,7 +1132,7 @@ main().catch((err) => {
 });
 ```
 
-- [ ] **Step 3: Widen `startServer` to take several servers**
+- [x] **Step 3: Widen `startServer` to take several servers**
 
 Change `startServer`'s signature in `oslc-mcp-server/src/server.ts:269` from
 `(client, discovery, serverURL, catalogURL, config)` to a single array parameter:
@@ -1150,7 +1152,7 @@ export async function startServer(servers: StartedServer[]): Promise<void> {
 
 Inside, iterate `servers`, building the client adapter and registering tools per server as it does today for one, and **prefix every registered tool name with `server.prefix`**. Keep the generic tools (`get_resource`, `query_resources`, `update_resource`, `delete_resource`, `list_resource_types`, `read_service_provider`) prefixed the same way, so a call is unambiguous about which server it reaches.
 
-- [ ] **Step 4: Build and run the full test suite**
+- [x] **Step 4: Build and run the full test suite**
 
 ```bash
 cd oslc-mcp-server && npm run build && npm test
@@ -1158,7 +1160,7 @@ cd oslc-mcp-server && npm run build && npm test
 
 Expected: build clean, all tests pass.
 
-- [ ] **Step 5: Confirm backwards compatibility by hand**
+- [x] **Step 5: Confirm backwards compatibility by hand**
 
 ```bash
 node dist/index.js --server http://localhost:8080 --catalog http://localhost:8080/oslc/catalog
@@ -1166,7 +1168,7 @@ node dist/index.js --server http://localhost:8080 --catalog http://localhost:808
 
 against a running `bmm-server`. Expected: discovery completes and tool names are **unprefixed**, exactly as before this plan.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add oslc-mcp-server/src/index.ts oslc-mcp-server/src/server.ts \
@@ -1183,7 +1185,7 @@ git commit -m "feat(oslc-mcp-server): serve several OSLC servers from one instan
 - Modify: `oslc-mcp-server/README.md`
 - Modify: `.gitignore`
 
-- [ ] **Step 1: Git-ignore the real configuration file**
+- [x] **Step 1: Git-ignore the real configuration file**
 
 Add to the repository's `.gitignore`:
 
@@ -1202,7 +1204,7 @@ git check-ignore -v oslc-mcp-server.yaml
 
 Expected: the rule is printed. If nothing is printed the file is **not** ignored — fix the rule before going further, because Step 3 puts real credentials in it.
 
-- [ ] **Step 2: Write the example configuration**
+- [x] **Step 2: Write the example configuration**
 
 Create `oslc-mcp-server/oslc-mcp-server.example.yaml`:
 
@@ -1260,7 +1262,7 @@ servers:
   # /am, /dm, /rmm and /amm all returned 404 on 2026-08-13.
 ```
 
-- [ ] **Step 3: Document the configuration file in the README**
+- [x] **Step 3: Document the configuration file in the README**
 
 **The README is the only documentation of this file's schema**, because the real file is git-ignored and the example is a redacted skeleton. Someone with a fresh checkout must be able to author a working configuration from the README alone. Write it to that bar, not as a pointer to the example.
 
@@ -1278,7 +1280,7 @@ Add a **Configuration file** section to `oslc-mcp-server/README.md` covering:
 | CLI compatibility | All four original flags still work, plus `--configuration-context` |
 | A complete worked ELM example | Three applications, inline in the README, not only in the example file |
 
-- [ ] **Step 4: Probe the real ELM server**
+- [~] **Step 4: Probe the real ELM server**
 
 With `ELM_USER` and `ELM_PASSWORD` set, and `<project-area-id>` and `<gc-id>` filled in:
 
@@ -1290,13 +1292,13 @@ Expected: three servers connect; each fetches **only** its listed service provid
 
 Then exercise, per application: `list_resource_types`, one `create_<type>`, one `query_<type>`, one `update_resource` writing a link. Delete the probe resources afterwards.
 
-- [ ] **Step 5: Close out the ELM verification report**
+- [~] **Step 5: Close out the ELM verification report**
 
 Record the outcome where the verification was raised: mark the four gaps in *Why this exists* as closed or still open, the create / query / link-write results per application, the service-provider count from Task 3 Step 5, and a verdict of `USABLE` or `NOT USABLE` per application.
 
 If this plan was raised by a downstream consumer with its own verification report, update that too — it is the consumer that has a decision waiting on the verdict, not this repository.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Check first that the real configuration is not staged:
 
