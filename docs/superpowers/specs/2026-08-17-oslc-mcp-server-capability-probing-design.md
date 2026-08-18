@@ -40,7 +40,7 @@ This design supplies the missing discovery mechanism empirically — by measurem
 | D1 | Form | **A shipped capability, not investigation scripts** | Server behaviour is version-specific, so an answer has a shelf life and must be re-obtainable; and the same question recurs at every deployment |
 | D2 | Interface | **MCP tools**, following the existing per-server prefixing | The assistant investigates the substrate the same way it investigates anything else, and results arrive where it can reason about them |
 | D3 | **One orchestrated probe, not several peers** | `probe_oslc` runs create → read → query → update → delete as one sequence. Read-only is a **mode**, not a separate tool | Create and query answer each other's questions (§5.1). Offering query-only and write-only probes as peers would invite the assistant to pick one and get materially weaker answers without knowing it |
-| D4 | Write safety | **`probe_oslc` refuses to write unless its target service provider is explicitly marked as a scratch area** | This is a tool an assistant can call. The marking makes blast radius a configuration decision rather than a command-line one |
+| D4 | Write safety | **`probe_oslc` writes only to service providers named by a repeatable `--probe-write-target` startup flag.** No flag, no writes, ever | This is a tool an assistant can call, so the guard must not be something the assistant can satisfy. A startup flag cannot be: it is set by whoever launches the server. Deliberately *not* a configuration field — a config file is the artifact that gets copied between machines and pasted into issues, and a permission stored there travels with it |
 | D5 | Evidence | **Every request records its full HTTP exchange, always — not behind a debug flag** | A result without the request that produced it is unfalsifiable. For normal tool operation the same transcript sits behind a debug flag |
 | D6 | Verdicts | **Verify effect, never acceptance** | A `200` means the parameter parsed, not that it did anything. `ignored` is a verdict available to every case |
 | D7 | Reference server | **Probe a server we control first** | A case failing there is a bug in the probe until proven otherwise. It also finds our own gaps |
@@ -77,7 +77,7 @@ Create and query answer each other's questions. **Create a known fixture first, 
 - **Query verification stops being comparative.** Without a fixture, a filter probe can only infer — filter for something impossible, see whether the count drops. With one, the probe filters for a value it created and knows to be unique, so the expected result is exactly one resource, *by identity*. Anything else is a finding stated precisely, rather than a count that looked wrong.
 - **`ignored` becomes exact.** One result means the filter worked; five means it was ignored; zero means something else is wrong. No dependence on the target having pre-existing data, and no ambiguity about how much it had.
 - **Some behaviour only appears across the seam.** Indexing latency (§5.6) is invisible to a write-only probe and to a read-only one, and shows up only in create-then-query.
-- **And the target is left as it was found**, which is what makes it safe to run anywhere rather than only against a scratch area.
+- **And the target is left as it was found**, which is what makes it safe to point at a shared project area at all, rather than needing a disposable one.
 
 ### 5.2 The sequence
 
@@ -108,15 +108,25 @@ Every value is chosen so its expected query result is known before the query is 
 
 ### 5.4 Write safety
 
-`probe_oslc` **refuses to write unless the target service provider is explicitly marked as a scratch area** in the configuration (D4) — marked per service provider, so a scratch area can sit alongside real ones in one configuration.
+`probe_oslc` writes only to service providers named at startup:
 
-Since this is an MCP tool an assistant can call, that guard is not a convenience. It is what stands between an exploratory question and artifacts appearing in a customer's requirements project.
+```
+oslc-mcp-server --config ./oslc-mcp-server.yaml \
+  --probe-write-target https://<host>/<app>/<sp-a>/services.xml \
+  --probe-write-target https://<host>/<app>/<sp-b>/services.xml
+```
+
+The flag is repeatable, so several targets can be enabled in one run — probing three applications is the normal case. **Absent the flag, `probe_oslc` cannot write at all** and falls back to read-only mode (§5.5). Asked to write to a service provider not named, it refuses and says which flag would have permitted it.
+
+**Why a startup flag rather than a field in the configuration.** This is an MCP tool an assistant can call, so the guard must be something the assistant cannot satisfy — and a startup flag is set by whoever launches the server, not by anything in the conversation. A configuration field would be weaker in a second way too: the configuration file is the artifact that gets copied between machines, pasted into issues and reused at the next deployment, and a write permission stored there travels with it silently. A flag has to be typed again, deliberately, each time the server is launched for probing.
+
+It is also simply smaller — no schema change, no validation, nothing new to document in the configuration reference.
 
 Every created URI is written to a run manifest **before** the create, so an interruption leaves a file naming exactly what exists.
 
 ### 5.5 Read-only mode
 
-When the target cannot be written to — no scratch marking, or a deployment where writes are not permitted — `probe_oslc` runs phases 4 and 7 only, against whatever content already exists.
+When the target cannot be written to — no `--probe-write-target` naming it, or a deployment where writes are not permitted — `probe_oslc` runs phases 4 and 7 only, against whatever content already exists. **This is the default**: read-only is not a mode you select, it is what you get unless writes were deliberately enabled at startup.
 
 **The report must label this prominently**, because the verification is materially weaker. Without a fixture there is no known expected result, so every effect-test falls back to comparing against a baseline, and the baseline comes from a bare `GET` on the query base — which may itself be unsupported, or return nothing. Where that happens the affected cases are recorded **`inconclusive`**, never as passes. An inconclusive effect-test reported as success is precisely the silent failure this design exists to expose.
 
@@ -265,7 +275,7 @@ Configuration-enabled project areas require a `Configuration-Context`; without o
 
 Both files are git-ignored. Real hostnames and project-area identifiers live only there.
 
-**Service providers used for writing carry the scratch marking** (§5.4), and the probe refuses to write without it.
+Neither file grants permission to write. That is a startup flag (§5.4), so a configuration can be copied to another deployment without carrying write access with it.
 
 ## 9. The report
 
