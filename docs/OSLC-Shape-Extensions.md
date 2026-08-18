@@ -68,6 +68,7 @@ An earlier draft of this proposal included a companion `oslc:inversePropertyDefi
 - No OSLC consumer queries by an inverse URI. The reverse direction of `<x> <forwardURI> <y>` is found by swapping subject and object on the same forward predicate; there is no separate stored triple and no need to name one.
 - The "URI not declared as an `rdf:Property`" pattern it required (a referenceable handle that isn't itself a vocabulary term) created authoring confusion without enabling any concrete behavior.
 - The presence-or-absence of `oslc:inversePropertyLabel` is sufficient to mark a property as a forward link versus an inverse view (see "Link ownership" below).
+- OSLC link guidance recommends storing a link assertion in one place as `<x> <forwardURI> <y>` and not also define redundant backlinks such as `<y> <inverseURI> <x>`. The inverse direction is intended to be handled as a query instead of being stored redundantly. 
 
 ### Link ownership — using presence of `oslc:inversePropertyLabel` as the signal
 
