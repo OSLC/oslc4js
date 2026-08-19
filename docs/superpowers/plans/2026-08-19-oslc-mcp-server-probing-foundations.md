@@ -27,6 +27,22 @@ This plan covers **steps 1–3 of the spec's §11 order of work**, which form a 
 
 **Needs no code at all.** The spec's §9 "second configuration file" is an operational artifact, not a feature: it is another YAML file passed to the existing `--config` flag, naming project areas that are not configuration-enabled. `parseConfigFile` already supports everything it needs. Do not add code for it; note it in the README when §11 step 5 is reached.
 
+## Repository layout — read before committing
+
+`oslc-mcp-server`, `oslc-service` and `oslc-client` are **separate git repositories**, nested inside
+the `oslc4js` working tree and git-ignored by it (`/oslc-mcp-server/` in `oslc4js/.gitignore`). Each
+has its own GitHub remote:
+
+| Directory | Remote |
+|---|---|
+| `oslc-mcp-server` | `github.com/OSLC/oslc-mcp-server` |
+| `oslc-service` | `github.com/OSLC/oslc-service` |
+| `oslc4js` (this plan lives here) | `github.com/OSLC/oslc4js` |
+
+So `git add oslc-mcp-server/src/...` from the `oslc4js` root **fails** — the path is ignored. Run git
+from inside the package being changed, with paths relative to it. A task touching both
+`oslc-service` and `oslc-mcp-server` needs **two commits**, one per repository.
+
 ## Global Constraints
 
 - **Evidence is never optional (D5).** Every probe request records its full HTTP exchange, always — not behind a debug flag.
@@ -124,7 +140,7 @@ Expected: PASS — 4 suites, 23 tests.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add oslc-mcp-server/src/discovery.ts oslc-mcp-server/src/discovery.test.ts
+git add src/discovery.ts src/discovery.test.ts
 git commit -m "fix(mcp): prefer application/rdf+xml so a parse failure means something"
 ```
 
@@ -430,7 +446,7 @@ Expected: 2 failures with the line removed; 14 passing once restored.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add oslc-mcp-server/src/http-transcript.ts oslc-mcp-server/src/http-transcript.test.ts
+git add src/http-transcript.ts src/http-transcript.test.ts
 git commit -m "feat(mcp): record HTTP exchanges as evidence, with credentials redacted"
 ```
 
@@ -633,8 +649,8 @@ Expected: PASS — 6 suites, 43 tests; `tsc` clean. A `tsc` error naming `Starte
 - [ ] **Step 6: Commit**
 
 ```bash
-git add oslc-mcp-server/src/catalog-resolution.ts oslc-mcp-server/src/catalog-resolution.test.ts \
-        oslc-mcp-server/src/index.ts oslc-mcp-server/src/server.ts
+git add src/catalog-resolution.ts src/catalog-resolution.test.ts \
+        src/index.ts src/server.ts
 git commit -m "feat(mcp): report how a catalog URL was resolved, not just what it is"
 ```
 
@@ -807,8 +823,10 @@ Expected: PASS — 6 suites, 45 tests; `tsc` clean.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add oslc-service/src/mcp/context.ts oslc-service/src/mcp/index.ts \
-        oslc-mcp-server/src/discovery.ts oslc-mcp-server/src/discovery.test.ts
+# Two repositories, so two commits.
+git -C ../oslc-service add src/mcp/context.ts src/mcp/index.ts
+git -C ../oslc-service commit -m "feat(mcp): record shapes that failed to fetch"
+git add src/discovery.ts src/discovery.test.ts
 git commit -m "feat(mcp): record shapes that failed to fetch, since each removes a tool"
 ```
 
@@ -1134,7 +1152,7 @@ Run: `cd oslc-mcp-server && node -e "import('./dist/server.js').then(() => conso
 - [ ] **Step 7: Commit**
 
 ```bash
-git add oslc-mcp-server/src/describe-discovery.ts oslc-mcp-server/src/describe-discovery.test.ts oslc-mcp-server/src/server.ts
+git add src/describe-discovery.ts src/describe-discovery.test.ts src/server.ts
 git commit -m "feat(mcp): add describe_discovery, mapping each tool to the URL it hits"
 ```
 
@@ -1478,7 +1496,7 @@ Expected: `tsc` clean; PASS — 8 suites, 62 tests.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add oslc-mcp-server/src/representation.ts oslc-mcp-server/src/representation.test.ts oslc-mcp-server/src/server.ts
+git add src/representation.ts src/representation.test.ts src/server.ts
 git commit -m "feat(mcp): add check_turtle_support, reporting what the server did"
 ```
 
@@ -1532,7 +1550,7 @@ request is conformant behaviour, not a fault.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add oslc-mcp-server/README.md
+git add README.md
 git commit -m "docs(mcp): document describe_discovery and check_turtle_support"
 ```
 

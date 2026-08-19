@@ -12,6 +12,22 @@
 
 **Prerequisite:** `docs/superpowers/plans/2026-08-19-oslc-mcp-server-probing-foundations.md` must be complete. This plan consumes `HttpExchange`, `formatTranscript`, `encodeFormParams`, `headerValue` and `redactHeaders` from `src/http-transcript.ts`, and assumes `ACCEPT_RDF` prefers RDF/XML.
 
+## Repository layout — read before committing
+
+`oslc-mcp-server`, `oslc-service` and `oslc-client` are **separate git repositories**, nested inside
+the `oslc4js` working tree and git-ignored by it (`/oslc-mcp-server/` in `oslc4js/.gitignore`). Each
+has its own GitHub remote:
+
+| Directory | Remote |
+|---|---|
+| `oslc-mcp-server` | `github.com/OSLC/oslc-mcp-server` |
+| `oslc-service` | `github.com/OSLC/oslc-service` |
+| `oslc4js` (this plan lives here) | `github.com/OSLC/oslc4js` |
+
+So `git add oslc-mcp-server/src/...` from the `oslc4js` root **fails** — the path is ignored. Run git
+from inside the package being changed, with paths relative to it. A task touching both
+`oslc-service` and `oslc-mcp-server` needs **two commits**, one per repository.
+
 ## Global Constraints
 
 - **Evidence is never optional (D5).** Every request records its full exchange, always — not behind a debug flag. Credentials are redacted (`redactHeaders`), because transcripts get pasted into issues.
@@ -302,7 +318,7 @@ confirm **"escapes '#' in the body"** fails. Restore and confirm it passes.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add oslc-mcp-server/src/probe/request.ts oslc-mcp-server/src/probe/request.test.ts
+git add src/probe/request.ts src/probe/request.test.ts
 git commit -m "feat(probe): recorded request layer, POST-form queries with GET fallback"
 ```
 
@@ -638,7 +654,7 @@ Expected: PASS — 13 tests.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add oslc-mcp-server/src/probe/ground-truth.ts oslc-mcp-server/src/probe/ground-truth.test.ts
+git add src/probe/ground-truth.ts src/probe/ground-truth.test.ts
 git commit -m "feat(probe): ground truth, sampled by URI when a fixture is impossible"
 ```
 
@@ -933,7 +949,7 @@ been tested.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add oslc-mcp-server/src/probe/verdicts.ts oslc-mcp-server/src/probe/verdicts.test.ts
+git add src/probe/verdicts.ts src/probe/verdicts.test.ts
 git commit -m "feat(probe): verdicts by effect, including the negation-pair partition test"
 ```
 
@@ -1199,7 +1215,7 @@ Expected: PASS — 13 tests.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add oslc-mcp-server/src/probe/fixture.ts oslc-mcp-server/src/probe/fixture.test.ts
+git add src/probe/fixture.ts src/probe/fixture.test.ts
 git commit -m "feat(probe): fixture shape, escaping, manifest-before-create, type choice"
 ```
 
@@ -1370,7 +1386,7 @@ Expected: PASS — 5 tests.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add oslc-mcp-server/src/probe/latency.ts oslc-mcp-server/src/probe/latency.test.ts
+git add src/probe/latency.ts src/probe/latency.test.ts
 git commit -m "feat(probe): measure time-to-queryable, which only create-then-query reveals"
 ```
 
@@ -1588,7 +1604,7 @@ Expected: PASS — 10 tests.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add oslc-mcp-server/src/probe/query-cases.ts oslc-mcp-server/src/probe/query-cases.test.ts
+git add src/probe/query-cases.ts src/probe/query-cases.test.ts
 git commit -m "feat(probe): the ten query cases, adequacy-checked before any request"
 ```
 
@@ -1656,7 +1672,7 @@ Run: `cd oslc-mcp-server && NODE_OPTIONS=--experimental-vm-modules npx jest src/
 - [ ] **Step 5: Commit**
 
 ```bash
-git add oslc-mcp-server/src/probe/orchestrate.ts oslc-mcp-server/src/probe/orchestrate.test.ts
+git add src/probe/orchestrate.ts src/probe/orchestrate.test.ts
 git commit -m "feat(probe): orchestrate the seven phases, degrading rather than stopping"
 ```
 
@@ -1708,7 +1724,7 @@ having been checked.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add oslc-mcp-server/src/probe/report.ts oslc-mcp-server/src/probe/report.test.ts
+git add src/probe/report.ts src/probe/report.test.ts
 git commit -m "feat(probe): the report, with its inconclusive handover and empty triage"
 ```
 
@@ -1764,7 +1780,7 @@ Run: `cd oslc-mcp-server && npx tsc --noEmit && NODE_OPTIONS=--experimental-vm-m
 - [ ] **Step 5: Commit**
 
 ```bash
-git add oslc-mcp-server/src/server.ts oslc-mcp-server/README.md
+git add src/server.ts README.md
 git commit -m "feat(probe): register probe_oslc"
 ```
 
