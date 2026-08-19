@@ -634,6 +634,9 @@ export async function sampleGroundTruth(
     for (const statement of store.statementsMatching(store.sym(uri), null, null)) {
       // Literals only. An object reference is not a value a filter can match
       // on without knowing the server's URI minting, which is not known here.
+      // (oslc:serviceProvider is the exception worth revisiting: where a server
+      // sets it on every resource it would let the probe confirm a sampled
+      // resource really belongs to the service provider under test.)
       if (statement.object.termType !== 'Literal') continue;
       const predicate = statement.predicate.value;
       properties.set(predicate, [...(properties.get(predicate) ?? []), statement.object.value]);
@@ -1657,11 +1660,18 @@ Expected: FAIL — `Cannot find module './orchestrate.js'`.
 | 1 | Is a creation factory advertised? If not → read-only, reason `no creation factory advertised`. If so, create **one** artifact and delete it. Record `deleteSupported`. |
 | — | If delete is unsupported: honour `onDeleteUnsupported` — `stop` returns immediately with what is known; `read-only` continues without a fixture; `proceed` builds the fixture and accepts residue. |
 | 2 | Create the fixture, recording each URI in the manifest **before** the create. |
-| 3 | Read each back by URI; report properties silently dropped. |
+| 3 | Read each back by URI; report properties silently dropped — **only** properties the probe sent (see below). |
 | 4 | Run the §8 cases against the fixture, wrapped in `waitUntilQueryable`. |
 | 5 | Update one resource, re-read, re-query. |
 | 6 | Delete the fixture; anything that fails goes to `needingCleanup`. |
 | 7 | Query once more, confirming deletion is visible to query. |
+
+**Phase 3 compares in one direction only.** A server legitimately adds properties of its own to a
+created resource — `oslc:serviceProvider`, `oslc:instanceShape`, `dcterms:created`, `dcterms:creator`
+— so the read-back graph is expected to be a superset of what was sent. Report a property that was
+sent and did not come back; never report one that came back and was not sent. Comparing set equality
+would turn every conformant server annotation into a finding, and against a release decision a false
+finding is as costly as a missed one.
 
 In read-only mode run phases 4 and 7 only, with `sampleGroundTruth` supplying the ground truth from the baseline that `caseBareGet` returned.
 
