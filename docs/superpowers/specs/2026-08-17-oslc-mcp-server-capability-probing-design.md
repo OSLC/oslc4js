@@ -25,7 +25,8 @@ This design supplies the missing discovery mechanism empirically — by measurem
 | | |
 |---|---|
 | `describe_discovery` | What discovery found, and which URL each generated tool will actually hit |
-| `probe_oslc` | **One orchestrated probe**: create a known fixture, read it back, query it, update, delete — each phase informing how the next is interpreted |
+| `probe_oslc` | **One orchestrated probe**: create a known fixture, read it back, query it, update, delete — each phase informing how the next is interpreted. Against a server that cannot be written to it degrades to querying what is there, and says what that costs |
+| Representation | Whether the server produces Turtle when asked — one fact per server (§7) |
 | A second configuration | Naming project areas that are **not** configuration-enabled, so that variable is removed |
 | The report | Evidence-carrying, human-readable, triage-ready |
 
@@ -39,8 +40,8 @@ This design supplies the missing discovery mechanism empirically — by measurem
 |---|---|---|---|
 | D1 | Form | **A shipped capability, not investigation scripts** | Server behaviour is version-specific, so an answer has a shelf life and must be re-obtainable; and the same question recurs at every deployment |
 | D2 | Interface | **MCP tools**, following the existing per-server prefixing | The assistant investigates the substrate the same way it investigates anything else, and results arrive where it can reason about them |
-| D3 | **One orchestrated probe, not several peers** | `probe_oslc` runs create → read → query → update → delete as one sequence. Read-only is a **mode**, not a separate tool | Create and query answer each other's questions (§5.1). Offering query-only and write-only probes as peers would invite the assistant to pick one and get materially weaker answers without knowing it |
-| D4 | Write safety | **`probe_oslc` writes only to service providers named by a repeatable `--probe-write-target` startup flag.** No flag, no writes, ever | This is a tool an assistant can call, so the guard must not be something the assistant can satisfy. A startup flag cannot be: it is set by whoever launches the server. Deliberately *not* a configuration field — a config file is the artifact that gets copied between machines and pasted into issues, and a permission stored there travels with it |
+| D3 | **One orchestrated probe, not several peers** | `probe_oslc` runs create → read → query → update → delete as one sequence. Read-only is a **fallback the server's capabilities determine**, not a separate tool | Create and query answer each other's questions (§5.1). Offering query-only and write-only probes as peers would invite the assistant to pick one and get materially weaker answers without knowing it |
+| D4 | Authorization | **The configuration is the authorization.** `probe_oslc` may write to any service provider the configuration names; there is no separate permission gate | Naming a project area in a git-ignored configuration, with credentials, is already a deliberate act — and those credentials carry whatever write rights the server granted, which is the gate that actually holds. A second gate decides nothing the account does not already decide, while making the normal case (several applications) easy to get wrong: a forgotten or mistyped target would degrade silently into materially weaker read-only results. It would also be inconsistent — the generated `create_*` and `delete_*` tools carry no such gate, and they write real content where the probe writes fixtures it removes |
 | D5 | Evidence | **Every request records its full HTTP exchange, always — not behind a debug flag** | A result without the request that produced it is unfalsifiable. For normal tool operation the same transcript sits behind a debug flag |
 | D6 | Verdicts | **Verify effect, never acceptance** | A `200` means the parameter parsed, not that it did anything. `ignored` is a verdict available to every case |
 | D7 | Reference server | **Probe a server we control first** | A case failing there is a bug in the probe until proven otherwise. It also finds our own gaps |
@@ -50,7 +51,7 @@ This design supplies the missing discovery mechanism empirically — by measurem
 
 **`ACCEPT_RDF` must prefer `application/rdf+xml`.** It currently reads `text/turtle, application/rdf+xml;q=0.9, application/ld+json;q=0.8`. Many ELM applications do not support Turtle at all, so every fetch presently asks first for a format the server may not produce — which makes any parse failure or empty graph uninterpretable.
 
-Until this changes, results conflate *"the server cannot do this"* with *"we asked for the wrong representation"*, and a triage report built on that would send a vendor chasing our own defect. It is a one-line change and belongs first.
+Until this changes, results conflate *"the server cannot do this"* with *"we asked for the wrong representation"*, and a triage report built on that would send a vendor chasing our own defect. It is a one-line change and belongs first. It is also a blunt one: a single global constant standing in for a per-server fact, which §7 turns into something measured rather than assumed.
 
 **A related known defect, in the other direction:** one OSLC server in this workspace serves `rootservices` as SPARQL-style Turtle that a conformant parser rejects. That is ours to fix, and probing a server we control (D7) is how such things surface.
 
@@ -77,19 +78,21 @@ Create and query answer each other's questions. **Create a known fixture first, 
 - **Query verification stops being comparative.** Without a fixture, a filter probe can only infer — filter for something impossible, see whether the count drops. With one, the probe filters for a value it created and knows to be unique, so the expected result is exactly one resource, *by identity*. Anything else is a finding stated precisely, rather than a count that looked wrong.
 - **`ignored` becomes exact.** One result means the filter worked; five means it was ignored; zero means something else is wrong. No dependence on the target having pre-existing data, and no ambiguity about how much it had.
 - **Some behaviour only appears across the seam.** Indexing latency (§5.6) is invisible to a write-only probe and to a read-only one, and shows up only in create-then-query.
-- **And the target is left as it was found**, which is what makes it safe to point at a shared project area at all, rather than needing a disposable one.
+- **And the target is left as it was found**, which is what makes it safe to point at a shared project area at all, rather than needing a disposable one. With no separate write gate (D4), this property is load-bearing rather than merely convenient.
 
 ### 5.2 The sequence
 
 | Phase | Action | Why here |
 |---|---|---|
-| 1 | **Establish delete support** — create one artifact, delete it | Delete is optional (§5.7). Finding out *after* building a fixture means leaving it permanently |
+| 1 | **Establish whether the server can be written to** — is a creation factory advertised; if so, create one artifact and delete it | Create and delete are both optional. Finding out with *one* artifact means an unwritable server costs a single attempt, rather than a half-built fixture that cannot be removed |
 | 2 | **Create the fixture** — several resources with controlled property values | The ground truth every later phase compares against |
 | 3 | **Read each back** | Confirms create worked, and reveals properties silently dropped |
-| 4 | **Query** — the §7 cases, against known content | Expected results are *known*, not inferred |
+| 4 | **Query** — the §8 cases, against known content | Expected results are *known*, not inferred |
 | 5 | **Update** one resource, re-read, re-query | Confirms the update took, and that the change is visible to query |
 | 6 | **Delete the fixture** | Leaves the target as it was found |
 | 7 | **Query once more** | Confirms deletion is visible to query too |
+
+**If phase 1 establishes that the server cannot be written to, the run continues without a fixture** — phases 4 and 7 only, on the terms §5.5 sets out. That is a capability outcome, not a failure, and not a reason to stop.
 
 **Phase 3 is easy to undervalue.** A server that accepts a property and silently drops it is the create-side analogue of the ignored filter, and equally invisible without reading back.
 
@@ -106,29 +109,50 @@ Small, and shaped by what the query cases need:
 
 Every value is chosen so its expected query result is known before the query is sent.
 
-### 5.4 Write safety
+### 5.4 Writes and cleanup
 
-`probe_oslc` writes only to service providers named at startup:
+`probe_oslc` writes to any service provider the configuration names. **The configuration is the authorization** (D4): it is git-ignored, it names real project areas, and it carries the credentials — which already carry whatever write rights the server chose to grant. Deciding what goes in it is where the decision belongs, and it is the operator's to make.
 
-```
-oslc-mcp-server --config ./oslc-mcp-server.yaml \
-  --probe-write-target https://<host>/<app>/<sp-a>/services.xml \
-  --probe-write-target https://<host>/<app>/<sp-b>/services.xml
-```
+What stands in place of a permission gate is **accountability**:
 
-The flag is repeatable, so several targets can be enabled in one run — probing three applications is the normal case. **Absent the flag, `probe_oslc` cannot write at all** and falls back to read-only mode (§5.5). Asked to write to a service provider not named, it refuses and says which flag would have permitted it.
+- Every created URI is written to a run manifest **before** the create, so an interruption leaves a file naming exactly what exists.
+- The report names **every service provider the run wrote to**, at the top, alongside the fixture's identifier prefix — so what a run touched is legible without reading the transcripts.
+- Artifacts that could not be deleted are reported as **needing manual cleanup**, with their URIs, never silently dropped.
 
-**Why a startup flag rather than a field in the configuration.** This is an MCP tool an assistant can call, so the guard must be something the assistant cannot satisfy — and a startup flag is set by whoever launches the server, not by anything in the conversation. A configuration field would be weaker in a second way too: the configuration file is the artifact that gets copied between machines, pasted into issues and reused at the next deployment, and a write permission stored there travels with it silently. A flag has to be typed again, deliberately, each time the server is launched for probing.
+The probe modifies and deletes only resources it created and marks as its own (`PROBE-…`). Nothing pre-existing is written to at any point, in any mode.
 
-It is also simply smaller — no schema change, no validation, nothing new to document in the configuration reference.
+### 5.5 Read-only — when the server cannot be written to
 
-Every created URI is written to a run manifest **before** the create, so an interruption leaves a file naming exactly what exists.
+**Not every server can be written to.** A service provider may advertise no creation factory; a create may be refused; delete may be unsupported and the caller may decline to leave residue (§5.7). In each case there is no fixture, and phases 4 and 7 run against whatever content already exists.
 
-### 5.5 Read-only mode
+This is a **capability** outcome rather than a permission one, and **the probe still runs**: it queries what it can, states what it established, and states plainly what it could not — leaving the remainder for the caller to verify another way.
 
-When the target cannot be written to — no `--probe-write-target` naming it, or a deployment where writes are not permitted — `probe_oslc` runs phases 4 and 7 only, against whatever content already exists. **This is the default**: read-only is not a mode you select, it is what you get unless writes were deliberately enabled at startup.
+**Ground truth without a fixture: sample it.** Read-only does not mean inference-only. Reading a resource by URI does not go through the query index, so the probe can *learn* ground truth instead of creating it:
 
-**The report must label this prominently**, because the verification is materially weaker. Without a fixture there is no known expected result, so every effect-test falls back to comparing against a baseline, and the baseline comes from a bare `GET` on the query base — which may itself be unsupported, or return nothing. Where that happens the affected cases are recorded **`inconclusive`**, never as passes. An inconclusive effect-test reported as success is precisely the silent failure this design exists to expose.
+1. Take a baseline set from the query base (case 1), or the capability's `oslc:resourceShape` where that is unavailable.
+2. `GET` several members **by URI** and record their actual property values.
+3. Use those values as expected results — a filter for a value read from one specific resource should return that resource, **by identity**.
+
+That recovers most of the precision the fixture gave, without writing anything. `ignored` stays exact wherever it applies: filter for a value only one sampled resource carries, and one result means the filter was honoured, the whole baseline means it was ignored.
+
+**Its limits, which must be stated rather than assumed away.** Sampled content is whatever happens to be there, and may not distinguish anything:
+
+| The case needs | It fails when | Then |
+|---|---|---|
+| A value unique to one resource | Every sampled resource shares it | `inconclusive`, naming the case and the reason |
+| Titles that order distinguishably | They are equal, or there is one resource | `oslc.orderBy` `inconclusive` |
+| More resources than `oslc.pageSize` | Too few exist | Paging `inconclusive` |
+| A term in some resources but not others | Nothing suitable was found | `oslc.searchTerms` `inconclusive` |
+
+So the probe **checks the sampled baseline is adequate for a case before running it**, and where it is not, records `inconclusive` with the reason. An inconclusive effect-test reported as a pass is exactly the silent failure this design exists to expose.
+
+**What no amount of sampling recovers.** These are not measured at all without writes, and the report says so rather than omitting them:
+
+- **Indexing latency** (§5.6) — it needs create-then-query, and neither half sees it alone.
+- **Properties silently dropped on create** (phase 3).
+- **Whether an update is visible to query** (phase 5).
+
+**What the caller verifies another way.** For every `inconclusive` case the report gives the exact request sent and what a correct result would have looked like, so it can be confirmed against the server's own UI or a known data set. That is the honest end of a read-only run: measurement narrows the question as far as it can, and hands over the remainder explicitly rather than guessing at it.
 
 ### 5.6 Indexing latency
 
@@ -148,7 +172,7 @@ But it means artifacts cannot always be removed, which is why phase 1 finds out 
 
 The caller then chooses: proceed and accept a permanently populated target, or fall back to read-only mode with the weaker verification §5.5 describes. Neither is decided by default.
 
-Artifacts that could not be deleted — whether because delete is unsupported or because it failed — are reported as **needing manual cleanup**, with their URIs, never silently dropped.
+Whatever the choice, artifacts that could not be removed are reported as needing manual cleanup, with their URIs (§5.4).
 
 ## 6. Request mechanics
 
@@ -198,9 +222,32 @@ OSLC query parameters go in a form-encoded body against the query base, not in t
 
 The query base's **own** parameters stay in the request URI — some servers advertise bases like `…/query?componentURI=…`, and those belong to the base, not to the query.
 
-**Whether POST-query works at all is itself variable**, so it is a probe case (§7, case 2) with GET as the fallback rather than an assumption.
+**Whether POST-query works at all is itself variable**, so it is a probe case (§8, case 2) with GET as the fallback rather than an assumption.
 
-## 7. Query cases and verdicts
+## 7. Representation — is Turtle supported?
+
+OSLC 3.0 promotes Turtle as the preferred RDF representation. ELM largely does not follow it: several applications do not produce Turtle at all, which is why `ACCEPT_RDF` must prefer RDF/XML today (§3). That preference is a workaround for a fact nobody has measured — so measure it.
+
+**The probe asks each server for Turtle and reports what the server did.** Not a verdict collapsed from several behaviours — the behaviours themselves, one fact per server:
+
+| What came back | What the probe records |
+|---|---|
+| Turtle, and it parses | `supported` |
+| An error — `400`, `406`, or another status | The status and the server's own message |
+| A different representation, with `200` | Which `Content-Type` was returned instead |
+| `Content-Type` says Turtle, a conformant parser rejects the body | `malformed` |
+
+**The middle two are both legitimate, and the probe must not merge them.** A server asked for a representation it does not have may refuse outright, or may disregard `Accept` and send what it does have — HTTP leaves that choice to the server, and both are conformant. Collapsing them into a single "unsupported" would discard the more useful half of the observation: *how* a server declines is what a client has to cope with, and the two demand quite different client code.
+
+`malformed` is the one row that is not merely a choice, and it is kept separate because it is already known to occur: one server in this workspace serves `rootservices` as SPARQL-style Turtle that a conformant parser rejects (§3). *Claims Turtle* and *produces parseable Turtle* are different facts, and merging them would hide a real defect behind an apparent success.
+
+**Absence here is not a defect, and the report must not imply one.** Since disregarding `Accept` is permitted, the probe can only ever report *"did not produce Turtle when asked"*. It cannot distinguish a server that **cannot** produce Turtle from one that simply **chose not to**, and no external test can. The report states the former and never the latter; whether an absence is worth raising with anyone is triage (D8).
+
+The actionable consequence falls on the client rather than the server: **the response `Content-Type` is the authority, never the request's `Accept`.** Code that parses according to what it asked for is wrong even against a fully conformant server.
+
+**Recorded, not probed — the RDF/XML serialization requirement.** Some applications parse certain documents with XPath rather than an RDF parser, and therefore require RDF/XML in one particular shape: abbreviated rather than expanded. DOORS Next is the known case, and the cause is historical rather than careless: the parsing happens in the application's front-end JavaScript, written before `rdflib.js` existed, when XPath over the XML was the available option. The requirement has outlived its cause, as such things do — which places it under *needs a special case* at triage, not *defect*. Two documents encoding an identical graph then behave differently, which no RDF-level comparison can detect. It is noted here because it governs what a client's writer must emit — but it is deliberately **not** a probe case. Which shape a server wants is a serialization question for the follow-on spec (§12), not a capability measured here.
+
+## 8. Query cases and verdicts
 
 Each case yields `supported` / `unsupported` (with status and the server's own message) / **`ignored`** / `error` / `inconclusive`.
 
@@ -217,7 +264,7 @@ Each case yields `supported` / `unsupported` (with status and the server's own m
 | 9 | `oslc.paging` with `oslc.pageSize` | Whether paging works and `oslc:nextPage` is returned |
 | 10 | `oslc.searchTerms` | Whether full-text search is implemented at all |
 
-### 7.1 Case 5 in full
+### 8.1 Case 5 in full
 
 Each construct is a separate request with its own verdict, since a server may implement some and not others — and an unsupported construct usually fails the whole filter, so they cannot be combined into one probe.
 
@@ -234,7 +281,7 @@ Each construct is a separate request with its own verdict, since a server may im
 
 The last two are listed separately on purpose. They are **not** in the query syntax, so a server rejecting them is entirely correct and must never be triaged as a defect. They are probed because a server that *does* support them offers capability worth knowing about — and worth deciding, deliberately, whether to depend on.
 
-### 7.2 Case 3 — prefix discovery
+### 8.2 Case 3 — prefix discovery
 
 Default prefix sets are undocumented and differ between servers, so probing *without* declarations and reading the error is how the set is recovered. Declaring prefixes up front would conceal exactly what is being learned.
 
@@ -247,41 +294,43 @@ Default prefix sets are undocumented and differ between servers, so probing *wit
 | Result | Means |
 |---|---|
 | `400` naming the prefix | Not predefined. Case 4 then confirms an explicit declaration fixes it |
-| Success, and the clause took effect (§7.3) | Predefined |
+| Success, and the clause took effect (§8.3) | Predefined |
 | Success, but the clause was **ignored** | Nothing about prefixes. The parameter was not honoured at all, so the prefix was never resolved either — record `inconclusive` and pursue the ignored parameter instead |
 
 That last row is the one to watch: a server that ignores `oslc.where` will also appear to accept every prefix, and reading that as "all prefixes predefined" would be exactly backwards.
 
-### 7.3 Effect, not acceptance
+### 8.3 Effect, not acceptance
 
 A `200` means the parameter parsed. It says nothing about whether the server did anything with it — and a capability that parses cleanly but does nothing is **more dangerous than one that errors**, because a developer will build on it. So every case names the observation that proves it took effect:
 
-| Parameter | Evidence it was honoured |
-|---|---|
-| `oslc.where` | Exactly the expected fixture resources are returned — by identity, not by count |
-| `oslc.select` | Returned properties narrow to those requested |
-| `oslc.select` nested | The nested property is genuinely present |
-| `oslc.orderBy` | The first member differs between ascending and descending |
-| `oslc.paging` / `pageSize` | Page size honoured and `oslc:nextPage` present |
-| `oslc.searchTerms` | Result set differs from the unfiltered set |
+| Parameter | Evidence it was honoured | Without a fixture (§5.5) |
+|---|---|---|
+| `oslc.where` | Exactly the expected fixture resources are returned — by identity, not by count | Same test, against a value sampled from one known resource |
+| `oslc.select` | Returned properties narrow to those requested | Unchanged — needs no known content |
+| `oslc.select` nested | The nested property is genuinely present | Unchanged |
+| `oslc.orderBy` | The first member differs between ascending and descending | Unchanged, provided sampled values differ |
+| `oslc.paging` / `pageSize` | Page size honoured and `oslc:nextPage` present | Unchanged, provided enough resources exist |
+| `oslc.searchTerms` | Result set differs from the unfiltered set | Term taken from a sampled resource |
+
+**A fixture-free effect test for filters: the negation pair.** Send `a="v"` and `a!="v"` as separate requests. If both are honoured the two result sets **partition** the baseline — together they account for it exactly, and neither on its own equals it. A server ignoring `oslc.where` returns the whole baseline to both, which the partition test catches without any resource being known in advance. It costs one extra request and needs no fixture, so it is worth running in every mode.
 
 Anything accepted without its evidence is recorded **`ignored`**.
 
-## 8. Configuration
+## 9. Configuration
 
 **A second configuration file**, alongside the existing one rather than replacing it, naming project areas that are **not configuration-enabled**.
 
 Configuration-enabled project areas require a `Configuration-Context`; without one, results are confounded and the probe cannot tell a genuine gap from a missing context. Removing that variable first makes everything else interpretable. Keeping both files side by side then allows the *comparison* — the same probe against configuration-enabled and non-configuration-enabled areas isolates exactly what the context changes.
 
-Both files are git-ignored. Real hostnames and project-area identifiers live only there.
+Both files are git-ignored. Real hostnames and project-area identifiers live only there — and since the configuration is the authorization (D4), what a run may write to is decided by what is put in them. A configuration copied to another deployment carries that reach with it, which is a reason to keep the two files scoped to the project areas actually meant for probing.
 
-Neither file grants permission to write. That is a startup flag (§5.4), so a configuration can be copied to another deployment without carrying write access with it.
-
-## 9. The report
+## 10. The report
 
 Returned to the caller as a summary, and written in full — transcripts included — to a path the caller names.
 
 Structure: per server, per capability, the phase results and a table of query cases with verdicts; then the transcripts; then a triage section. **Read-only runs are labelled as such at the top**, since their verification is weaker (§5.5).
+
+Two things sit at the top beside that label. **Every service provider the run wrote to** (§5.4), so what was touched is legible without reading transcripts. And **every case recorded `inconclusive`**, each with the request sent and what a correct result would have looked like — the run's explicit handover of what it could not settle, and what a read-only report is chiefly *for*.
 
 **Triage is filled in by a person** (D8). The probe supplies mechanical verdicts; the categories are judgements:
 
@@ -300,19 +349,22 @@ Structure: per server, per capability, the phase results and a table of query ca
 
 The **Ours to fix** row is why a server we control is probed first (D7), and the transcripts are what make **Defect** a credible report rather than an assertion.
 
-## 10. Order of work
+## 11. Order of work
 
 1. The `ACCEPT_RDF` prerequisite (§3).
 2. `describe_discovery` — smallest, immediately useful, and needed to interpret everything after it.
-3. `probe_oslc` against **a server we control**, to validate the probe itself.
-4. `probe_oslc` against the target deployment, non-configuration-enabled areas first.
-5. The same against configuration-enabled areas, to isolate what the configuration context changes.
-6. Triage, and the resulting issues.
+3. The Turtle check (§7) — one request per server, read-only, and it tells the prerequisite above whether it is still needed.
+4. `probe_oslc` against **a server we control**, to validate the probe itself.
+5. `probe_oslc` against the target deployment, non-configuration-enabled areas first.
+6. The same against configuration-enabled areas, to isolate what the configuration context changes.
+7. Triage, and the resulting issues.
 
-## 11. Open questions
+## 12. Open questions
 
 - **How much of a large response to keep in a transcript.** Full bodies make reports unwieldy; truncation can hide the very difference being diagnosed. A size cap with the full body written alongside is the likely answer.
 - **Whether the probe should attempt to infer *why* a capability is missing** — for instance distinguishing "not implemented" from "not permitted for this user". Permissions could masquerade as unsupported capabilities throughout, and the probe currently has no way to tell them apart.
+- **How resources are chosen for sampling in read-only mode.** Take the first page and the baseline may be degenerate — uniform values, too few members — where a better-chosen sample would have settled the case. Whether to look further before declaring `inconclusive`, and how much further, is unresolved.
 - **How the fixture's resource type is chosen.** The fixture needs a creatable type whose shape the probe can satisfy; where several are advertised, choosing badly could fail creation for reasons unrelated to the capability under test.
 - **Whether probe results should eventually be recorded in configuration** and used to adapt tool descriptions. That is the follow-on spec's question, but the report format should not make it awkward.
+- **Which RDF/XML serialization a server requires**, where one parses with XPath rather than an RDF parser (§7). Determining it means sending one graph in both shapes and comparing — and producing both deliberately, since most RDF writers emit whichever form they prefer and offer no control. A serialization concern for the follow-on spec rather than a capability probe.
 - **Whether a native REST API can be wrapped as an OSLC query adapter** where a server lacks OSLC query entirely. Out of scope here; worth its own investigation.
