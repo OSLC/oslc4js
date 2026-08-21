@@ -902,7 +902,7 @@ export function judgePartition(args: {
   if (overlap.length > 0) {
     return {
       verdict: 'unsupported',
-      reason: `${overlap.length} resource(s) matched both a filter and its negation, which cannot both be true`,
+      reason: `${overlap.length} resource(s) overlap: they matched both a filter and its negation, which cannot both be true`,
     };
   }
   if (!sameSet([...matching, ...notMatching], baseline)) {
