@@ -51,7 +51,6 @@ from inside the package being changed, with paths relative to it. A task touchin
 | `src/probe/fixture.ts` | Fixture shape (§5.3), run manifest, create / read-back / update / delete (§5.4) |
 | `src/probe/query-cases.ts` | The ten cases (§8), the `oslc.where` constructs (§8.1), prefix discovery (§8.2) |
 | `src/probe/verdicts.ts` | Effect tests (§8.3), the negation-pair partition test |
-| `src/probe/latency.ts` | Time-to-queryable with backoff (§5.6) |
 | `src/probe/orchestrate.ts` | Phases 1–7 (§5.2), mode selection, delete-unsupported branch (§5.7) |
 | `src/probe/report.ts` | The report (§10) |
 | `src/server.ts` | Register `probe_oslc` |
@@ -1224,178 +1223,7 @@ git commit -m "feat(probe): fixture shape, escaping, manifest-before-create, typ
 
 ---
 
-### Task 5: Time to queryable
-
-§5.6. A resource that has been created may not be immediately queryable: servers commonly index asynchronously, so a create returning `201` can be followed by a query that legitimately returns nothing, for a while. Neither half of the probe sees this alone — reading by URI does not use the index, and a query-only probe never creates anything.
-
-Not a query defect. Reported as one of: immediately queryable; queryable after *n* seconds; or not queryable within the timeout.
-
-**Files:**
-- Create: `oslc-mcp-server/src/probe/latency.ts`
-- Test: `oslc-mcp-server/src/probe/latency.test.ts`
-
-**Interfaces:**
-- Consumes: nothing.
-- Produces:
-  - `type Queryability = { kind: 'immediate' } | { kind: 'delayed'; afterMs: number } | { kind: 'not-within-timeout'; timeoutMs: number }`
-  - `function waitUntilQueryable(args: { attempt: () => Promise<boolean>; now: () => number; sleep: (ms: number) => Promise<void>; timeoutMs?: number }): Promise<Queryability>`
-
-- [ ] **Step 1: Write the failing tests**
-
-Create `oslc-mcp-server/src/probe/latency.test.ts`:
-
-```ts
-import { describe, it, expect, jest } from '@jest/globals';
-import { waitUntilQueryable } from './latency.js';
-
-/** A clock the test drives, so no test ever actually sleeps. */
-function fakeClock() {
-  let t = 0;
-  return {
-    now: () => t,
-    sleep: async (ms: number) => { t += ms; },
-    advance: (ms: number) => { t += ms; },
-  };
-}
-
-describe('waitUntilQueryable', () => {
-  it('reports immediate when the first attempt succeeds', async () => {
-    const clock = fakeClock();
-    const result = await waitUntilQueryable({
-      attempt: async () => true, now: clock.now, sleep: clock.sleep,
-    });
-    expect(result).toEqual({ kind: 'immediate' });
-  });
-
-  it('reports how long it took when the resource appears later', async () => {
-    const clock = fakeClock();
-    let calls = 0;
-    const result = await waitUntilQueryable({
-      attempt: async () => ++calls >= 3, now: clock.now, sleep: clock.sleep,
-    });
-    expect(result.kind).toBe('delayed');
-    expect((result as any).afterMs).toBeGreaterThan(0);
-  });
-
-  it('backs off rather than hammering the server', async () => {
-    const clock = fakeClock();
-    const slept: number[] = [];
-    await waitUntilQueryable({
-      attempt: async () => false,
-      now: clock.now,
-      sleep: async (ms) => { slept.push(ms); await clock.sleep(ms); },
-      timeoutMs: 10_000,
-    });
-    expect(slept.length).toBeGreaterThan(1);
-    expect(slept[1]).toBeGreaterThan(slept[0]);
-  });
-
-  it('gives up at the timeout and says so — a finding, not a query defect', async () => {
-    const clock = fakeClock();
-    const result = await waitUntilQueryable({
-      attempt: async () => false, now: clock.now, sleep: clock.sleep, timeoutMs: 5_000,
-    });
-    expect(result).toEqual({ kind: 'not-within-timeout', timeoutMs: 5_000 });
-  });
-
-  it('treats a throwing attempt as not-yet rather than failing the probe', async () => {
-    const clock = fakeClock();
-    let calls = 0;
-    const result = await waitUntilQueryable({
-      attempt: async () => { if (++calls < 2) throw new Error('502'); return true; },
-      now: clock.now, sleep: clock.sleep,
-    });
-    expect(result.kind).toBe('delayed');
-  });
-});
-```
-
-- [ ] **Step 2: Run the tests to verify they fail**
-
-Run: `cd oslc-mcp-server && NODE_OPTIONS=--experimental-vm-modules npx jest src/probe/latency.test.ts`
-
-Expected: FAIL — `Cannot find module './latency.js'`.
-
-- [ ] **Step 3: Write the implementation**
-
-Create `oslc-mcp-server/src/probe/latency.ts`:
-
-```ts
-/**
- * How soon a created resource became visible to query (§5.6).
- *
- * `not-within-timeout` is a finding in its own right, not a query defect: any
- * process that creates resources and then verifies them by query will appear
- * to fail intermittently against such a server, and the failure looks like
- * data loss rather than latency.
- */
-export type Queryability =
-  | { kind: 'immediate' }
-  | { kind: 'delayed'; afterMs: number }
-  | { kind: 'not-within-timeout'; timeoutMs: number };
-
-const FIRST_DELAY_MS = 500;
-const MAX_DELAY_MS = 8_000;
-const DEFAULT_TIMEOUT_MS = 60_000;
-
-/**
- * Retry `attempt` with exponential backoff until it succeeds or the timeout
- * passes, recording how long it took.
- *
- * The clock and sleep are injected so the behaviour can be tested without a
- * test ever actually waiting.
- */
-export async function waitUntilQueryable(args: {
-  attempt: () => Promise<boolean>;
-  now: () => number;
-  sleep: (ms: number) => Promise<void>;
-  timeoutMs?: number;
-}): Promise<Queryability> {
-  const { attempt, now, sleep, timeoutMs = DEFAULT_TIMEOUT_MS } = args;
-  const started = now();
-  let delay = FIRST_DELAY_MS;
-  let first = true;
-
-  for (;;) {
-    let visible = false;
-    try {
-      visible = await attempt();
-    } catch {
-      // A transient error is not-yet, not a verdict. The exchange is recorded
-      // by the request layer either way.
-      visible = false;
-    }
-
-    if (visible) {
-      const elapsed = now() - started;
-      return first && elapsed === 0 ? { kind: 'immediate' } : { kind: 'delayed', afterMs: elapsed };
-    }
-    first = false;
-
-    if (now() - started + delay > timeoutMs) return { kind: 'not-within-timeout', timeoutMs };
-
-    await sleep(delay);
-    delay = Math.min(delay * 2, MAX_DELAY_MS);
-  }
-}
-```
-
-- [ ] **Step 4: Run the tests to verify they pass**
-
-Run: `cd oslc-mcp-server && NODE_OPTIONS=--experimental-vm-modules npx jest src/probe/latency.test.ts`
-
-Expected: PASS — 5 tests.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add src/probe/latency.ts src/probe/latency.test.ts
-git commit -m "feat(probe): measure time-to-queryable, which only create-then-query reveals"
-```
-
----
-
-### Task 6: The query cases
+### Task 5: The query cases
 
 §8, cases 1–10, plus the `oslc.where` constructs of §8.1 and prefix discovery of §8.2. Each case is a function taking the request layer, the query base and `GroundTruth`, returning a `CaseResult` — so a case runs identically against a fixture and against sampled content, and declares itself `inconclusive` with a reason when the ground truth cannot support it.
 
@@ -1613,7 +1441,7 @@ git commit -m "feat(probe): the ten query cases, adequacy-checked before any req
 
 ---
 
-### Task 7: Orchestration — the seven phases
+### Task 6: Orchestration — the seven phases
 
 §5.2 and §5.7. Phase 1 establishes whether the server can be written to at all; if it cannot, the run continues without a fixture on the terms of §5.5 rather than stopping. If delete is unsupported the probe **stops and reports** before phase 2, and the caller chooses — proceed and accept a permanently populated target, or fall back to read-only. Neither is decided by default.
 
@@ -1625,7 +1453,7 @@ git commit -m "feat(probe): the ten query cases, adequacy-checked before any req
 - Consumes: everything above.
 - Produces:
   - `type ProbeMode = 'fixture' | 'read-only'`
-  - `interface ProbeRun { mode: ProbeMode; modeReason: string; serviceProvidersWritten: string[]; cases: CaseResult[]; queryability?: Queryability; needingCleanup: string[]; deleteSupported: boolean | null }`
+  - `interface ProbeRun { mode: ProbeMode; modeReason: string; serviceProvidersWritten: string[]; cases: CaseResult[]; fixtureVisibleToQuery?: boolean; needingCleanup: string[]; deleteSupported: boolean | null }`
   - `function runProbe(args: { http; sp: DiscoveredServiceProvider; queryBase: string; onDeleteUnsupported: 'stop' | 'proceed' | 'read-only'; manifestWrite: (line: string) => void }): Promise<ProbeRun>`
 
 - [ ] **Step 1: Write the failing tests**
@@ -1645,7 +1473,7 @@ describe('runProbe', () => {
 });
 ```
 
-Write these with stub `http` objects scripted per phase, following the `scriptedHttp` pattern from Task 6.
+Write these with stub `http` objects scripted per phase, following the `scriptedHttp` pattern from Task 5.
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
@@ -1661,7 +1489,7 @@ Expected: FAIL — `Cannot find module './orchestrate.js'`.
 | — | If delete is unsupported: honour `onDeleteUnsupported` — `stop` returns immediately with what is known; `read-only` continues without a fixture; `proceed` builds the fixture and accepts residue. |
 | 2 | Create the fixture, recording each URI in the manifest **before** the create. |
 | 3 | Read each back by URI; report properties silently dropped — **only** properties the probe sent (see below). |
-| 4 | Run the §8 cases against the fixture, wrapped in `waitUntilQueryable`. |
+| 4 | Confirm the fixture is visible to an unfiltered query, then run the §8 cases against it. If it is **not** visible, every case is `inconclusive` with reason `fixture not visible to query` — never `unsupported`, which would blame the filters for an invisible fixture. |
 | 5 | Update one resource, re-read, re-query. |
 | 6 | Delete the fixture; anything that fails goes to `needingCleanup`. |
 | 7 | Query once more, confirming deletion is visible to query. |
@@ -1688,7 +1516,7 @@ git commit -m "feat(probe): orchestrate the seven phases, degrading rather than 
 
 ---
 
-### Task 8: The report
+### Task 7: The report
 
 §10. Returned to the caller as a summary, and written in full — transcripts included — to a path the caller names.
 
@@ -1697,7 +1525,7 @@ git commit -m "feat(probe): orchestrate the seven phases, degrading rather than 
 - Test: `oslc-mcp-server/src/probe/report.test.ts`
 
 **Interfaces:**
-- Consumes: `ProbeRun` (Task 7).
+- Consumes: `ProbeRun` (Task 6).
 - Produces: `function formatProbeReport(run: ProbeRun): string`
 
 - [ ] **Step 1: Write the failing tests**
@@ -1727,7 +1555,7 @@ cases with verdicts; then the transcripts; then an **empty** triage section with
 headings from §10 for a person to fill in. Read-only runs carry their label, the list of service
 providers written to, and the inconclusive list at the top.
 
-In read-only mode the report must state that indexing latency, properties dropped on create, and
+In read-only mode the report must state that properties dropped on create and
 update visibility to query were **not measured** — rather than omitting them, which would read as
 having been checked.
 
@@ -1740,7 +1568,7 @@ git commit -m "feat(probe): the report, with its inconclusive handover and empty
 
 ---
 
-### Task 9: Register `probe_oslc`
+### Task 8: Register `probe_oslc`
 
 **Files:**
 - Modify: `oslc-mcp-server/src/server.ts`

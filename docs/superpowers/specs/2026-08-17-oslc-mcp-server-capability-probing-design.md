@@ -45,6 +45,7 @@ This design supplies the missing discovery mechanism empirically — by measurem
 | D5 | Evidence | **Every request records its full HTTP exchange, always — not behind a debug flag** | A result without the request that produced it is unfalsifiable. For normal tool operation the same transcript sits behind a debug flag |
 | D6 | Verdicts | **Verify effect, never acceptance** | A `200` means the parameter parsed, not that it did anything. `ignored` is a verdict available to every case |
 | D7 | Reference server | **Probe a server we control first** | A case failing there is a bug in the probe until proven otherwise. It also finds our own gaps |
+| D9 | Consequence | **The client implements the standard; a special case needs a measured reason** | The probe's output is not a licence to accumulate per-server behaviour. `oslc-mcp-server` sends what OSLC specifies and nothing bespoke by default. A special case is warranted only where the specification leaves something **optional**, a server has been **measured** to have declined it, and the client cannot proceed otherwise. A defect gets reported to the vendor, not worked around silently; a convenience gets neither. Without this, a report of ten servers' quirks becomes ten code paths, and the client stops being a standard client |
 | D8 | Triage | **The probe records mechanical facts; a person assigns categories** | Whether an absence is a conformant choice or a defect is a judgement about the specification, not an observation. Emitting it automatically would make the report an opinion rather than evidence |
 
 ## 3. Prerequisite
@@ -77,7 +78,7 @@ Create and query answer each other's questions. **Create a known fixture first, 
 
 - **Query verification stops being comparative.** Without a fixture, a filter probe can only infer — filter for something impossible, see whether the count drops. With one, the probe filters for a value it created and knows to be unique, so the expected result is exactly one resource, *by identity*. Anything else is a finding stated precisely, rather than a count that looked wrong.
 - **`ignored` becomes exact.** One result means the filter worked; five means it was ignored; zero means something else is wrong. No dependence on the target having pre-existing data, and no ambiguity about how much it had.
-- **Some behaviour only appears across the seam.** Indexing latency (§5.6) is invisible to a write-only probe and to a read-only one, and shows up only in create-then-query.
+- **Some behaviour only appears across the seam.** Whether a created resource is visible to query at all (§5.6), and whether an update is (phase 5), are invisible to a write-only probe and to a read-only one; they show up only in create-then-query.
 - **And the target is left as it was found**, which is what makes it safe to point at a shared project area at all, rather than needing a disposable one. With no separate write gate (D4), this property is load-bearing rather than merely convenient.
 
 ### 5.2 The sequence
@@ -148,21 +149,29 @@ So the probe **checks the sampled baseline is adequate for a case before running
 
 **What no amount of sampling recovers.** These are not measured at all without writes, and the report says so rather than omitting them:
 
-- **Indexing latency** (§5.6) — it needs create-then-query, and neither half sees it alone.
+- **Whether a created resource is visible to query** (§5.6) — it needs create-then-query, and neither half sees it alone.
 - **Properties silently dropped on create** (phase 3).
 - **Whether an update is visible to query** (phase 5).
 
 **What the caller verifies another way.** For every `inconclusive` case the report gives the exact request sent and what a correct result would have looked like, so it can be confirmed against the server's own UI or a known data set. That is the honest end of a read-only run: measurement narrows the question as far as it can, and hands over the remainder explicitly rather than guessing at it.
 
-### 5.6 Indexing latency
+### 5.6 Query visibility, and the latency that is not here
 
-**A resource that has been created may not be immediately queryable.** Servers commonly index asynchronously, so a create returning `201` can be followed by a query that legitimately returns nothing, for a while.
+**A write and the query that reads it back hit the same store.** An OSLC query against a service
+provider is answered by that application from its own data, so a resource this probe creates is
+queryable immediately. There is no time-to-queryable to measure, and phase 4 does not retry.
 
-Neither half of the probe could see this alone: reading by URI does not use the index, and a query-only probe never creates anything. Only create-then-query exposes it.
+What phase 4 *does* do is confirm the fixture is visible to an unfiltered query before running any
+filter case. If it is not, every case is recorded `inconclusive` with that reason rather than
+`unsupported` — one honest finding instead of a run of false negatives blaming the filters for an
+invisible fixture.
 
-So phase 4 **retries with backoff and records time-to-queryable**, reporting one of: immediately queryable; queryable after *n* seconds; or **not queryable within the timeout** — a finding in its own right, and not a query defect.
-
-This matters well beyond the probe. Any process that creates resources and then verifies them by query — populating a dataset, then checking it — will appear to fail intermittently against such a server, and the failure looks like data loss rather than latency.
+**The latency that does exist is somewhere else.** Cross-server incoming links are not served from
+the owning application's store: they come from a Tracked Resource Set consumed into a link index —
+LQE, or an equivalent. That path is genuinely asynchronous, and a link created on one server becomes
+visible to a query on another only after the feed is consumed. **It is out of scope here**, because
+this probe writes and reads within one service provider and never crosses that seam. A probe of
+cross-server link discovery would have to measure it, and would be a different probe.
 
 ### 5.7 If delete is unsupported
 
@@ -342,6 +351,11 @@ Two things sit at the top beside that label. **Every service provider the run wr
 | **Defect — ask the vendor** | Advertised and broken, or non-conformant where the specification does say **MUST** | An issue, with the transcript as evidence |
 | **Ours to fix** | A defect in our own code | An issue in the right repository |
 | **The specification's gap** | Behaviour the specification permits to vary, with no way for a client to discover which way | Feedback to OSLC-OP, not to a product vendor |
+
+**What a finding licenses.** Per **D9**, a measured gap in an *optional* feature may justify a
+special case in the client — disjunction and wildcards in `oslc.where` are the likely candidates,
+since the specification permits a server to offer neither. A gap in something the specification
+requires is a defect to report, not to route around. The default path stays the standard one.
 
 **The second and fourth rows are the distinction that matters most**, and conflating them is the easy mistake. A server that does not implement `oslc.orderBy` has done nothing wrong — the specification allows it — and raising that as a defect wastes everyone's time and damages the credibility of the reports that *are* defects. What is legitimately wrong in that case is that a client had to discover it by experiment.
 
