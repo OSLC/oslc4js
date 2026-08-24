@@ -126,11 +126,47 @@ This is guidance, not a requirement. The point is that absence-of-label should n
   - `oslc:name` (camelCase, matching the property URI's local name)
   - `oslc:propertyDefinition` (the property URI from the vocabulary)
   - `dcterms:description` describing the property's role *on this resource type*
-  - `oslc:occurs` — `Zero-or-one` | `Exactly-one` | `Zero-or-many` | `One-or-many`
+  - `oslc:occurs` — `Zero-or-one` | `Exactly-one` | `Zero-or-many` | `One-or-many`. **Link properties always take a zero lower bound** — see "Cardinality of link properties" below.
   - `oslc:valueType` — see **"Value types for inherited OSLC properties"** below before choosing. `xsd:string` is the wrong default for rich text: OSLC defines `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` as `rdf:XMLLiteral` (XHTML content), not strings.
   - For link properties: `oslc:representation oslc:Reference`, `oslc:range` (the *shape* range — what types this server expects to see at the other end), plus the inverse metadata above when incoming-link discovery and labeling matter (recommended but optional).
   - Optional: `oslc:icon` (proposed extension) when a type-icon makes sense in UIs.
 - **Inheritance is manual.** OSLC ResourceShapes do not honor `rdfs:subClassOf` traversal — that's an inferential mechanism OSLC deliberately avoids. Each concrete shape lists every property it allows, including ones shared across types. Use named property nodes (`<#p-title>`, `<#p-creator>`, …) and reference them from each shape's `oslc:property` list so the duplication is editorial, not by copy-paste.
+
+### Cardinality of link properties
+
+**Every link property gets a zero lower bound: `Zero-or-one` or `Zero-or-many`, never `Exactly-one`
+or `One-or-many`.** This applies to any property whose `oslc:valueType` is `oslc:Resource`,
+`oslc:AnyResource` or `oslc:LocalResource` — a reference to another resource. Required *literals*
+are fine and normal (`dcterms:title oslc:Exactly-one`); the rule is about references.
+
+Three reasons, in increasing order of how much they hurt:
+
+1. **Existence precedes reference.** To assert A→B, both must already exist. A required link on the
+   first resource of any pair or cycle cannot be satisfied by any single create, so the model
+   becomes unpopulatable through the API.
+2. **Creation dialogs and creation factories do not supply links.** A shape-driven creation form
+   collects literals; links are a post-create step, added by a later update once both ends exist. A
+   required link makes every create through the dialog fail.
+3. **A server cannot re-import its own export.** If a required link were enforced on create, an
+   Envelope taken from that very server would be refused on the way back in — the server would
+   reject resources it already serves.
+
+Servers therefore end up **exempting references from create-time validation** to stay usable, and
+that exemption is where the real damage lands: the resource is created without the required link,
+and then *every later update fails*, because update-time validation does enforce cardinality. The
+resource is writable once and never again — accepted on the way in, permanently un-editable
+afterwards.
+
+Put the modeling intent in the **upper** bound instead: `Zero-or-one` for a functional relationship,
+`Zero-or-many` otherwise. That keeps the useful constraint (at most one `assesses` target) without
+the unpopulatable lower bound. Genuine "must have" obligations belong in business rules or
+data-quality checks over a populated server, not in shape cardinality — a shape describes what a
+*request* may contain, and no request can contain a link to something that does not exist yet.
+
+Server-assigned reference properties — `oslc:serviceProvider`, `oslc:instanceShape`, `rdf:type`,
+`dcterms:creator`, `oslc:modifiedBy` — keep a zero lower bound too, for a different reason: the
+server supplies them, often after validating the request, so a shape that demanded them would
+reject bodies no client is permitted to send.
 
 ## Value types for inherited OSLC properties
 
@@ -267,6 +303,7 @@ In either style, the shapes HTML must:
 6a. **Every inherited OSLC Core/domain property's `oslc:valueType` matches the normative shapes** (see "Value types for inherited OSLC properties"). Diff them explicitly rather than eyeballing — `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` must be `rdf:XMLLiteral`, and declaring them `xsd:string` is the single most common defect in generated shapes. It has shipped in real domains (BMM, ASPICE) and silently downgrades every client's editor for those fields.
 7. Every link property in a shape that should support incoming-link discovery declares `oslc:inversePropertyLabel` (strongly recommended; not strictly required for shape validity).
 8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
+8a. **No link property has a non-zero lower bound.** Every property whose `oslc:valueType` is `oslc:Resource` / `oslc:AnyResource` / `oslc:LocalResource` uses `Zero-or-one` or `Zero-or-many` — grep for `Exactly-one` and `One-or-many` and confirm every hit is literal-valued. This is what catches an ontology's "mandatory" relationships before they reach a server, and **ShapeChecker will not flag it**: the shape is perfectly valid, just unpopulatable. See "Cardinality of link properties".
 9. Property names match camelCase; predicates are short verb phrases without target-type folding.
 10. The HTML renders without errors in a modern browser.
 11. Resource shape count matches the count of **instantiable** classes — supertypes and enums do not have shapes.
@@ -345,6 +382,7 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 > 6a. Every inherited OSLC Core/domain property's `oslc:valueType` matches the normative shapes (core-shapes.ttl / the domain shapes) — in particular `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` are `rdf:XMLLiteral`, never `xsd:string`.
 > 7. Every link property whose incoming side should be discoverable declares `oslc:inversePropertyLabel` (recommended; not strictly required).
 > 8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
+> 8a. Every link property (`oslc:valueType` of `oslc:Resource`/`oslc:AnyResource`/`oslc:LocalResource`) has a **zero lower bound** — `Zero-or-one` or `Zero-or-many`, never `Exactly-one` or `One-or-many`. Links cannot be supplied at create, so a required link makes the type unpopulatable. Put multiplicity in the upper bound; obligations are business rules, not shape cardinality.
 > 9. Property names match camelCase; predicates are short verb phrases without target-type folding.
 > 10. The HTML renders cleanly.
 > 11. Resource shape count equals the count of instantiable classes — supertypes and enums do not have shapes.
@@ -377,6 +415,7 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 | One shape per class (including abstract supertypes) | Shapes are only for instantiable classes. Supertypes structure the type hierarchy; they are never created directly. |
 | Java-style predicate naming | Drop the target-type suffix (`:amplifiedByMission` → `:amplifiedBy`). |
 | Asserting both directions of a link | The triple is stored once. The inverse URI is metadata, not a triple. |
+| A link property with `oslc:occurs oslc:Exactly-one` or `oslc:One-or-many` | Use `Zero-or-one` / `Zero-or-many`. Links cannot be supplied at create — the target may not exist yet and creation dialogs collect literals — so a required link makes the type unpopulatable, and on servers that exempt references from create-time validation it leaves resources that are writable once and then rejected by every update. Express multiplicity in the upper bound; express obligation as a business rule. See "Cardinality of link properties". |
 | Missing inverse-direction label on a link property where incoming-link discovery matters | Add `oslc:inversePropertyLabel` so clients can label incoming-link discovery results. The shape is still valid without it; clients fall back to rendering the SPARQL-style `^<predicateName>` form. |
 | Duplicating property constraints across shapes by copy-paste | Use named property nodes (`<#p-title>`) and reference them from each shape's `oslc:property` list. |
 | Designing for reasoning ("the system will infer that…") | OSLC servers don't reason. If a constraint matters at the API, encode it in the shape; if it matters as a runtime check, use SHACL alongside, but don't expect property-level inference. |
