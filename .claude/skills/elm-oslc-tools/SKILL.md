@@ -154,10 +154,34 @@ take the first allowed value blindly, and never take the advertised default. *(q
 `oslc:allowedValue`. A client that does not dereference it sees an empty list for a property that is
 `Exactly-one`, skips it, and gets a precondition failure it cannot explain. *(quirk 17)*
 
-**Honour `oslc:readOnly` even though nothing enforces it.** EWM accepts `oslc_cm:status "Resolved"` on
-create, answers `201`, and stores `"New"`; the same by `PUT` answers `200` and changes nothing. Both
-state properties are declared `oslc:readOnly true`. **Workflow state is not settable over OSLC** —
-reaching a non-initial state means EWM's own workflow actions, which are outside OSLC. *(quirk 18)*
+**`oslc:readOnly` is a hint, not a rule — it is unreliable in both directions.** On one EWM work-item
+shape, `oslc_cm:status` is declared `readOnly true` and a write is accepted then **discarded**, while
+`oslc_cm:relatedArchitectureElement` is declared `readOnly true` and a write is accepted and
+**applied**. Both answer `200`. Honouring it loses a link that would have written; ignoring it loses a
+state that would not. **Only the read-back settles it.** *(quirks 18, 20)*
+
+**To change a work-item state, name the transition — not the state.**
+
+```
+PUT <workItemURI>?_action=<workflowActionId>      # body: the resource's own representation, unchanged
+```
+
+Writing `oslc_cm:status` cannot work because a state is a *destination*, and the workflow decides
+which are reachable from where; `?_action=` names an edge in the state machine. EWM does not check
+that the item's properties suit the new state — that is the caller's judgement, as in the UI.
+
+Discover the ids rather than hard-coding them: the shape's `rtc_cm:state` → `oslc:allowedValues` URIs
+carry the workflow id in their path, then
+`GET …/oslc/workflows/{projectArea}/actions/{workflowId}`. Task closes with `complete`, Defect with
+`resolve`, Capability with `accept` — and Capability needs **eight** transitions from `Draft`.
+
+**An unavailable transition answers `200` and does nothing**, so a close-everything loop can report
+success while changing nothing. Verify on **`oslc_cm:closed`**, which means the same across every
+workflow — the status label does not: closed reads `Done` for Task and Defect and `Accepted` for
+Capability. *(quirk 22)*
+
+This is **not** OSLC Actions: EWM advertises no `oslc:action` or `oslc:binding` on the resource or the
+service provider.
 
 **Watch the crossed titles.** `oslc_cm:status` is titled **"State"**; `rtc_cm:state` is titled
 **"Status"**. Match on `oslc:propertyDefinition`, never on `dcterms:title`. There is no
