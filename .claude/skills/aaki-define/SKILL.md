@@ -126,7 +126,7 @@ This is guidance, not a requirement. The point is that absence-of-label should n
   - `oslc:name` (camelCase, matching the property URI's local name)
   - `oslc:propertyDefinition` (the property URI from the vocabulary)
   - `dcterms:description` describing the property's role *on this resource type*
-  - `oslc:occurs` — `Zero-or-one` | `Exactly-one` | `Zero-or-many` | `One-or-many`. **Link properties always take a zero lower bound** — see "Cardinality of link properties" below.
+  - `oslc:occurs` — `Zero-or-one` | `Exactly-one` | `Zero-or-many` | `One-or-many`. **Reference properties take a zero lower bound, enumerations excepted** — see "Cardinality of link properties" below.
   - `oslc:valueType` — see **"Value types for inherited OSLC properties"** below before choosing. `xsd:string` is the wrong default for rich text: OSLC defines `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` as `rdf:XMLLiteral` (XHTML content), not strings.
   - For link properties: `oslc:representation oslc:Reference`, `oslc:range` (the *shape* range — what types this server expects to see at the other end), plus the inverse metadata above when incoming-link discovery and labeling matter (recommended but optional).
   - Optional: `oslc:icon` (proposed extension) when a type-icon makes sense in UIs.
@@ -135,38 +135,65 @@ This is guidance, not a requirement. The point is that absence-of-label should n
 ### Cardinality of link properties
 
 **Every link property gets a zero lower bound: `Zero-or-one` or `Zero-or-many`, never `Exactly-one`
-or `One-or-many`.** This applies to any property whose `oslc:valueType` is `oslc:Resource`,
-`oslc:AnyResource` or `oslc:LocalResource` — a reference to another resource. Required *literals*
-are fine and normal (`dcterms:title oslc:Exactly-one`); the rule is about references.
+or `One-or-many`.** This applies to any property whose value is a reference to another resource:
+`oslc:valueType` of `oslc:Resource`, `oslc:AnyResource` or `oslc:LocalResource`, **or** a property
+constrained by `oslc:range` alone (see "Range-only properties are references" below). Required
+*literals* are fine and normal (`dcterms:title oslc:Exactly-one`); the rule is about references.
 
-Three reasons, in increasing order of how much they hurt:
+**First, what is *not* the reason.** A POST can carry links. A creation factory accepts any property
+the shape allows, references included, and the server stores a reference *without resolving it* — so
+the target need not exist yet and creation order does not matter. Scripts, importers and migrations
+should set every link in the create and skip the round trip entirely. Any claim that "a link cannot
+be supplied at create" is false, and the error is not harmless: it dresses the create-then-link round
+trip up as a protocol requirement when it is only a dialog convention, and it sends people looking
+for topological orderings of their seed data that they never needed.
 
-1. **Existence precedes reference.** To assert A→B, both must already exist. A required link on the
-   first resource of any pair or cycle cannot be satisfied by any single create, so the model
-   becomes unpopulatable through the API.
-2. **Creation dialogs and creation factories do not supply links.** A shape-driven creation form
-   collects literals; links are a post-create step, added by a later update once both ends exist. A
-   required link makes every create through the dialog fail.
-3. **A server cannot re-import its own export.** If a required link were enforced on create, an
-   Envelope taken from that very server would be refused on the way back in — the server would
-   reject resources it already serves.
+The rule holds for two narrower reasons.
 
-Servers therefore end up **exempting references from create-time validation** to stay usable, and
-that exemption is where the real damage lands: the resource is created without the required link,
-and then *every later update fails*, because update-time validation does enforce cardinality. The
-resource is writable once and never again — accepted on the way in, permanently un-editable
-afterwards.
+1. **A creation dialog cannot supply a link.** It collects literals from a person who, at that
+   moment, has nothing to point at. A required link therefore makes the type **uncreatable through
+   its own dialog** — not through any request, but through the interactive path every shape-driven
+   UI takes.
+2. **It leaves the resource writable exactly once.** Servers exempt references from *create*-time
+   validation, so the create succeeds without the required link — and then *every later update
+   fails*, because update-time validation does enforce cardinality. Accepted on the way in,
+   permanently un-editable afterwards. This asymmetry is the real damage, and nothing reveals it
+   until someone tries to edit.
 
 Put the modeling intent in the **upper** bound instead: `Zero-or-one` for a functional relationship,
 `Zero-or-many` otherwise. That keeps the useful constraint (at most one `assesses` target) without
-the unpopulatable lower bound. Genuine "must have" obligations belong in business rules or
-data-quality checks over a populated server, not in shape cardinality — a shape describes what a
-*request* may contain, and no request can contain a link to something that does not exist yet.
+making the type undialogable. Genuine "must have" obligations belong in business rules or
+data-quality checks over a populated server, not in shape cardinality.
+
+**Enumerations are the exception, and may be `Exactly-one`.** An enumeration's value is one of a
+fixed set of vocabulary individuals that always exist, so neither reason above applies: a dialog
+renders it as a dropdown from `oslc:range` / `oslc:allowedValue`, and there is nothing to add later.
+Use `Exactly-one` where the value is intrinsic to the resource — an ARP4761A `analysisMethod` or
+`assessmentLevel`, the OSLC-OP PLM `effectiveValueType` — and `Zero-or-one` where it is genuinely
+optional, such as a status nobody has set yet. The example under "Enumerations" below is
+`Exactly-one` for exactly this reason.
 
 Server-assigned reference properties — `oslc:serviceProvider`, `oslc:instanceShape`, `rdf:type`,
 `dcterms:creator`, `oslc:modifiedBy` — keep a zero lower bound too, for a different reason: the
 server supplies them, often after validating the request, so a shape that demanded them would
 reject bodies no client is permitted to send.
+
+### Range-only properties are references
+
+A property that declares `oslc:range` and **no** `oslc:valueType` is a *reference*, not a string.
+OSLC Core lets a property constrain its value space with `oslc:range` alone, and the normative shapes
+do exactly that for enumerations — `oslc_cm:state` carries `oslc:range oslc_cm:State` and nothing
+else. Prefer that form (see "Enumerations"). Two consequences worth stating, because both have
+already cost real time:
+
+- **Never add `oslc:valueType oslc:Resource` to work around a server.** A server that defaults a
+  missing `oslc:valueType` to string is the thing that is broken. genoslc-framework did exactly that
+  and rejected every conformant enumeration property with "must be a literal of type STRING" until
+  `ShapeLoader` was fixed to read a range-only property as a reference. Patching the shape hides a
+  server bug in a published vocabulary.
+- **A mechanical cardinality check has to look for both forms.** Grepping for
+  `oslc:valueType oslc:Resource` finds none of the range-only properties in the file — which is most
+  of the enumerations. See check 8a.
 
 ## Value types for inherited OSLC properties
 
@@ -303,7 +330,7 @@ In either style, the shapes HTML must:
 6a. **Every inherited OSLC Core/domain property's `oslc:valueType` matches the normative shapes** (see "Value types for inherited OSLC properties"). Diff them explicitly rather than eyeballing — `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` must be `rdf:XMLLiteral`, and declaring them `xsd:string` is the single most common defect in generated shapes. It has shipped in real domains (BMM, ASPICE) and silently downgrades every client's editor for those fields.
 7. Every link property in a shape that should support incoming-link discovery declares `oslc:inversePropertyLabel` (strongly recommended; not strictly required for shape validity).
 8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
-8a. **No link property has a non-zero lower bound.** Every property whose `oslc:valueType` is `oslc:Resource` / `oslc:AnyResource` / `oslc:LocalResource` uses `Zero-or-one` or `Zero-or-many` — grep for `Exactly-one` and `One-or-many` and confirm every hit is literal-valued. This is what catches an ontology's "mandatory" relationships before they reach a server, and **ShapeChecker will not flag it**: the shape is perfectly valid, just unpopulatable. See "Cardinality of link properties".
+8a. **No reference property has a non-zero lower bound, enumerations excepted.** Check *both* forms of reference: `oslc:valueType` of `oslc:Resource` / `oslc:AnyResource` / `oslc:LocalResource`, **and** `oslc:range` with no `oslc:valueType` — grepping only for `valueType` misses every range-only property, which is most of the enumerations. So: grep for `Exactly-one` and `One-or-many`, then confirm each hit is either literal-valued or enumeration-valued. An enumeration may be `Exactly-one` (its individuals always exist and a dialog can render a dropdown); a link to an instance may not. This is what catches an ontology's "mandatory" relationships before they reach a server, and **ShapeChecker will not flag it**: the shape is perfectly valid, just uncreatable through its own dialog and writable exactly once. See "Cardinality of link properties".
 9. Property names match camelCase; predicates are short verb phrases without target-type folding.
 10. The HTML renders without errors in a modern browser.
 11. Resource shape count matches the count of **instantiable** classes — supertypes and enums do not have shapes.
@@ -382,7 +409,7 @@ Brief an AI assistant (or yourself) with a prompt of roughly this shape, replaci
 > 6a. Every inherited OSLC Core/domain property's `oslc:valueType` matches the normative shapes (core-shapes.ttl / the domain shapes) — in particular `dcterms:title`, `dcterms:description`, and `oslc:shortTitle` are `rdf:XMLLiteral`, never `xsd:string`.
 > 7. Every link property whose incoming side should be discoverable declares `oslc:inversePropertyLabel` (recommended; not strictly required).
 > 8. `oslc:range` values on link properties refer to classes that exist in the vocabulary.
-> 8a. Every link property (`oslc:valueType` of `oslc:Resource`/`oslc:AnyResource`/`oslc:LocalResource`) has a **zero lower bound** — `Zero-or-one` or `Zero-or-many`, never `Exactly-one` or `One-or-many`. Links cannot be supplied at create, so a required link makes the type unpopulatable. Put multiplicity in the upper bound; obligations are business rules, not shape cardinality.
+> 8a. Every reference property — `oslc:valueType` of `oslc:Resource`/`oslc:AnyResource`/`oslc:LocalResource`, **or** `oslc:range` with no `oslc:valueType` — has a **zero lower bound**: `Zero-or-one` or `Zero-or-many`, never `Exactly-one` or `One-or-many`. **Enumeration-valued properties are exempt** and may be `Exactly-one`. The reason is not the protocol — a POST can carry links, and the server stores a reference without resolving it — but the creation *dialog*, which collects literals: a required link makes the type uncreatable through its own dialog and writable exactly once. Put multiplicity in the upper bound; obligations are business rules, not shape cardinality.
 > 9. Property names match camelCase; predicates are short verb phrases without target-type folding.
 > 10. The HTML renders cleanly.
 > 11. Resource shape count equals the count of instantiable classes — supertypes and enums do not have shapes.
@@ -415,7 +442,7 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 | One shape per class (including abstract supertypes) | Shapes are only for instantiable classes. Supertypes structure the type hierarchy; they are never created directly. |
 | Java-style predicate naming | Drop the target-type suffix (`:amplifiedByMission` → `:amplifiedBy`). |
 | Asserting both directions of a link | The triple is stored once. The inverse URI is metadata, not a triple. |
-| A link property with `oslc:occurs oslc:Exactly-one` or `oslc:One-or-many` | Use `Zero-or-one` / `Zero-or-many`. Links cannot be supplied at create — the target may not exist yet and creation dialogs collect literals — so a required link makes the type unpopulatable, and on servers that exempt references from create-time validation it leaves resources that are writable once and then rejected by every update. Express multiplicity in the upper bound; express obligation as a business rule. See "Cardinality of link properties". |
+| A link property with `oslc:occurs oslc:Exactly-one` or `oslc:One-or-many` | Use `Zero-or-one` / `Zero-or-many` — unless the value is an **enumeration**, which may be `Exactly-one`. The reason is not that a POST cannot carry links (it can; the server stores the reference without resolving it) but that a creation *dialog* collects literals: a required link makes the type uncreatable through its own dialog, and — because create-time validation exempts references while update-time validation does not — leaves resources writable once and then rejected by every update. Express multiplicity in the upper bound; express obligation as a business rule. See "Cardinality of link properties". |
 | Missing inverse-direction label on a link property where incoming-link discovery matters | Add `oslc:inversePropertyLabel` so clients can label incoming-link discovery results. The shape is still valid without it; clients fall back to rendering the SPARQL-style `^<predicateName>` form. |
 | Duplicating property constraints across shapes by copy-paste | Use named property nodes (`<#p-title>`) and reference them from each shape's `oslc:property` list. |
 | Designing for reasoning ("the system will infer that…") | OSLC servers don't reason. If a constraint matters at the API, encode it in the shape; if it matters as a runtime check, use SHACL alongside, but don't expect property-level inference. |
