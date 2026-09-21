@@ -202,17 +202,44 @@ either 404 or 410 as gone.** *(quirk 17)*
 
 ## Configuration context
 
-On a **configuration-enabled** project area, a request without a `Configuration-Context` may fail, or
-may **silently resolve against a default** — and the second is worse, because nothing in the response
-says which happened. Determine which *before* creating content in bulk, not after.
+**Settled, and it is the bad answer: a request with no `Configuration-Context` does not fail.** It is
+answered against a configuration the server chooses, and nothing in the response names it. So a query
+that is reporting about the wrong stream is indistinguishable from one reporting about the right one.
+**Always send the context** on a configuration-enabled project area — `set_configuration_context` with
+`allServers: true` for a global configuration, so every application resolves against the same thing
+rather than each picking its own. *(quirk 49)*
 
-The configuration-management APIs were not reachable by API alone on the deployment tested:
-`/gc/oslc/configurations` is `404` on a server whose `/gc` is up, `/rm/oslc_config/components` returns
-something other than what its path suggests, and `configurationQuery` rejects an `oslc.where` on
-`dcterms:title`. The web component picker remained the practical route to a stream URI. *(quirk 5)*
+**Scope a configuration server to the ServiceProvider, not to the area.** A CDCM configuration area
+has two URIs that both resolve and both return its title:
 
-*No project area on the deployment tested is configuration-enabled, so this is untested there — which
-also means results taken against it carry no configuration confound.*
+```
+.../cdcm/{space}/oslc/areas/{areaId}/service-provider     <- the ServiceProvider. Use this
+.../cdcm/{space}/oslc/areas/{areaId}                      <- the details resource. The UI shows this
+```
+
+Scoped to the bare one, discovery reports `1/1 providers` with the correct title and **zero
+capabilities**, and `list_configurations` says *"advertises a configuration catalog but no service
+providers were discovered"* — which reads as a CDCM with no configurations rather than a missing path
+segment. The catalog at `.../oslc_config/catalog` lists the correct, suffixed form for every area.
+*(quirk 48)*
+
+**Zero capabilities on a provider whose `oslc:service` is a blank node means unmeasured, not zero.**
+Fixing the URI is necessary and not sufficient — the client does not walk into the blank node. The LDP
+containers are reachable by `get_resource` regardless: component → `configurations` → configuration →
+`contribution` / `baselines`. Note `.../areas/{areaId}/components` is a `404`, and **dereference each
+`oslc_config:contribution`** rather than reading its title from the parent: the titles are whatever
+the person who added the contribution typed, and one observed had its own URI as its title.
+
+**Verify a configuration claim by comparing member sets, not counts.** Two configurations of the same
+project hold the same *number* of resources by construction — that is what a branch is — so a
+count-only comparison reports "identical" for populations that share not one URI. And remember what
+is not versioned: **EWM work items are not configuration-managed**, so a stable work-item count across
+a context change proves nothing at all.
+
+**ELM's own `/gc` surface is a separate matter and still awkward:** `/gc/oslc/configurations` is `404`
+on a server whose `/gc` is up, `/rm/oslc_config/components` returns something other than what its path
+suggests, and `configurationQuery` rejects an `oslc.where` on `dcterms:title`. There, the web
+component picker remains the practical route to a stream URI. *(quirk 5)*
 
 ---
 
