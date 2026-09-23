@@ -187,6 +187,18 @@ service provider.
 **"Status"**. Match on `oslc:propertyDefinition`, never on `dcterms:title`. There is no
 `oslc_cm:state`. *(quirk 18)*
 
+**Two tools are called `update_resource` and they have opposite semantics. Read the schema.** The
+ELM one takes `{uri, properties}` and *merges* — "provided properties replace existing values;
+omitted properties are unchanged". The genOSLC one takes a Turtle `body` and *replaces the whole
+graph* — "properties you omit are removed". Assuming the replace semantics on the merge tool leads to
+declining a safe edit; assuming the merge semantics on the replace tool destroys data. Neither
+mistake announces itself.
+
+Underneath, `oslc-client` reads a resource into an rdflib store on `OSLCResource`; edits add
+assertions to that store and `putResource` serialises the whole of it. **Nothing is lost by a PUT
+built that way** — the flattened key/value projection a tool shows you is a display, not the graph.
+Do not reason about what a write will preserve from what a read prints.
+
 **Read back after create, and compare in one direction only.** A server legitimately adds properties
 of its own — `oslc:serviceProvider`, `oslc:instanceShape`, `dcterms:created` — so the read-back graph
 is a *superset* of what you sent. Report a property you sent that did not come back; never report one
