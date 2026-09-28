@@ -48,10 +48,56 @@ A sentence like *"ASPICE generally expects bidirectional traceability"* fails th
 For each criterion in scope:
 
 1. Resolve its `concerns*` targets — that is *what* must be evidenced.
-2. Traverse the link graph to the ELM artifacts that evidence them. Forward links are on the source side; use the Link Discovery Manager for incoming links rather than assuming, per the `aaki-activate` quality bar.
+2. Traverse the link graph to the ELM artifacts that evidence them. Forward links are on the source side. For incoming links use the three-mechanism fallback above — never assume one is available.
 3. **Record every artifact URI examined, including the ones that turned out to be absent.** An absence that was looked for is evidence; an absence that was never queried is a gap in the analysis, and the two must not read alike in the output.
 
 Report what was searched, not only what was found. "No `TestCase` links to `CMP-X` via `validatesArchitectureElement`; the query base and the six candidates checked are listed" is usable. "There are no tests" is not.
+
+## Finding what points *at* a resource
+
+**This is where beat 1 of the AAKI thread failed**, and the failure is worth stating before the
+method: the assistant projected `oslc_qm:validatesRequirement` across every test case and never
+`oslc_qm:validatesArchitectureElement`, so it never asked what tests verify an architecture element.
+It missed that a shared component's integration test was implicated — an absent question that looked
+exactly like absent data.
+
+### There is no single mechanism. Try three, in order, and take the first that answers.
+
+| | Mechanism | Who supports it | Note |
+|---|---|---|---|
+| 1 | **LQE `/incoming-links`** | servers that feed a Tracked Resource Set into LQE — the ELM applications | Answers *"what points here **via this predicate**"*: `linkType` is required and takes **one** predicate, so you find only what you enumerate. Needs `oslc_config.context`, and the body must be form-urlencoded |
+| 2 | **LDM `/discover-links`** (draft OSLC-OP Link Discovery Management) | the genOSLC servers — BMM, ASPICE | Not implemented by ELM, and **not by Rhapsody SE** |
+| 3 | **OSLC query** on the server that *stores* the link | everyone | `oslc.where` on the predicate against the storing server's query base. Always available, and what DOORS Next itself relies on for incoming links |
+
+**Rhapsody SE has only the third.** It supports no TRS, so it contributes nothing to LQE, and it does
+not implement `/discover-links`. Every link into the SysML v2 model is found by querying the server
+that stores it — which is never RSE, because these links are stored on the ELM side.
+
+### Enumerate the predicates that **target** the resource's domain
+
+The discipline that prevents the beat-1 failure. When you need what points at a resource, do not list
+the predicates *of* its domain — list the ones whose **range** is its domain, on each server that could
+hold one:
+
+| The resource is | Ask, on | For |
+|---|---|---|
+| an **architecture element** (RSE) | ETM | `oslc_qm:validatesArchitectureElement` |
+| | EWM | `oslc_cm:relatedArchitectureElement` |
+| | RSE itself | `jazz_am:trace`, `jazz_am:satisfy`, `jazz_am:refine`, `jazz_am:derives` |
+| a **requirement** (DOORS Next) | ETM | `oslc_qm:validatesRequirement` |
+| | EWM | `oslc_cm:implementsRequirement`, `affectsRequirement`, `tracksRequirement` |
+| | BMM / ASPICE | `jazz_am:trace` |
+| a **test case or result** (ETM) | EWM | `oslc_cm:relatedTestCase`, `blocksTestExecutionRecord`, `affectsTestResult` |
+| | ASPICE | `jazz_am:trace` |
+| a **business motivation or assessment resource** | EWM | `oslc_cm:relatedArchitectureElement` — the only EWM→AM link type |
+
+**Project the predicate across the whole collection in one query** rather than fetching resources one
+at a time: `oslc.select` the link predicates over the query base, and read the column. That is how a
+link stored on one server and invisible from the other gets found.
+
+**Report the traversal, not just the result.** Say which mechanism answered and which predicate you
+projected, because "nothing points here" and "I did not ask" are indistinguishable in the output and
+only one of them is a finding.
 
 ## Rating drafting
 
