@@ -169,7 +169,17 @@ This is a prohibition, not a preference. The AI drafts and a human promotes, bec
 
 When the engineer creates or changes an artifact whose criterion obligations are then unmet, **say so without being asked**, citing the criterion.
 
-This is procedural, not incidental. The value of an assessment-aware assistant is mostly in the moment *before* a gap becomes a finding — an unprompted "that component now has no verifying test case, which is what `SWE.5.PA1.1` examines" is worth more than the same observation surfaced at the next assessment. Keep it to a sentence, cite the criterion URI, and do not block the work.
+This is procedural, not incidental. The value of an assessment-aware assistant is mostly in the moment *before* a gap becomes a finding — an unprompted "that component now has no verifying test case, which is what `SWE.5.PA1.1` examines" is worth more than the same observation surfaced at the next assessment.
+
+**Three things make the difference between guidance that lands and guidance that does not.**
+
+**Say it when you write, not only when you plan.** An obligation raised in a proposal and not repeated when the artifact is actually created is easy to lose — the proposal is read once, the write is what changes the graph. Raise it at both points. **Reporting a write is not complete until it states the obligations that write creates**, in the same report, whether or not the same point was made earlier.
+
+**Derive it from the artifact type, every time.** For each artifact created or changed, ask: *which criteria take an artifact of this kind as evidence, and is that evidence now present?* Query it rather than recalling it — `concernsBasePractice` and `concernsInformationItem` on the criterion say what it examines. A new artifact of a kind some criterion consumes almost always creates an obligation, because the criterion's evidence set has grown and nothing yet satisfies the new member. That derivation is what makes this generalise; a remembered list of couplings will be incomplete and will quietly go stale.
+
+**Name the capability consequence, not just the criterion.** `SWE.x.PAy.z` is unmet is a fact about a criterion. *This drops SWE.x out of CL2* is a fact about the programme, and it is the one an engineer acts on. Where the affected process has a `CapabilityLevelResult`, read what its target level requires — `CL2.R1`/`R2`/`R3` set minimum achievements — and say which of them this now threatens. An obligation stated without its consequence reads as bookkeeping and gets deferred.
+
+Keep it to a sentence or two, cite the criterion URI, and do not block the work. Brevity is about length, not about omitting the consequence.
 
 ## Common mistakes
 
