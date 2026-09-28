@@ -81,7 +81,7 @@ hold one:
 
 | The resource is | Ask, on | For |
 |---|---|---|
-| an **architecture element** (RSE) | ETM | `oslc_qm:validatesArchitectureElement` |
+| an **architecture element** (RSE) | ETM | **`rqm_qm:validatesArchitectureElement`** — `http://jazz.net/ns/qm/rqm#`, *not* the OSLC QM namespace |
 | | EWM | `oslc_cm:relatedArchitectureElement` |
 | | RSE itself | `jazz_am:trace`, `jazz_am:satisfy`, `jazz_am:refine`, `jazz_am:derives` |
 | a **requirement** (DOORS Next) | ETM | `oslc_qm:validatesRequirement` |
@@ -90,6 +90,13 @@ hold one:
 | a **test case or result** (ETM) | EWM | `oslc_cm:relatedTestCase`, `blocksTestExecutionRecord`, `affectsTestResult` |
 | | ASPICE | `jazz_am:trace` |
 | a **business motivation or assessment resource** | EWM | `oslc_cm:relatedArchitectureElement` — the only EWM→AM link type |
+
+> **Read the `oslc:propertyDefinition`, never the local name.** ELM mixes vocabularies within one
+> shape: on the ETM test-case shape `validatesRequirement` is `oslc_qm:` while
+> `validatesArchitectureElement` is `rqm_qm:` (`http://jazz.net/ns/qm/rqm#`). Query the wrong
+> namespace and `oslc.select` returns **200 with the column silently absent** — which reads exactly
+> like "nothing links here" and is the natural first query in an impact analysis. This cost the AAKI
+> thread's beat 1 its central discovery twice.
 
 **Project the predicate across the whole collection in one query** rather than fetching resources one
 at a time: `oslc.select` the link predicates over the query base, and read the column. That is how a
