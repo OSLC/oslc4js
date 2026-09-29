@@ -176,9 +176,19 @@ carry the workflow id in their path, then
 `resolve`, Capability with `accept` — and Capability needs **eight** transitions from `Draft`.
 
 **An unavailable transition answers `200` and does nothing**, so a close-everything loop can report
-success while changing nothing. Verify on **`oslc_cm:closed`**, which means the same across every
-workflow — the status label does not: closed reads `Done` for Task and Defect and `Accepted` for
-Capability. *(quirk 22)*
+success while changing nothing — verify that the transition took. **Do not verify on
+`oslc_cm:closed`.** It reads `"0"` on work items that are demonstrably closed: Task 583 is
+`state.done` with a `closeDate` and a `resolvedBy` and still reports `closed: "0"`, as does a Done
+defect, and the whole `approved`/`reviewed`/`verified`/`fixed` family reads `"0"` alongside it.
+
+Verify on **`rtc_cm:state`**, corroborated by `oslc_cm:closeDate` and `oslc_cm:resolvedBy`. `state`
+is workflow-specific — closure reads `Done` for Task and Defect, `Accepted` for Capability, which has
+no `Done` state — so map each workflow's closed state once rather than trusting the boolean. A
+workflow-specific value that is correct beats a uniform one that is not. *(quirks 22, 62)*
+
+**This failure runs in the dangerous direction**: it reports work as not done when it is, so an
+assistant gating on it declines authorised work and looks careful while doing so. It cost an AAKI
+beat a properly approved write until the assistant noticed and read `state` instead.
 
 This is **not** OSLC Actions: EWM advertises no `oslc:action` or `oslc:binding` on the resource or the
 service provider.
