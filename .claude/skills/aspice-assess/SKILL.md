@@ -165,6 +165,31 @@ End quantified, per the `aaki-activate` quality bar — how many criteria, how m
 
 This is a prohibition, not a preference. The AI drafts and a human promotes, because the human is the one on the RACI and the assessment's credibility rests on that being true rather than claimed. If asked to make a rating official, propose it and say plainly that promotion is the human's to perform.
 
+**What the gate is not.** It is not a prohibition on touching `official` resources. Settled 2026-09-30,
+after an assistant declined to amend an official rating and the engineer ruled:
+
+> I think it's ok for the ai assistant to suggest reasonable findings and rating updates as part of
+> its proposals, the human can always override.
+
+So the assistant **may propose** a change to an official rating — a corrected rationale, a widened
+`jazz_am:trace`, a different achievement — and **may execute it once approved**. What it may never do
+is move `aspice:status`. The gate is the approval, not the resource class; refusing to propose an
+amendment is not caution, it withholds the finding.
+
+Two obligations come with that latitude:
+
+**Say what the amendment does to the record.** An official rating is what an assessor relies on. When
+proposing a change, name what is currently recorded, what would replace it, and why — *"the rationale
+states DEF-1 answers the failed result; DEF-1 was closed `invalid` four weeks before the rating was
+written"* — so the engineer is overriding a stated claim rather than approving an edit.
+
+**Amending is a full-graph replace, and that is the real hazard.** `update_resource` on a genOSLC
+server removes any property omitted. Adding one triple to a rating means reading it, appending, and
+re-sending everything — `oslc:instanceShape` included. A rating carries its achievement, criterion,
+process, attribute, status, rationale and its whole evidence set; one omission silently destroys part
+of an assessment record. Read first, re-send whole, verify by fresh read, and report which properties
+were re-sent.
+
 ## Unprompted guidance
 
 When the engineer creates or changes an artifact whose criterion obligations are then unmet, **say so without being asked**, citing the criterion.
