@@ -190,6 +190,14 @@ workflow-specific value that is correct beats a uniform one that is not. *(quirk
 assistant gating on it declines authorised work and looks careful while doing so. It cost an AAKI
 beat a properly approved write until the assistant noticed and read `state` instead.
 
+**The same trap on the ETM side runs the other way, and that direction is worse.** A TestResult's
+`isCurrent` reads `"0"` on the very result its own TestExecutionRecord names as
+`oslc_qm:currentTestResult`. Read currency from the **TER**, never from the result. And note what
+establishes "never passed": `rqm_qm:lastPassedTestResult` is simply **absent** from the TER, so it is
+the missing property rather than any boolean that tells you a test case has never gone green. This
+one reports a live failure as superseded — the comfortable reading — so it will not feel like an
+error. *(quirk 63)*
+
 This is **not** OSLC Actions: EWM advertises no `oslc:action` or `oslc:binding` on the resource or the
 service provider.
 
@@ -213,6 +221,18 @@ Do not reason about what a write will preserve from what a read prints.
 of its own — `oslc:serviceProvider`, `oslc:instanceShape`, `dcterms:created` — so the read-back graph
 is a *superset* of what you sent. Report a property you sent that did not come back; never report one
 that came back and you did not send. Set equality turns every conformant annotation into a finding.
+
+**The one exception: a property the server added that changes the link graph.** An EWM description is
+**link-bearing** — bare URLs in prose are harvested into
+`com.ibm.team.workitem.linktype.textualReference.textuallyReferenced`, a property you never sent.
+Writing a namespace out in full to document which vocabulary a predicate belongs to produced a
+work-item link pointing at a namespace document. Name vocabularies **without the scheme** in anything
+EWM will store, and read back the link graph rather than only the fields you set. `dcterms:created` is
+bookkeeping; an edge is a change downstream traversals will find. *(quirk 64)*
+
+**Descriptions are stored verbatim, so pre-escaped markup stays escaped.** `&lt;br/&gt;` renders as
+literal `&lt;br/&gt;`, not a line break. Send raw `<br/>` — EWM's own UI-authored descriptions carry
+raw tags and a trailing `<!-- generated-from-rich-text-model-7.2-->` comment. *(quirk 64)*
 
 **Delete responses differ in every detail** — EWM `204`, DOORS Next and ETM `200`; then `404` from EWM
 and ETM, `410 Gone` from DOORS Next. All defensible, none predictable. **Treat any 2xx as success and
