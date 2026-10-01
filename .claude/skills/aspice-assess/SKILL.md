@@ -9,6 +9,26 @@ description: Use when doing Automotive SPICE work over a governed OSLC graph —
 
 > **The canonical copy of this file lives in `oslc4js/.claude/skills/aspice-assess/`**, beside `aaki-define`, `aaki-instantiate` and `aaki-activate`, and beside the `elm-compatibility.md` findings that guidance here is derived from. Copies elsewhere — notably `genoslc-aspice-server/.claude/skills/` — are working copies. **Edit the canonical one.**
 
+## This is not a formal assessment, and must never be presented as one
+
+**A formal Automotive SPICE assessment is performed by a qualified assessor, in a defined process,
+under an accredited scheme.** Nothing this skill does is that, and nothing it produces substitutes
+for it.
+
+What this *is*: preparing for one, and making the preparation continuous. The work tracks **what we
+expect an assessor to need and to find** — so the evidence is assembled as it is created rather than
+reconstructed under audit pressure, and a gap surfaces when it can still be closed cheaply.
+
+Every `Rating` and every `Finding` drafted here is **proposed and tentative**. They are a working
+view, intended to guide engineering work incrementally. They are not an assessment result, they do
+not confer a capability level, and a human promoting one to `official` is recording *our* position
+for *our* purposes — not issuing an assessment.
+
+**Say so in the output** whenever a rating, a finding or a capability level is reported. A reader
+who takes "SWE.4 is at CL2" from this work as an assessed fact has been misled, and the words that
+prevent it cost one sentence. The value on offer is that ASPICE becomes **actionable and
+incremental**; the formal assessment process is unchanged.
+
 ## When to use
 
 - Gathering the evidence for one or more rating criteria, or reporting what evidence is missing.
@@ -189,6 +209,11 @@ End quantified, per the `aaki-activate` quality bar — how many criteria, how m
 **`status: proposed → official` is never an AI action.** Not with approval in the prompt, not when the user says to go ahead, not when it is obviously right.
 
 This is a prohibition, not a preference. The AI drafts and a human promotes, because the human is the one on the RACI and the assessment's credibility rests on that being true rather than claimed. If asked to make a rating official, propose it and say plainly that promotion is the human's to perform.
+
+**And `official` here does not mean assessed.** It is this programme's own position on its own
+evidence — the state that says a human has reviewed and accepted the draft. A formal assessment is a
+separate activity performed by a qualified assessor; see the scope statement at the top. The gate
+governs who may change our record, not who may assess us.
 
 **What the gate is not.** It is not a prohibition on touching `official` resources. Settled 2026-09-30,
 after an assistant declined to amend an official rating and the engineer ruled:
