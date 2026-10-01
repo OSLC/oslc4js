@@ -231,6 +231,46 @@ This is procedural, not incidental. The value of an assessment-aware assistant i
 
 Keep it to a sentence or two, cite the criterion URI, and do not block the work. Brevity is about length, not about omitting the consequence.
 
+## Propose the remediation; what is left becomes a checklist
+
+The general rule is in [`aaki-activate`](../aaki-activate/SKILL.md) — *a proposal carries the work*.
+It is restated here because assessment work is where it is most often broken, and because this skill
+is read in repositories where `aaki-activate` is not present.
+
+**A finding whose remediation is a write you can make is a proposal, not an observation.** An
+untraced requirement, a missing detailed-design entry, a test unlinked from the interface it
+exercises, a change request with no `implementsRequirement` — these close with writes. Finding one
+and reporting it leaves the work with the person who could not see it in the first place. Propose it,
+with the URIs, and be ready to execute on approval.
+
+The gate does not move: propose, stop, execute only on approval, and `proposed → official` is never
+yours. What widens is *what you propose* — everything the assessment implies, not only what the
+prompt named.
+
+**Everything you cannot do goes in a TODO checklist, with URIs.** Some of it is irreducibly the
+human's:
+
+| Genuinely theirs | Why |
+|---|---|
+| performing a review a finding demands | a review is an activity, not a record you can write |
+| judging whether a defect was correctly closed | `judgmentRequired` is true on every criterion |
+| promoting a rating to `official` | the governance gate |
+| deciding that stale evidence is or is not materially stale | a timestamp cannot tell a typo from a semantic change |
+
+Write each as a checklist item naming the resource and what must happen to it:
+
+```markdown
+## TODO — needs you
+- [ ] Decide whether defect 579 (`…/WorkItem/579`) was correctly closed `invalid`; its failed result
+      is still inside `rat-swe-4-pa1-1`'s evidence set, whose rationale says the defect answers it
+- [ ] Perform the review `fnd-2` requires and record it on `Task 583` (`…/WorkItem/583`)
+```
+
+**The test to apply to your own output:** every gap the assessment surfaced is either in a proposal
+block the engineer can approve, or in the TODO checklist with a URI. A gap in neither has been
+reported and lost — and these are the items least likely to resurface, because nothing in the graph
+is tracking them yet.
+
 ## Common mistakes
 
 | Mistake | What to do instead |

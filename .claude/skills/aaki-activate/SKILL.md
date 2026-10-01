@@ -144,6 +144,39 @@ When the user wants the AI to draft a resource:
 
 This pattern matters because the AI is a collaborator, not an agent on the RACI chart. Humans remain Responsible and Accountable for every governed resource the system records; the AI accelerates the work but the governance trail (provenance, the user's chosen working context, approval state) proves the human owned the outcome.
 
+### A proposal carries the work — and what it cannot carry becomes a checklist
+
+**Do not hand back a gap as an observation when it could have been a proposal.** If the analysis
+finds an untraced requirement, a defect that can be closed, a review that has been performed but not
+recorded, or a finding whose remediation is a write the assistant can make — **propose the work, and
+be ready to do it on approval**. Naming it and stopping puts the burden back on the person who asked
+precisely because they could not see it in the first place.
+
+This is not a licence to act. The gate is unchanged: propose, stop, execute only on approval. What
+changes is the *scope* of what gets proposed — everything the analysis implies, not only the artifact
+the prompt named.
+
+**Whatever remains goes in the output as a TODO checklist, with links.** Some work is genuinely the
+user's: a review that must be performed by a person, a judgement about whether a defect was correctly
+closed, a promotion to `official`. Write each one as a checklist item naming the resource by URI and
+what has to happen to it:
+
+```markdown
+## TODO — needs you
+- [ ] Decide whether defect 579 (`…/WorkItem/579`) was correctly closed `invalid`; its failed result
+      `…/ExecutionResult/_Fxh1YK…` is still inside `rat-swe-4-pa1-1`'s evidence set
+- [ ] Perform the architecture review `fnd-2` asks for, and record it on `Task 583` (`…/WorkItem/583`)
+```
+
+**Why the checklist is not optional.** An item mentioned in a paragraph of a long report is an item
+that gets lost — and these are the items least likely to resurface on their own, because nothing in
+the graph is yet tracking them. The checklist is the difference between "the assistant noticed" and
+"the programme has it".
+
+**The test to apply to your own output:** for every gap the analysis surfaced, is it either (a) in a
+proposal block the user can approve, or (b) in the TODO checklist with a URI? If it is in neither, it
+has been reported and lost.
+
 ## Working with multiple servers (cross-tool integration)
 
 The same analysis pattern applies across multiple OSLC servers when an AI is connected to several MCP endpoints (e.g., a domain-specific server with embedded MCP plus a standalone bridge for third-party OSLC servers like ELM, MID OSLC connectors, etc.). The catalog from each server tells you which vocabularies and shapes apply where; cross-server links are followed by their URIs; LDM/LQE federation (when present) is the substrate for cross-tool gap and impact analysis. Same archetypes, larger graph.
