@@ -149,6 +149,31 @@ Three things this rule depends on, all of which must be said aloud when it is ap
 
 **What counts as "changed" is a configuration-management fact, not an inference.** Never take it from the assistant's own reading of what probably changed. Prefer, in this order: the **owning tool's own version history** (for Rhapsody SE, the commit changeset — `GET /commits/{c}/changes` between the commits the two configurations resolve to); then **artifact timestamps** where the tool keeps them; then a **run manifest**, only where neither exists. The tool's history is preferred because it is independent of who made the change and survives a run the manifest did not record. Artifact timestamps (`dcterms:modified` against an execution record's `rqm_qm:startTime`) corroborate where they exist — DOORS Next and ETM — but they are not available everywhere. **Rhapsody SE carries no modification time and no version identity on the element itself** — neither over OSLC AM nor in the SysML v2 element payload. Its change history lives in the **commits**: `GET /projects/{p}/commits` is timestamped and chained, and `GET /projects/{p}/commits/{c}/changes` gives one record per changed element, so "when did this element last change" is answered by finding the commits whose changeset contains it. Use that for architecture elements rather than looking for a `dcterms:modified` that is not there. **Surface staleness as a question for the human gate, not as a verdict**; a modification date cannot distinguish a corrected typo from a semantic change, which is precisely why `judgmentRequired` is true.
 
+**For a link, look on BOTH sides — and know which side changed what.** A link is stored once, on the
+owning side (the Link Ownership table of the OSLC Linking Profiles note, encoded in oslc-client's
+`LINK_PROFILE`). Two different changes follow, and an assistant that checks one resource finds only
+one of them:
+
+| What changed | Where it shows |
+|---|---|
+| the **link** — created, removed, retargeted | the **owning** resource's history and timestamp |
+| the **target's content**, under a link that still stands | the **target's** own history and timestamp |
+
+So the second clause of the scoping rule — *evidence invalidated by a change to an artifact it links
+to* — needs both. Measured 2026-10-01: a `jazz_am:trace` added from a BMM Objective to a DOORS Next
+requirement moved the **Objective's** `dcterms:modified` and left the requirement's untouched, because
+the link is not stored in the requirement and no PUT reached it. **That is correct behaviour, not a
+quirk.** Reading only the requirement would report no change at all; reading only the Objective would
+miss the requirement's text being rewritten under a link that never moved.
+
+**Do not build staleness on `dcterms:modified` or ETags where link validity is available.** The
+proposed OSLC-OP link validity specification, and the IBM and MID implementations of it, are based on
+a **configurable content hash** — one that can be told which properties do *not* count as a change.
+That is strictly better than a timestamp for this job: it survives a resource rewritten with identical
+content, and it can distinguish a label edit from a threshold edit, which is exactly the distinction a
+modification date cannot make. Where a provider implements link validity, it is the better authority;
+timestamps remain the fallback.
+
 ## ASPICE-driven impact analysis
 
 Given a proposed change and a target capability level, answer three questions, in this order and all from the catalog:
