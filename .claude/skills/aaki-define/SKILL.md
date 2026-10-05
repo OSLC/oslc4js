@@ -276,6 +276,56 @@ When a property's value comes from a fixed set of terms (a category, a status, a
 
 The enumeration values live in the vocabulary (open for extension), so other servers can add values or restrict to subsets through their own shapes — the same open-vocabulary + constraining-shape split as everything else.
 
+### A namespace is an identifier, not a locator — resolve vocabularies through discovery
+
+The range-only form means a client's **only** route from `oslc:range ex:RatingStatus` to the allowed
+values is to obtain the enumeration class's individuals. If it cannot, it has no list to render and
+the property is indistinguishable at the client from a free-text string — a shape that is perfectly
+conformant and unusable through its own editor.
+
+**Two rules govern this, and they pull in different directions.**
+
+**The namespace URI is fixed by provenance and ownership.** It identifies who defined the terms, and
+it must not encode where any server happens to be deployed. `http://vda.de/ns/aspice#` is the VDA's
+whether or not your server exists; `http://www.omg.org/spec/BMM#` is the OMG's. Never mint a
+namespace under your deployment host to make resolution convenient — that re-attributes someone
+else's vocabulary to you, and breaks the moment the deployment moves.
+
+**OSLC says namespaces *should* be dereferenceable; in practice they frequently are not.** Observed
+on the AAKI servers: `http://www.omg.org/spec/BMM` returns **500**, `http://vda.de/ns/aspice`
+returns **404**. Both are third-party domains you cannot fix. **A design that requires the namespace
+to dereference is therefore unacceptable** — it makes a core editing capability depend on a server
+nobody on the project controls, and it fails silently.
+
+Reconciling them: **separate identity from location, and publish the binding as deployment
+metadata.**
+
+- **Serve the vocabulary document** at a URL the deployment controls (`…/domain/<Prefix>` beside the
+  shapes).
+- **Advertise the binding from namespace to that document in the catalog / ServiceProvider** — the
+  deployment-owned artifacts — e.g. `<namespace> rdfs:seeAlso <served-document>`. Use `rdfs:seeAlso`
+  (a pointer to a representation), not `rdfs:isDefinedBy` (a provenance claim): the document is a
+  served copy, not the authority. A catalog carrying `oslc:domain <http://vda.de/ns/aspice#>` and
+  nothing else has told a client the *name* of a vocabulary it has no way to fetch.
+- **Never put a deployment URL in the vocabulary file.** It is portable and provenance-owned; it
+  carries `vann:preferredNamespaceUri` and `rdfs:isDefinedBy <base>` and nothing about any host.
+- **Treat dereferencing as the last resort, not the primary path.** Resolution order for a client:
+  graphs already loaded, indexed by namespace → the document advertised in discovery → dereference
+  the namespace → and, failing all three, still honour the shape and write the value as a
+  **reference**.
+- **Check it the way a client would.** Reading the individuals in your own `.ttl` proves nothing
+  about what a client can reach. Follow the published discovery chain and confirm the members arrive.
+
+**The failure is silent and lands on the wrong component.** A client that cannot enumerate the
+members reasonably concludes the property is not an enumeration, renders a text input, and writes a
+literal — and the *server* then rejects the write ("must be a resource reference"). The error
+surfaces at the write, two hops from the cause, and reads like a client bug or a shape bug when it is
+neither. It is a discovery gap.
+
+**This is cross-domain, not a quirk of one vocabulary.** It affects every genOSLC domain whose
+namespace authority is external, which is the normal case — BMM and ASPICE are both broken the same
+way for the same reason.
+
 ## HTML rendering
 
 Two acceptable styles:
@@ -448,5 +498,8 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 | Designing for reasoning ("the system will infer that…") | OSLC servers don't reason. If a constraint matters at the API, encode it in the shape; if it matters as a runtime check, use SHACL alongside, but don't expect property-level inference. |
 | Vocabulary file with no `owl:Ontology` header | Add the ontology declaration block at the top with title, description, publisher, issue date, license, source, version, and copyright — match the OSLC-OP convention. It's metadata, not reasoning. |
 | Terms not associated with the ontology (ShapeChecker: "subject not part of an ontology" / "unused vocabulary") | Declare `vann:preferredNamespaceUri "<base>#"` on the ontology and `rdfs:isDefinedBy <base>` on every term. Ontology subject = base URI (no `#`); terms live in the `#` namespace. |
+| Relying on the namespace URI being dereferenceable | It identifies; it does not locate, and third-party namespaces commonly 404 or 500 (`vda.de` 404, `omg.org` 500). Serve a copy and advertise the namespace→document binding in the catalog/ServiceProvider with `rdfs:seeAlso`; dereference only as a last resort. See "A namespace is an identifier, not a locator". |
+| Minting a namespace under the deployment host so it resolves | The namespace is fixed by provenance and ownership, not by where the server runs. Keep the owner's URI and publish a served copy separately. |
+| Adding `oslc:valueType oslc:Resource` to an enumeration because a write failed | The range-only form is correct and normative. A component that treats a range-only property as a string is the broken one. Patching the shape hides the bug in a published vocabulary and is the single most likely wrong turn when debugging this. See "Range-only properties are references". |
 | Lowercasing the namespace URI to match the prefix | Prefixes are lowercase by convention (`bmm`), but the namespace URI is case-sensitive and copied verbatim from the owning authority — OMG spec URIs use uppercase acronyms (`…/spec/BMM#`). Don't lowercase the URI. |
 | Confusing `owl:Ontology` document metadata with OWL reasoning over instances | The document declares itself an ontology only to publish its identity and provenance. OSLC servers do not run an OWL reasoner; the choice of `owl:Ontology` over (say) `rdfs:Resource` is purely conventional. |
