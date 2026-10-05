@@ -177,6 +177,24 @@ the graph is yet tracking them. The checklist is the difference between "the ass
 proposal block the user can approve, or (b) in the TODO checklist with a URI? If it is in neither, it
 has been reported and lost.
 
+**The checklist has to outlive the conversation that produced it.** "In the output" is not enough
+when the output is a chat reply or a subagent's report: both are consumed once and gone, which is the
+same disappearance this rule exists to prevent, moved one level up. If the work has a durable
+artifact — a transcript, a report file, a tracking work item — **write the checklist there**, in full,
+with the URIs. A verdict that the checklist existed is not the checklist.
+
+This failed exactly that way on the AAKI thread. A beat agent produced a correct checklist of ten
+unexecuted verification measures in its report; the transcript recorded the assertion as met and did
+not reproduce it; and the list was gone from the repository until the engineer asked where it was.
+Every participant passed the rule as it was then written.
+
+Two consequences, both procedural:
+
+- **If you are a subagent**, say in your report where the checklist must be written, and do not treat
+  handing it back as discharging it. Better still, write it to the artifact yourself if you have one.
+- **If you are consuming a subagent's report**, the checklist is the part you carry over verbatim.
+  Summarise findings if you must; never summarise a checklist into a claim that one exists.
+
 ## Working with multiple servers (cross-tool integration)
 
 The same analysis pattern applies across multiple OSLC servers when an AI is connected to several MCP endpoints (e.g., a domain-specific server with embedded MCP plus a standalone bridge for third-party OSLC servers like ELM, MID OSLC connectors, etc.). The catalog from each server tells you which vocabularies and shapes apply where; cross-server links are followed by their URIs; LDM/LQE federation (when present) is the substrate for cross-tool gap and impact analysis. Same archetypes, larger graph.
