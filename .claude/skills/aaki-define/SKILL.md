@@ -297,24 +297,44 @@ returns **404**. Both are third-party domains you cannot fix. **A design that re
 to dereference is therefore unacceptable** — it makes a core editing capability depend on a server
 nobody on the project controls, and it fails silently.
 
-Reconciling them: **separate identity from location, and publish the binding as deployment
-metadata.**
+Reconciling them: **separate identity from location, and let the shapes document say where its
+vocabulary is.**
 
-- **Serve the vocabulary document** at a URL the deployment controls (`…/domain/<Prefix>` beside the
-  shapes).
-- **Advertise the binding from namespace to that document in the catalog / ServiceProvider** — the
-  deployment-owned artifacts — e.g. `<namespace> rdfs:seeAlso <served-document>`. Use `rdfs:seeAlso`
-  (a pointer to a representation), not `rdfs:isDefinedBy` (a provenance claim): the document is a
-  served copy, not the authority. A catalog carrying `oslc:domain <http://vda.de/ns/aspice#>` and
-  nothing else has told a client the *name* of a vocabulary it has no way to fetch.
+A shapes document already references vocabulary terms in three places — `oslc:propertyDefinition`,
+`oslc:range` and `oslc:describes` — and none of them resolve. It is therefore the right place to
+name the vocabulary, and it is already reachable, because `oslc:instanceShape` on every resource
+leads to it.
+
+**Declare `owl:imports` on the shapes document, with a RELATIVE reference:**
+
+```turtle
+<> a oslc:ResourceShapeConstraints ;
+   dcterms:title "… Constraints" ;
+   owl:imports <ASPICE> .          # the vocabulary, served beside the shapes
+```
+
+- **Relative is the whole point.** It resolves against the URL the document is served from, so the
+  file carries no deployment host and works unchanged on localhost, staging and production. Both
+  rdflib and Jena resolve `<ASPICE>` against `…/aspice/domain/ASPICE-Shapes` to
+  `…/aspice/domain/ASPICE`, and `<>` to the document itself.
+- **It is same-origin by construction**, which matters because an import is a fetch instruction.
+  Treat an absolute, cross-origin import with suspicion.
+- **`owl:imports` is standard**, not an extension, and no reasoner is implied: it is being used as a
+  document locator, which is what it is in practice.
+- **Serve the two documents from the same directory**, since that is what the relative reference
+  assumes.
 - **Never put a deployment URL in the vocabulary file.** It is portable and provenance-owned; it
   carries `vann:preferredNamespaceUri` and `rdfs:isDefinedBy <base>` and nothing about any host.
-- **Treat dereferencing as the last resort, not the primary path.** Resolution order for a client:
-  graphs already loaded, indexed by namespace → the document advertised in discovery → dereference
-  the namespace → and, failing all three, still honour the shape and write the value as a
-  **reference**.
+- **Resolution order for a client**: graphs already loaded, then the document named by
+  `owl:imports`, then dereference the namespace, and failing all three still honour the shape and
+  write the value as a **reference**.
 - **Check it the way a client would.** Reading the individuals in your own `.ttl` proves nothing
-  about what a client can reach. Follow the published discovery chain and confirm the members arrive.
+  about what a client can reach. Follow the published chain — resource → `oslc:instanceShape` →
+  shapes → `owl:imports` → vocabulary — and confirm the members arrive.
+
+Advertising the binding in the catalog or ServiceProvider instead (`rdfs:seeAlso` on the namespace)
+also works, but it is strictly weaker: it requires the client to have traversed discovery, where
+`owl:imports` works from a resource's `oslc:instanceShape` alone.
 
 **The failure is silent and lands on the wrong component.** A client that cannot enumerate the
 members reasonably concludes the property is not an enumeration, renders a text input, and writes a
@@ -498,7 +518,8 @@ The prompt is reusable across domains. Replace `[Domain Name]`, `[spec URL]`, `[
 | Designing for reasoning ("the system will infer that…") | OSLC servers don't reason. If a constraint matters at the API, encode it in the shape; if it matters as a runtime check, use SHACL alongside, but don't expect property-level inference. |
 | Vocabulary file with no `owl:Ontology` header | Add the ontology declaration block at the top with title, description, publisher, issue date, license, source, version, and copyright — match the OSLC-OP convention. It's metadata, not reasoning. |
 | Terms not associated with the ontology (ShapeChecker: "subject not part of an ontology" / "unused vocabulary") | Declare `vann:preferredNamespaceUri "<base>#"` on the ontology and `rdfs:isDefinedBy <base>` on every term. Ontology subject = base URI (no `#`); terms live in the `#` namespace. |
-| Relying on the namespace URI being dereferenceable | It identifies; it does not locate, and third-party namespaces commonly 404 or 500 (`vda.de` 404, `omg.org` 500). Serve a copy and advertise the namespace→document binding in the catalog/ServiceProvider with `rdfs:seeAlso`; dereference only as a last resort. See "A namespace is an identifier, not a locator". |
+| Relying on the namespace URI being dereferenceable | It identifies; it does not locate, and third-party namespaces commonly 404 or 500 (`vda.de` 404, `omg.org` 500). Declare `owl:imports <Vocab>` — relative — on the shapes document and serve the vocabulary beside it; dereference only as a last resort. See "A namespace is an identifier, not a locator". |
+| A shapes document that names vocabulary terms it gives no way to fetch | `oslc:propertyDefinition`, `oslc:range` and `oslc:describes` all point into a namespace. Add `owl:imports` so a client can resolve them. |
 | Minting a namespace under the deployment host so it resolves | The namespace is fixed by provenance and ownership, not by where the server runs. Keep the owner's URI and publish a served copy separately. |
 | Adding `oslc:valueType oslc:Resource` to an enumeration because a write failed | The range-only form is correct and normative. A component that treats a range-only property as a string is the broken one. Patching the shape hides the bug in a published vocabulary and is the single most likely wrong turn when debugging this. See "Range-only properties are references". |
 | Lowercasing the namespace URI to match the prefix | Prefixes are lowercase by convention (`bmm`), but the namespace URI is case-sensitive and copied verbatim from the owning authority — OMG spec URIs use uppercase acronyms (`…/spec/BMM#`). Don't lowercase the URI. |
